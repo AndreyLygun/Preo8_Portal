@@ -6,22 +6,23 @@ use SaintSystems\OData\ODataClient;
 use SaintSystems\OData\Query\Builder;
 use SaintSystems\OData\Query\IProcessor;
 
-function conditionalDD($var) {
+function conditionalDD($var)
+{
     if (request()->has('test')) {
         dd($var);
     }
 }
 
 
-
-class PostProcessor implements IProcessor {
+class PostProcessor implements IProcessor
+{
     public function processSelect(Builder $query, $response)
     {
 
         if (!is_array($response)) return $response;
         if (!isset($response[0]['Id'])) return [];
         $result = [];
-        foreach($response as $item) {
+        foreach ($response as $item) {
             $entity = $item["properties"];
             if (isset($entity["@odata.type"])) {
                 $chuncks = explode(".", $entity["@odata.type"]);
@@ -37,17 +38,19 @@ class PostProcessor implements IProcessor {
 //TODO: Сделать обработку ошибок при работе с сервисом интеграции
 class DRXClient extends ODataClient
 {
-	public function __construct() {
+    public function __construct()
+    {
         $url = env("DIRECTUM_INTEGRATION_URL");
         $login = Auth()->user()->DrxAccount->DRX_Login;
         $password = Auth()->user()->DrxAccount->DRX_Password;
-        parent::__construct($url, function($request) use ($login, $password) {
-            $request->headers['Authorization'] = 'Basic '.base64_encode($login.':'.$password);
+        parent::__construct($url, function ($request) use ($login, $password) {
+            $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
         });
         $this->postProcessor = new PostProcessor();
     }
 
-    public function getEntity($EntityType, int $Id, $ExpandFields) {
+    public function getEntity($EntityType, int $Id, $ExpandFields)
+    {
         $query = $this->from($EntityType);
         if ($ExpandFields)
             $query = $query->expand($ExpandFields);
@@ -55,19 +58,20 @@ class DRXClient extends ODataClient
         return $entity;
     }
 
-    public function saveEntity($EntityType, $Entity, $ExpandFields, $CollectionFields) {
-        $Id = (int) $Entity['Id']??null;
+    public function saveEntity($EntityType, $Entity, $ExpandFields, $CollectionFields)
+    {
+        $Id = (int)$Entity['Id'] ?? null;
         unset($Entity['Id']);
         // обрабатываем странное поведение контрола Orchid Select, который возвращает строку вместо целого числа\
         // у нас такая хрень мешает в полях-ссылках (в терминах DRX), которые здесь выглядят как Select::make('entity.somefield.Id')
         // TODO нужно попытаться исправить это в коде контрола
         foreach ($Entity as $key => $field) {
             if (isset($field['Id'])) {
-                $Entity[$key]['Id'] = (int) $field['Id'];
+                $Entity[$key]['Id'] = (int)$field['Id'];
             }
         }
         // Обрабатываем поля-коллекции из списка $this->CollectionFields
-        foreach($CollectionFields as $cf) {
+        foreach ($CollectionFields as $cf) {
             if (isset($Entity[$cf])) {
                 // ..исправлям баг|фичу, из-за которой поле Matrix начинает нумерацию строк с единицы
                 $Entity[$cf] = array_values($Entity[$cf]);
@@ -84,28 +88,41 @@ class DRXClient extends ODataClient
         return $Entity;
     }
 
-    public function deleteEntity($DRXEntity, int $Id) {
-	    $this->from($DRXEntity)->whereKey($Id)->delete();
+    public function deleteEntity($DRXEntity, int $Id)
+    {
+        $this->from($DRXEntity)->whereKey($Id)->delete();
     }
 
-    public function getList($DRXEntity, $ExpandFields=[], $orderBy='', $perPage = 1000) {
-        $total = $this->from($DRXEntity)->count();
-        $p = $this->pagination($total, $perPage);
-        $request = $this->from($DRXEntity)
-                        ->take($p['per_page'] * $p['page'])
-                        ->skip($p['per_page'] * ($p['page']-1))
-                        ->order($this->OrderBy($orderBy));
-        if ($ExpandFields) $request = $request->expand($ExpandFields);
-        $entities = $request->get();
+    public function getList($DRXEntity, $ExpandFields = [], $orderBy = '', $perPage = 1000)
+    {
+        try {
+            $total = $this->from($DRXEntity)->count();
+            $p = $this->pagination($total, $perPage);
+            $request = $this->from($DRXEntity)
+                ->take($p['per_page'] * $p['page'])
+                ->skip($p['per_page'] * ($p['page'] - 1))
+                ->where('Id', '>', 0)   // Обходим баг в сервисе интеграции DRX. Без этого условия параметры take skip не работают
+                ->order($this->OrderBy($orderBy));
+            if ($ExpandFields) $request = $request->expand($ExpandFields);
+            $entities = $request->get();
+        } catch (GuzzleException $e) {
+            return [
+                'error' => [
+                    'message' => $e->getMessage(),
+                    'errnum' => $e->getCode()
+                ]
+            ];
+        }
         return [
-            "entities" =>  $entities,
+            "entities" => $entities,
             "pagination" => $p
         ];
     }
 
 
     // выбираем из строки запроса параметр sort и преваращаем его в параметры для odata-order
-    protected function OrderBy($orderBy = 'Id') {
+    protected function OrderBy($orderBy = 'Id')
+    {
         $order_field = request()->get('sort', $orderBy);
         $order_dir = 'Asc';
         if ($order_field[0] == '-') {
@@ -117,10 +134,11 @@ class DRXClient extends ODataClient
     }
 
     // Преобразовывает массив из ['Id'=>$Id, 'Name' => $Name] в [$Id => $Name]
-    public function CollectKeyValue($Id = 'Id', $Name = 'Name') {
-	    $arr = $this->toArray();
+    public function CollectKeyValue($Id = 'Id', $Name = 'Name')
+    {
+        $arr = $this->toArray();
         return array_reduce($arr,
-            function($carry, $item) use ($Id, $Name){
+            function ($carry, $item) use ($Id, $Name) {
                 $carry[$item[$Id]] = $item[$Name];
                 return $carry;
             });
@@ -130,14 +148,14 @@ class DRXClient extends ODataClient
     {
         $pagination = [];
         $pagination["total"] = $total;
-        $page = request("page")??1;
-        $pagination["per_page"] = request("per_page")??$perPage;
+        $page = request("page") ?? 1;
         $pagination["page"] = $page;
+        $pagination["per_page"] = request("per_page") ?? $perPage;
         $pagination["last_page"] = (int)ceil($total / $pagination["per_page"]);
         $pagination["first_page_url"] = http_build_query(array_merge(request()->all(), ["page" => 1]));
         $pagination["last_page_url"] = http_build_query(array_merge(request()->all(), ["page" => $pagination["last_page"]]));
-        $pagination["prev_page_url"] = $page>0?http_build_query(array_merge(request()->all(), ["page" => $page-1])):"";
-        $pagination["next_page_url"] = $page<$total?http_build_query(array_merge(request()->all(), ["page" => $page+1])):"";
+        $pagination["prev_page_url"] = $page > 0 ? http_build_query(array_merge(request()->all(), ["page" => $page - 1])) : "";
+        $pagination["next_page_url"] = $page < $total ? http_build_query(array_merge(request()->all(), ["page" => $page + 1])) : "";
         return $pagination;
     }
 }

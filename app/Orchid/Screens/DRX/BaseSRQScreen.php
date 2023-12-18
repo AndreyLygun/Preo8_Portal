@@ -23,7 +23,7 @@ class BaseSRQScreen extends Screen
      */
 
     public $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
-    public $CollectionFields = [];                      // Список полей-коллекций, которые нужно пересоздавать заново при каждом сохранении
+    public $CollectionFields = [];                      // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
     public $Title = '';
     public $entity;
 
@@ -85,7 +85,7 @@ class BaseSRQScreen extends Screen
             case 'Draft':
                 if (isset($this->entity["Id"])) {
 //                    $buttons[] = Button::make("Удалить")->method("Delete")->confirm('Удалить заявку?');
-                    $buttons[] = Button::make("Отправить на согласование")->method("Submit");
+                    $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
                 }
                 $buttons[] = Button::make("Сохранить")->method("Save");
                 break;
@@ -109,14 +109,10 @@ class BaseSRQScreen extends Screen
     }
 
 
-    /**
-     * @return mixed|object
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
 
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
-    public function SaveEntity() {
+    public function SaveToDRX() {
+        $this->entity = request()->get('entity');
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
@@ -125,16 +121,14 @@ class BaseSRQScreen extends Screen
     }
 
     public function Save() {
-        $this->entity = request()->get('entity');
-        $this->entity = $this->SaveEntity();
+        $this->entity = $this->SaveToDRX();
         Toast::info("Успешно сохранено");
         return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
     }
 
-    public function Submit() {
-        $this->entity = request()->get('entity');
+    public function SubmitToApproval() {
         $this->entity['RequestState'] = 'OnReview';
-        $this->SaveEntity();
+        $this->SaveToDRX();
         Toast::info("Заявка сохранена и отправлена на согласование");
         return redirect(route('drx.srqlist'));
     }
