@@ -2,9 +2,11 @@
 namespace App\DRX;
 
 use GuzzleHttp\Exception\GuzzleException;
+use Orchid\Screen\Repository;
 use SaintSystems\OData\ODataClient;
 use SaintSystems\OData\Query\Builder;
 use SaintSystems\OData\Query\IProcessor;
+use function LaravelLang\Locales\Enums\collection;
 
 function conditionalDD($var)
 {
@@ -93,7 +95,7 @@ class DRXClient extends ODataClient
         $this->from($DRXEntity)->whereKey($Id)->delete();
     }
 
-    public function getList($DRXEntity, $ExpandFields = [], $orderBy = '', $perPage = 1000)
+    public function getList($DRXEntity, $ExpandFields = [], $orderBy = '', $perPage = 100000)
     {
         try {
             $total = $this->from($DRXEntity)->count();
@@ -114,7 +116,7 @@ class DRXClient extends ODataClient
             ];
         }
         return [
-            "entities" => $entities,
+            "entities" => collect($entities),
             "pagination" => $p
         ];
     }

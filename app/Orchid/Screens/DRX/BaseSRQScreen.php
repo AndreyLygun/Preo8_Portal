@@ -3,6 +3,7 @@
 namespace App\Orchid\Screens\DRX;
 
 use App\DRX\DRXClient;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
@@ -51,7 +52,15 @@ class BaseSRQScreen extends Screen
     {
         if ($id) {
             $odata = new DRXClient();
-            $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
+            try {
+                $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
+            } catch (GuzzleException $ex) {
+                return [
+                    'error' => [
+                        'Message' => $ex->getMessage()
+                    ]
+                ];
+            }
         } else {
             $entity = $this->NewEntity();
         }

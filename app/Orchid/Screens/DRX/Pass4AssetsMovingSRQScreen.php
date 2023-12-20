@@ -5,6 +5,7 @@ namespace App\Orchid\Screens\DRX;
 
 
 use App\DRX\DRXClient;
+use GuzzleHttp\Exception\GuzzleException;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
 use Orchid\Support\Facades\Layout;
@@ -37,13 +38,21 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
         $IdNameFunction = function(array $value) {
             return [$value['Id']=>$value['Name']];
         };
-        $result = parent::query($id);
-        $odata = new DRXClient();
-        $result['LoadingSites'] = $odata->from('IServiceRequestsSites')
-                                    ->where('Type', 'Loading')
-                                    ->get()->mapWithKeys($IdNameFunction);
-        $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction);
-        $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
+        try {
+            $result = parent::query($id);
+            $odata = new DRXClient();
+            if (isset($result['error'])) return $result;
+            $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction);
+            $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction);
+            $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
+        } catch (GuzzleException $ex) {
+            return [
+                'error' => [
+                    'message' => $ex->getMessage()
+
+                ]
+            ];
+        }
         return $result;
     }
 
