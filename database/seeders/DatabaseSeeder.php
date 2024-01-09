@@ -24,20 +24,9 @@ class DatabaseSeeder extends Seeder
         $this->createDrxAccount("Ricoh Rus", "ricoh");
         $this->createDrxAccount("УК Sawatzky", "sawatzky");
         $this->createDrxAccount("БЦ Прео8", "preo8");
+        $this->createDrxAccount("Positive Techonologies", "ptsecurity");
         $this->createDrxAccount("Saint-Gobain", "sgcp");
-//
-//
-//        $DrxAccount = DrxAccount::FirstOrCreate(["name" => "УК Sawatzky"], ["drx_login" => "sawatzky", "drx_password" => "31185"]);
-//        User::where(["name" => "gvozdika"])->update(["drx_account_id" => $DrxAccount->id]);
-//        echo "УК Sawatzky\n";
-//
-//        $DrxAccount = DrxAccount::FirstOrCreate(["name" => "БЦ Прео-8"], ["drx_login" => "preo8", "drx_password" => "31185"]);
-//        User::where(["name" => ""])->update(["drx_account_id" => $DrxAccount->id]);
-//        echo "Преo8\n";
-//
-//        $DrxAccount = DrxAccount::FirstOrCreate(["name" => "Saint-Gobain"], ["drx_login" => "sgcp", "drx_password" => "31185"]);
-//        User::where(["name" => ""])->update(["drx_account_id" => $DrxAccount->id]);
-//        echo "Преo8\n";
-
+        $this->createDrxAccount("АО Юникон", "unicon");
+        $this->createDrxAccount("ООО МКТ", "marvel");
     }
 }

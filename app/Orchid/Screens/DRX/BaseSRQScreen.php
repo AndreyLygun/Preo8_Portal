@@ -23,9 +23,9 @@ class BaseSRQScreen extends Screen
      * @return array
      */
 
-    public $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
-    public $CollectionFields = [];                      // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
-    public $Title = '';
+    protected $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
+    protected $CollectionFields;                      // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected $Title = '';
     public $entity;
 
 
@@ -36,7 +36,6 @@ class BaseSRQScreen extends Screen
         $ExpandFields = ["Author", "DocumentKind", "Renter"];
         return $ExpandFields;
     }
-
 
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity() {
@@ -87,8 +86,8 @@ class BaseSRQScreen extends Screen
      */
     public function commandBar(): iterable
     {
-
         $buttons = [];
+        if (!isset($this->entity["RequestState"])) return $buttons;
 //        $buttons[] = Button::make("Копировать");
         switch ($this->entity["RequestState"]) {
             case 'Draft':
@@ -122,7 +121,7 @@ class BaseSRQScreen extends Screen
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
     public function SaveToDRX() {
         $this->entity = request()->get('entity');
-        $this->entity['Creator'] = Auth()->user()->name;
+        $this->entity['Creator'] =   Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields);

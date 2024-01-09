@@ -5,6 +5,7 @@ namespace App\Orchid\Screens\DRX;
 
 
 use App\DRX\DRXClient;
+use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
@@ -20,9 +21,9 @@ use Illuminate\Support\Collection;
 class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
 {
 
-    public $EntityType = 'IServiceRequestsPass4AssetsMovings';
-    public $Title = 'Заявка на перемещение ТМЦ';
-    public $CollectionFields = ["Loaders", "Inventory"];
+    protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
+    protected $Title = 'Заявка на перемещение ТМЦ';
+    protected $CollectionFields = ["Loaders", "Inventory"];
     public ?Collection $LoadingSites = null; // места разгрузки-загрузки
     public ?Collection $SectionSites = null; // секции здания
     public ?Collection $TimeSpans = null;
@@ -32,7 +33,6 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
         $ExpandFields = ["Loaders", "Cars", 'LoadingSite', 'TimeSpan', 'Inventory'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
-
 
     public function query($id = null):iterable {
         $IdNameFunction = function(array $value) {
@@ -64,20 +64,22 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
             Select::make('entity.MovingDirection')
                 ->title('Направление перемещения')
                 ->options(config('srq.MovingDirection'))->empty('')
-                ->required()
+                //->required()
                 ->horizontal()
                 ->disabled($readonly),
             DateTimer::make('entity.ValidOn')
                 ->title("Дата перемещения")
-                ->format('Y-m-d\Z')
+                ->format('Y-m-d')
+                ->serverFormat('Y-m-d\Z')
                 ->required()
                 ->horizontal()
                 ->enableTime(false)
+                ->min(Carbon::today())
                 ->disabled($readonly),
             Select::make('entity.LoadingSite.Id')
                 ->title('Место разгрузки')
                 ->options($this->LoadingSites)
-                ->required()
+                //->required()
                 ->horizontal()
                 ->empty('')
                 ->disabled($readonly),
@@ -85,13 +87,13 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
                 ->title('Время ввоза-вывоза')
                 ->options($this->TimeSpans)->empty('')
                 ->horizontal()
-                ->required()
+                //->required()
                 ->disabled($readonly),
             Select::make('entity.Floor.Id')
                 ->title('Этаж')
-                ->options($this->SectionSites)->empty('')
+                ->options($this->SectionSites)->empty('Выберите этаж')
                 ->horizontal()
-                ->required()
+                //->required()
                 ->disabled($readonly),
             CheckBox::make('entity.Elevator')
                 ->title('Требуется грузовой лифт')

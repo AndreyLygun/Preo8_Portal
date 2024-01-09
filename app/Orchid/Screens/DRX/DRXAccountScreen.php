@@ -58,7 +58,7 @@ class DRXAccountScreen extends Screen
     public function commandBar(): iterable
     {
         $buttons = [];
-        $buttons[] = Button::make("Удалить")->method("Delete")->confirm('Удалить учётную записть?')->class('btn btn-light');
+        $buttons[] = Button::make("Удалить")->method("Delete")->confirm('Удалить учётную запись?')->class('btn btn-light');
         $buttons[] = Button::make("Проверить")->method("TestConnection")->class('btn btn-primary');
         $buttons[] = Button::make("Сохранить")->method("Save")->class('btn btn-primary');
         return $buttons;
@@ -91,6 +91,8 @@ class DRXAccountScreen extends Screen
 
     public function TestConnection()
     {
+        //TODO сделать проверку запроса от имени редактируемой учётки
+        Toast::info("Пока это заглушка проверки");
         $odata = new DRXClient();
         try {
             $result = $odata->from('IServiceRequestsBaseSRQs')->count();
@@ -104,14 +106,14 @@ class DRXAccountScreen extends Screen
 
     public function Save()
     {
-        Toast::info("Сохранено");
+        Toast::info("Пока это заглушка сохранения");
 //        return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
     }
 
     public function Delete()
     {
 
-        Toast::info("Заявка удалена");
+        Toast::info("Пока это заглушка удаления");
  //       return redirect(route('drx.srqlist'));
     }
 }

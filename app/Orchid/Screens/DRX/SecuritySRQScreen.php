@@ -17,7 +17,7 @@ class SecuritySRQScreen extends BaseSRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsSecuritySRQScreen";
+    protected $EntityType = "IServiceRequestsSecuritySRQScreen";
     public $entity;
 
     public function ExpandFields() {

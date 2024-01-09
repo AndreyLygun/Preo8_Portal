@@ -2,10 +2,6 @@
 
 namespace App\Orchid\Screens\DRX;
 
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Log\Logger;
-use Illuminate\Support\Facades\Log;
-use Mockery\Exception;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\DropDown;
@@ -61,8 +57,7 @@ class EntitiesListScreen extends Screen
                 ])->title('Ошибка!')
             ];
         }
-
-        return [
+        $Layout = [
             Layout::table("entities", [
                 ExtendedTD::make("Id", "№")
                     ->render(fn($item) => $item["Id"])
@@ -87,8 +82,11 @@ class EntitiesListScreen extends Screen
                 ExtendedTD::make("RequestState", "Статус")
                     ->render(fn($item) => config('srq.RequestState')[$item["RequestState"]])
                     ->cssClass(fn($item) => $item["RequestState"])->sort()
-            ]),
-            Layout::view("Pagination", ["pagination" => $this->query("pagination")])
+            ])
         ];
+        if ($pagination = ($this->query()['pagination'] ?? false) and ($pagination['last_page'] > 1)) {
+            $Layout[] = Layout::view("Pagination", ["pagination" => $pagination]);
+        };
+        return $Layout;
     }
 }

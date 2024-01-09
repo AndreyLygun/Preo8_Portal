@@ -2,6 +2,7 @@
 namespace App\DRX;
 
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Auth;
 use Orchid\Screen\Repository;
 use SaintSystems\OData\ODataClient;
 use SaintSystems\OData\Query\Builder;
@@ -45,6 +46,7 @@ class DRXClient extends ODataClient
         $url = env("DIRECTUM_INTEGRATION_URL");
         $login = Auth()->user()->DrxAccount->DRX_Login;
         $password = Auth()->user()->DrxAccount->DRX_Password;
+        //dd($url, $login, $password);
         parent::__construct($url, function ($request) use ($login, $password) {
             $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
         });
@@ -85,6 +87,7 @@ class DRXClient extends ODataClient
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
         } else {            // Создаём запись
+            dd(json_encode($Entity));
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->post($Entity))[0];
         }
         return $Entity;
