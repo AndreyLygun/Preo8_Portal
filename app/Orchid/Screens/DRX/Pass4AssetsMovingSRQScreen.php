@@ -24,13 +24,13 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
     protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
     protected $Title = 'Заявка на перемещение ТМЦ';
     protected $CollectionFields = ["Loaders", "Inventory"];
-    public ?Collection $LoadingSites = null; // места разгрузки-загрузки
-    public ?Collection $SectionSites = null; // секции здания
-    public ?Collection $TimeSpans = null;
+    public $LoadingSites = null; // места разгрузки-загрузки
+    public $SectionSites = null; // секции здания
+    public $TimeSpans = null;
 
     public function ExpandFields()
     {
-        $ExpandFields = ["Loaders", "Cars", 'LoadingSite', 'TimeSpan', 'Inventory'];
+        $ExpandFields = ["Loaders", "Cars", 'LoadingSite', 'TimeSpan', 'Inventory', 'Floor'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
@@ -42,8 +42,8 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
             $result = parent::query($id);
             $odata = new DRXClient();
             if (isset($result['error'])) return $result;
-            $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction);
-            $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction);
+            $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction)->toArray();
+            $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction)->toArray();
             $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
         } catch (GuzzleException $ex) {
             return [
@@ -58,13 +58,23 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
+//        dd($this->entity, $this->LoadingSites, $this->TimeSpans, $this->SectionSites, config('srq.MovingDirection'));
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
             Select::make('entity.MovingDirection')
+                ->options([
+                    "MoveIn" => "Ввоз",
+                    "MoveOut" => "Вывоз",
+                    "CarryIn" => "Внос",
+                    "CarryOut" => "Вынос",
+                    166 => 'wrong',
+                    167 => 'ok',
+                ])->title('Проверка')->horizontal(),
+            Select::make('entity.MovingDirection')
                 ->title('Направление перемещения')
                 ->options(config('srq.MovingDirection'))->empty('')
-                //->required()
+                ->required()
                 ->horizontal()
                 ->disabled($readonly),
             DateTimer::make('entity.ValidOn')
@@ -79,21 +89,20 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
             Select::make('entity.LoadingSite.Id')
                 ->title('Место разгрузки')
                 ->options($this->LoadingSites)
-                //->required()
+                ->required()
                 ->horizontal()
-                ->empty('')
                 ->disabled($readonly),
             Select::make('entity.TimeSpan.Id')
                 ->title('Время ввоза-вывоза')
-                ->options($this->TimeSpans)->empty('')
+                ->options($this->TimeSpans)
                 ->horizontal()
-                //->required()
+                ->required()
                 ->disabled($readonly),
             Select::make('entity.Floor.Id')
                 ->title('Этаж')
-                ->options($this->SectionSites)->empty('Выберите этаж')
+                ->options($this->SectionSites)
                 ->horizontal()
-                //->required()
+                ->required()
                 ->disabled($readonly),
             CheckBox::make('entity.Elevator')
                 ->title('Требуется грузовой лифт')
