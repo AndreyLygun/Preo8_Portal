@@ -20,7 +20,7 @@
             @include('orchid.extendedMatrixRow',['row' => $row, 'key' => $key])
         @endforeach
 
-        @if(!$readonly)
+        @if(!($readonly??false))
             <tr class="add-row">
                 <th colspan="{{ count($columns) }}" class="text-center p-0">
                     <a href="#" data-action="matrix#addRow" class="btn btn-block small text-muted">
@@ -31,7 +31,6 @@
                 </th>
             </tr>
         @endif
-
         <template class="matrix-template">
             @include('orchid.extendedMatrixRow',['row' => [], 'key' => '{index}'])
         </template>

@@ -15,6 +15,8 @@ return [
     |
      */
 
+    'url' => env('DRX_URL', 'http://preo8/Integration/odata/'),
+
     'DocumentKinds' => [
             33 => 'Разовый гостевой пропуск ',
             34 => 'Разовый автомобильный пропуск',

@@ -7,6 +7,7 @@ namespace App\Orchid\Screens\DRX;
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
 use Orchid\Support\Facades\Layout;
@@ -35,16 +36,20 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
     }
 
     public function query($id = null):iterable {
+
         $IdNameFunction = function(array $value) {
             return [$value['Id']=>$value['Name']];
         };
         try {
+            Log::debug("Начало query($id) ");
             $result = parent::query($id);
+            Log::debug("Середина query($id)");
             $odata = new DRXClient();
             if (isset($result['error'])) return $result;
             $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction)->toArray();
             $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction)->toArray();
             $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
+
         } catch (GuzzleException $ex) {
             return [
                 'error' => [
@@ -53,24 +58,17 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
                 ]
             ];
         }
+        Log::debug("Конец query($id)");
         return $result;
     }
 
     public function layout(): iterable
     {
+        Log::debug("Начало layout()");
 //        dd($this->entity, $this->LoadingSites, $this->TimeSpans, $this->SectionSites, config('srq.MovingDirection'));
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
-            Select::make('entity.MovingDirection')
-                ->options([
-                    "MoveIn" => "Ввоз",
-                    "MoveOut" => "Вывоз",
-                    "CarryIn" => "Внос",
-                    "CarryOut" => "Вынос",
-                    166 => 'wrong',
-                    167 => 'ok',
-                ])->title('Проверка')->horizontal(),
             Select::make('entity.MovingDirection')
                 ->title('Направление перемещения')
                 ->options(config('srq.MovingDirection'))->empty('')
@@ -125,6 +123,7 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
             Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
             Matrix::make('entity.Loaders')->columns(['ФИО' => 'Name'])->title('Персонал')->horizontal(),
         ])->title('Сведения о перевозчике');
+        Log::debug("Конец layout()");
         return $layout;
     }
 }

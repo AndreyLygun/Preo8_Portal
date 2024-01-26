@@ -52,9 +52,12 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make(__('Roles'))
                 ->icon('bs.lock')
                 ->route('platform.systems.roles')
+                ->permission('platform.systems.roles'),
+
+            Menu::make(__('Settings'))
+                ->icon('bs.lock')
+                ->route('drx.sitesettings')
                 ->permission('platform.systems.roles')
-
-
 
 /*            Menu::make('Get Started')
                 ->icon('bs.book')

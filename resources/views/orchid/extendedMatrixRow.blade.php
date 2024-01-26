@@ -2,16 +2,19 @@
     @foreach($columns as $column)
 
         <th class="p-0 align-middle">
-            {!!
-               $fields[$column]
-                    ->value($row[$column] ?? '')
-                    ->prefix($name)
-                    ->id("$idPrefix-$key-$column")
-                    ->name($keyValue ? $column : "[$key][$column]")->readonly($readonly)
-            !!}
+            @if(is_string($row))
+                {!! $row !!}
+            @else
+                {!!
+                   $fields[$column]
+                        ->value($row[$column] ?? '')
+                        ->prefix($name)
+                        ->id("$idPrefix-$key-$column")
+                        ->name($keyValue ? $column : "[$key][$column]")->readonly($readonly??false)
+                !!}
+            @endif
         </th>
-
-        @if ($loop->last && $removableRows && !$readonly)
+        @if ($loop->last && $removableRows && !($readonly??false))
             <th class="no-border text-center align-middle">
                 <a href="#"
                    data-action="matrix#deleteRow"

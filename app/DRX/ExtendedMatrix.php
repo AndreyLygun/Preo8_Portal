@@ -9,7 +9,7 @@ use Orchid\Screen\Fields\Matrix;
 class ExtendedMatrix extends Matrix {
     protected $view = 'orchid.extendedMatrix';
 
-    public function readonly(bool $readonly) : self
+    public function readonly(bool $readonly=true) : self
     {
         $this->set('readonly', $readonly);
         return $this;

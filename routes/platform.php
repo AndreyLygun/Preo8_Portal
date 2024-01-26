@@ -15,6 +15,7 @@ use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\DRX\EntitiesListScreen;
+use App\Orchid\Screens\DRX\SiteSettingsScreen;
 use App\Orchid\Screens\DRX\Pass4VisitorsSRQScreen;
 use App\Orchid\Screens\DRX\Pass4VisitorCarSRQScreen;
 use App\Orchid\Screens\DRX\Pass4AssetsMovingSRQScreen;
@@ -37,6 +38,10 @@ use Tabuna\Breadcrumbs\Trail;
 */
 
 // Main
+
+Route::screen("/srq/settings", SiteSettingsScreen::class)
+    ->name('drx.sitesettings');
+
 
 Route::screen("/srq/list", EntitiesListScreen::class)
     ->name('drx.srqlist');

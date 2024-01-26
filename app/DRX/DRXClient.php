@@ -44,7 +44,7 @@ class DRXClient extends ODataClient
 {
     public function __construct()
     {
-        $url = env("DIRECTUM_INTEGRATION_URL");
+        $url = config('srq.url');
         $login = Auth()->user()->DrxAccount->DRX_Login;
         $password = Auth()->user()->DrxAccount->DRX_Password;
         //dd($url, $login, $password);

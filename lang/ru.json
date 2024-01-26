@@ -1,4 +1,9 @@
 {
+    "Settings": "Настройки",
+    "Create account": "Зарегистрироваться",
+    "Forgot Your Password?": "Забыли пароль?",
+    "Email Password Reset Link": "Отправить письмо",
+    "No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "Укажите адрес своей почты, и мы отправим вам письмо со ссылкой на страницу сброса пароля.",
     "(and :count more error)": "(и ещё :count ошибка)",
     "(and :count more errors)": "(и ещё :count ошибок)",
     "All rights reserved.": "Все права защищены.",

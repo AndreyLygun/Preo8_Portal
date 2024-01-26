@@ -2,6 +2,7 @@
 
 namespace App\Orchid\Screens\DRX;
 
+use Illuminate\Support\Facades\Log;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\DropDown;
@@ -26,8 +27,10 @@ class EntitiesListScreen extends Screen
 
     public function query(): iterable
     {
+        Log::debug("Начало query() для списка");
         $odata = new DRXClient();
         $result = $odata->getList($this->DRXEntityType, $this->ExpandFields(), '-Created', 10);
+        Log::debug("Конец query() для списка");
         return $result;
     }
 
