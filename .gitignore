@@ -20,3 +20,4 @@ yarn-error.log
 /.vs
 init.bat
 ssh.bat
+composer.lock
