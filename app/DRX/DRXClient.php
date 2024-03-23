@@ -63,7 +63,7 @@ class DRXClient extends ODataClient
         return $entity;
     }
 
-    public function saveEntity($EntityType, $Entity, $ExpandFields, $CollectionFields)
+    public function saveEntity($EntityType, $Entity, $ExpandFields=[], $CollectionFields=[])
     {
         $Id = (int)$Entity['Id'] ?? null;
         unset($Entity['Id']);
@@ -84,7 +84,7 @@ class DRXClient extends ODataClient
                 if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
             }
         }
-        // dd($Entity);
+//         dd(json_encode($Entity));
         Log::info(json_encode($Entity));
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
@@ -163,6 +163,12 @@ class DRXClient extends ODataClient
         $pagination["prev_page_url"] = $page > 0 ? http_build_query(array_merge(request()->all(), ["page" => $page - 1])) : "";
         $pagination["next_page_url"] = $page < $total ? http_build_query(array_merge(request()->all(), ["page" => $page + 1])) : "";
         return $pagination;
+    }
+
+    public function callAPIfunction($functionName, $params)
+    {
+        $Entity = $this->from($functionName)->post($params);
+        return $Entity;
     }
 }
 

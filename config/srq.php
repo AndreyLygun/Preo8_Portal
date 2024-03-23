@@ -32,7 +32,7 @@ return [
         "Obsolete" => "Устарел",
     ],
 
-    'MovingDirection' => [
+    'MovingType' => [
         'MoveIn' => 'Ввоз',
         'MoveOut' => 'Вывоз',
         'CarryIn' => 'Внос',

@@ -106,7 +106,9 @@ class DRXAccountScreen extends Screen
 
     public function Save()
     {
-        Toast::info("Пока это заглушка сохранения");
+
+        $this->entity->fill(request('entity'))->save();
+
 //        return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
     }
 

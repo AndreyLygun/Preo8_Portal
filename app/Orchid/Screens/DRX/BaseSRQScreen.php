@@ -37,6 +37,11 @@ class BaseSRQScreen extends Screen
         return $ExpandFields;
     }
 
+    public function CollectionFields() {
+        return [];
+    }
+
+
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity() {
         $entity = [
@@ -54,6 +59,7 @@ class BaseSRQScreen extends Screen
             try {
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
             } catch (GuzzleException $ex) {
+                dd($ex);
                 return [
                     'error' => [
                         'Message' => $ex->getMessage()
@@ -119,31 +125,35 @@ class BaseSRQScreen extends Screen
 
 
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
-    public function SaveToDRX() {
-        $this->entity = request()->get('entity');
+    public function SaveToDRX($submitToApproval = false) {
         $this->entity['Creator'] =   Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
-        $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields);
+ //       dd($this->EntityType, json_encode($this->entity), $this->ExpandFields(), $this->CollectionFields());
+        $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
+        if ($submitToApproval) {
+            $odata->callAPIfunction('ServiceRequests/StartDocumentReviewTask', ['requestId' => $entity['Id']]);
+        }
         return $entity;
     }
 
     public function Save() {
+        $this->entity = request()->get('entity');
         $this->entity = $this->SaveToDRX();
         Toast::info("Успешно сохранено");
         return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
     }
 
     public function SubmitToApproval() {
-        $this->entity['RequestState'] = 'OnReview';
-        $this->SaveToDRX();
+        $this->entity = request()->get('entity');
+        $this->SaveToDRX(true);
         Toast::info("Заявка сохранена и отправлена на согласование");
         return redirect(route('drx.srqlist'));
     }
 
     public function Delete() {
         $odata = new DRXClient();
-        $odata->deleteEntity($this->EntityType, request('entity.Id'));
+        $odata->deleteEntity($this->EntityType  , request('entity.Id'));
         Toast::info("Заявка удалена");
         return redirect(route('drx.srqlist'));
     }

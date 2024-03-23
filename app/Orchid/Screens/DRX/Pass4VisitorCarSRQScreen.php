@@ -3,10 +3,14 @@
 namespace App\Orchid\Screens\DRX;
 
 
+use Carbon\Carbon;
+use DateTimeZone;
+use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Matrix;
 use Orchid\Screen\Fields\DateTimer;
+
 
 
 
@@ -20,24 +24,23 @@ class Pass4VisitorCarSRQScreen extends SecuritySRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsPass4VisitorCars";
+    protected $EntityType = "IServiceRequestsPass4VisitorCars";
     public $Title = "Заявка на разовый автопропуск";
-    public $CollectionFields = ["Visitors"];
-
-    public function ExpandFields() {
-        $ExpandFields = ["Visitors"];
-        return array_merge(parent::ExpandFields(), $ExpandFields);
-    }
 
     // Описывает макет экрана
     public function layout(): iterable
     {
+        $tz = new DateTimeZone('Europe/Moscow');
+
         $layout = parent::layout();
         $layout[] = Layout::rows([
-                DateTimer::make("entity.ValidOn")->title("Дата посещения")->horizontal()->enableTime(false)->format('Y-m-d\Z'),
+                DateTimer::make("entity.ValidOnDateTime")->title("Дата/время въезда")->horizontal()
+                    ->format("Y-m-d\TH:i:00+03:00")
+//                    ->serverformat('Y-m-d\TH:i:00+03:00')
+                    ->enableTime(true)->format24hr()->position("auto left"),
                 Input::make("entity.CarModel")->title("Модель автомобиля")->horizontal(),
                 Input::make("entity.CarNumber")->title("Номер автомобиля")->horizontal(),
-                Matrix::make("entity.Visitors")->columns(['ФИО' => 'Name'])->title("Посетители")->horizontal()
+                TextArea::make("entity.Visitors")->title("Посетители")->horizontal()->rows(5)
             ]);
         return $layout;
     }

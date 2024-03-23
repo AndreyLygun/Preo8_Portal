@@ -9,4 +9,5 @@ use Orchid\Screen\AsSource;
 class DrxAccount extends Model
 {
     use HasFactory, AsSource;
+    protected $guarded = [];
 }

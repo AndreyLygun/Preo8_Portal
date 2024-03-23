@@ -31,12 +31,11 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
 
     public function ExpandFields()
     {
-        $ExpandFields = ["Loaders", "Cars", 'LoadingSite', 'TimeSpan', 'Inventory', 'Floor'];
+        $ExpandFields = ["Loaders", 'LoadingSite', 'TimeSpan', 'Inventory'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
     public function query($id = null):iterable {
-
         $IdNameFunction = function(array $value) {
             return [$value['Id']=>$value['Name']];
         };
@@ -47,14 +46,11 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
             $odata = new DRXClient();
             if (isset($result['error'])) return $result;
             $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction)->toArray();
-            $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction)->toArray();
             $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
-
         } catch (GuzzleException $ex) {
             return [
                 'error' => [
                     'message' => $ex->getMessage()
-
                 ]
             ];
         }
@@ -65,13 +61,12 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
     public function layout(): iterable
     {
         Log::debug("Начало layout()");
-//        dd($this->entity, $this->LoadingSites, $this->TimeSpans, $this->SectionSites, config('srq.MovingDirection'));
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
-            Select::make('entity.MovingDirection')
+            Select::make('entity.MovingType')
                 ->title('Направление перемещения')
-                ->options(config('srq.MovingDirection'))->empty('')
+                ->options(config('srq.MovingType'))->empty('')
                 ->required()
                 ->horizontal()
                 ->disabled($readonly),
