@@ -2,24 +2,21 @@
 
 namespace App\Orchid\Screens\DRX;
 
-
-
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
+use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Matrix;
 use App\DRX\ExtendedMatrix;
 use Orchid\Screen\Fields\DateTimer;
-use Illuminate\Support\Collection;
 
 
-
-class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
+class Pass4AssetsMovingScreen extends SecuritySRQScreen
 {
 
     protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
@@ -31,8 +28,13 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
 
     public function ExpandFields()
     {
-        $ExpandFields = ["Loaders", 'LoadingSite', 'TimeSpan', 'Inventory'];
+        $ExpandFields = ['LoadingSite', 'TimeSpan', 'Inventory'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
+    }
+
+    public function CollectionFields()
+    {
+        return array_merge(parent::CollectionFields(), ["Inventory"]);
     }
 
     public function query($id = null):iterable {
@@ -64,9 +66,9 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
-            Select::make('entity.MovingType')
+            Select::make('entity.MovingDirection')
                 ->title('Направление перемещения')
-                ->options(config('srq.MovingType'))->empty('')
+                ->options(config('srq.MovingDirection'))->empty('')
                 ->required()
                 ->horizontal()
                 ->disabled($readonly),
@@ -90,10 +92,10 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
                 ->options($this->TimeSpans)
                 ->horizontal()
                 ->required()
+                ->empty('Выберите время использование лифта')
                 ->disabled($readonly),
-            Select::make('entity.Floor.Id')
+            Input::make('entity.Floor')
                 ->title('Этаж')
-                ->options($this->SectionSites)
                 ->horizontal()
                 ->required()
                 ->disabled($readonly),
@@ -101,7 +103,7 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
                 ->title('Требуется грузовой лифт')
                 ->horizontal()
                 ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
-                ->readonly($readonly)->sendTrueOrFalse(),
+                ->disabled($readonly)->sendTrueOrFalse(),
             CheckBox::make('entity.StorageRoom')
                 ->title('Через комнату временного хранения')
                 ->horizontal()
@@ -116,7 +118,7 @@ class Pass4AssetsMovingSRQScreen extends SecuritySRQScreen
         $layout[] = Layout::rows([
             Input::make('entity.CarModel')->title('Модель автомобиля')->horizontal(),
             Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
-            Matrix::make('entity.Loaders')->columns(['ФИО' => 'Name'])->title('Персонал')->horizontal(),
+            TextArea::make('entity.Visitors')->title('Грузчики')->horizontal(),
         ])->title('Сведения о перевозчике');
         Log::debug("Конец layout()");
         return $layout;

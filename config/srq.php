@@ -32,11 +32,11 @@ return [
         "Obsolete" => "Устарел",
     ],
 
-    'MovingType' => [
-        'MoveIn' => 'Ввоз',
-        'MoveOut' => 'Вывоз',
-        'CarryIn' => 'Внос',
-        'CarryOut' => 'Вынос',
+    'MovingDirection' => [
+        'MovingIn' => 'Ввоз',
+        'MovingOut' => 'Вывоз',
+        'CarryingIn' => 'Внос',
+        'CarryingOut' => 'Вынос',
     ],
 
     'RequestState' => [

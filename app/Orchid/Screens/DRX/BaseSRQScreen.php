@@ -3,6 +3,7 @@
 namespace App\Orchid\Screens\DRX;
 
 use App\DRX\DRXClient;
+use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
 use Orchid\Support\Facades\Layout;
@@ -47,7 +48,11 @@ class BaseSRQScreen extends Screen
         $entity = [
             "Renter" => ['Name' => Auth()->user()->DrxAccount->Name],
             "Creator" => Auth()->user()->name,
-            "RequestState" => "Draft"
+            "RequestState" => "Draft",
+            'ValidFrom' => Carbon::today()->addDay(),
+            'ValidTill' => Carbon::today()->addDay(),
+            'ValidOn' => Carbon::today()->addDay(),
+
         ];
         return $entity;
     }
@@ -59,7 +64,6 @@ class BaseSRQScreen extends Screen
             try {
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
             } catch (GuzzleException $ex) {
-                dd($ex);
                 return [
                     'error' => [
                         'Message' => $ex->getMessage()
@@ -118,7 +122,6 @@ class BaseSRQScreen extends Screen
                 $buttons[] = Button::make("Отказ")->disabled();
                 break;
         }
-
         return $buttons;
     }
 

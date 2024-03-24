@@ -9,7 +9,7 @@ use Orchid\Screen\Fields\Matrix;
 use Orchid\Screen\Fields\DateTimer;
 
 
-class Pass4VisitorsSRQScreen extends SecuritySRQScreen
+class Pass4VisitorsScreen extends SecuritySRQScreen
 {
     /**
      * Fetch data to be displayed on the screen.

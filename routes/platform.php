@@ -10,16 +10,27 @@ use App\Orchid\Screens\Examples\ExampleFieldsScreen;
 use App\Orchid\Screens\Examples\ExampleLayoutsScreen;
 use App\Orchid\Screens\Examples\ExampleScreen;
 use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
+
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
-use App\Orchid\Screens\DRX\EntitiesListScreen;
-use App\Orchid\Screens\DRX\SiteSettingsScreen;
-use App\Orchid\Screens\DRX\Pass4VisitorsSRQScreen;
-use App\Orchid\Screens\DRX\Pass4VisitorCarSRQScreen;
-use App\Orchid\Screens\DRX\Pass4AssetsMovingSRQScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
+
+use App\Orchid\Screens\DRX\SiteSettingsScreen;
+use App\Orchid\Screens\DRX\EntitiesListScreen;
+
+use App\Orchid\Screens\DRX\Pass4VisitorsScreen;             // Разовый пропуск
+use App\Orchid\Screens\DRX\PermanentPass4EmployeeScreen;    // Пропуск для сотрудника
+use App\Orchid\Screens\DRX\Permission4EmployeeScreen;       // Допуск для сотрудника
+use App\Orchid\Screens\DRX\StopPermanentPass4EmployeeScreen;// Блокировка пропуска сотрудника
+use App\Orchid\Screens\DRX\Pass4VisitorCarScreen;           // Разовый автопропуск
+use App\Orchid\Screens\DRX\PermanentPass4CarScreen;         // Псстоянный автопропуск
+use App\Orchid\Screens\DRX\StopPermanentPass4CarScreen;     // Блокировка автопропуска
+use App\Orchid\Screens\DRX\Pass4AssetsMovingScreen;         // Разовое Перемещение ТМЦ
+use App\Orchid\Screens\DRX\Pass4PermanentAssetsMovingScreen;// Разовое Перемещение ТМЦ
+
+
 
 
 use Illuminate\Support\Facades\Route;
@@ -43,17 +54,30 @@ Route::screen("/srq/settings", SiteSettingsScreen::class)
     ->name('drx.sitesettings');
 
 
-Route::screen("/srq/list", EntitiesListScreen::class)
-    ->name('drx.srqlist');
+Route::screen("/srq/list", EntitiesListScreen::class)->name('drx.srqlist');
 
-Route::screen("/srq/IPass4VisitorDto/{id?}", Pass4VisitorsSRQScreen::class)
-    ->name('drx.GuestPassSRQDto');
+// Люди
+Route::screen("/srq/IPass4VisitorDto/{id?}", Pass4VisitorsScreen::class)->name('drx.Pass4Visitors');
+Route::screen("/srq/IPermanentPass4EmployeeDto/{id?}", PermanentPass4EmployeeScreen::class)->name('drx.PermanentPass4Employee');
+Route::screen("/srq/IPermission4EmployeeDto/{id?}", Permission4EmployeeScreen::class)->name('drx.Permission4Employee');
+Route::screen("/srq/IStopPermanentPass4EmployeeDto/{id?}", StopPermanentPass4EmployeeScreen::class)->name('drx.StopPermanentPass4Employee');
 
-Route::screen("/srq/IPass4VisitorCarDto/{id?}", Pass4VisitorCarSRQScreen::class)
-    ->name('drx.AutoPassSRQDto');
+// Машины
+Route::screen("/srq/IPass4VisitorCarDto/{id?}", Pass4VisitorCarScreen::class)->name('drx.Pass4VisitorCar');
+Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentPass4CarScreen::class)->name('drx.PermanentPass4Car');
+Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", StopPermanentPass4CarScreen::class)->name('drx.StopPermanentPass4Car');
+// Грузы
+Route::screen("/srq/IPass4AssetsMovingDto/{id?}", Pass4AssetsMovingScreen::class)->name('drx.Pass4AssetsMoving');
+Route::screen("/srq/IPass4PermanentAssetsMovingDto/{id?}", Pass4PermanentAssetsMovingScreen::class)->name('drx.Pass4PermanentAssetsMoving');
 
-Route::screen("/srq/IPass4AssetsMovingDto/{id?}", Pass4AssetsMovingSRQScreen::class)
-    ->name('drx.Pass4AssetsMovingSRQDto');
+
+
+//Route::screen("/srq/IPermanentPass4CarsDto/{id?}", PermanentPass4CarsSRQScreen::class)
+//    ->name('drx.PermanentPass4Carsto');
+
+
+
+
 
 
 Route::screen("/srq/renters", \App\Orchid\Screens\DRX\DRXAccountListScreen::class)

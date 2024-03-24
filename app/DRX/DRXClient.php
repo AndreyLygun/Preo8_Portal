@@ -56,10 +56,12 @@ class DRXClient extends ODataClient
 
     public function getEntity($EntityType, int $Id, $ExpandFields)
     {
+// dd($EntityType, $Id, $ExpandFields);
         $query = $this->from($EntityType);
         if ($ExpandFields)
             $query = $query->expand($ExpandFields);
         $entity = $query->find($Id);
+// dd($entity);
         return $entity;
     }
 
@@ -84,7 +86,7 @@ class DRXClient extends ODataClient
                 if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
             }
         }
-//         dd(json_encode($Entity));
+        //dd(json_encode($Entity));
         Log::info(json_encode($Entity));
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
@@ -167,6 +169,7 @@ class DRXClient extends ODataClient
 
     public function callAPIfunction($functionName, $params)
     {
+//       dd($functionName, $params);
         $Entity = $this->from($functionName)->post($params);
         return $Entity;
     }
