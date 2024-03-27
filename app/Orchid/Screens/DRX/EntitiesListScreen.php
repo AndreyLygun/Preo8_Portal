@@ -94,6 +94,7 @@ class EntitiesListScreen extends Screen
             ])
         ];
         if ($pagination = ($this->query()['pagination'] ?? false) and ($pagination['last_page'] > 1)) {
+            dd($pagination);
             $Layout[] = Layout::view("Pagination", ["pagination" => $pagination]);
         };
         return $Layout;
