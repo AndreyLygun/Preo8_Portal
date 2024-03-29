@@ -4,6 +4,7 @@ namespace App\DRX;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Mockery\Exception;
 use Orchid\Screen\Repository;
 use SaintSystems\OData\ODataClient;
 use SaintSystems\OData\Query\Builder;
@@ -83,7 +84,13 @@ class DRXClient extends ODataClient
                 // ..исправлям баг|фичу, из-за которой поле Matrix начинает нумерацию строк с единицы
                 $Entity[$cf] = array_values($Entity[$cf]);
                 // ..потом очищаем поле на сервере DRX, чтоб заполнить его новыми значениями
-                if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
+
+                try {
+                    if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
+                } catch (GuzzleException $ex) {
+                    dd($EntityType, $Id, $cf, $ex);
+                }
+
             }
         }
         //dd(json_encode($Entity));

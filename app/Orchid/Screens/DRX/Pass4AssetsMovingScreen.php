@@ -6,6 +6,7 @@ use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
@@ -58,6 +59,17 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
         }
         Log::debug("Конец query($id)");
         return $result;
+    }
+
+    public function commandBar(): iterable
+    {
+        $buttons = parent::commandBar();
+        switch ($this->entity["RequestState"]) {
+            case 'Approved':
+                $buttons[] = Button::make("Сохранить")->method("Save");
+                break;
+        }
+        return $buttons;
     }
 
     public function layout(): iterable

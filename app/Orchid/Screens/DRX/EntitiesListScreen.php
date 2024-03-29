@@ -29,7 +29,7 @@ class EntitiesListScreen extends Screen
     {
         Log::debug("Начало query() для списка");
         $odata = new DRXClient();
-        $result = $odata->getList($this->DRXEntityType, $this->ExpandFields(), '-Created', 10);
+        $result = $odata->getList($this->DRXEntityType, $this->ExpandFields(), '-Created', 30);
         Log::debug("Конец query() для списка");
         return $result;
     }
