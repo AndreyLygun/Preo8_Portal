@@ -165,6 +165,7 @@ class UserEditScreen extends Screen
         $user->when($request->filled('user.password'), function (Builder $builder) use ($request) {
             $builder->getModel()->password = Hash::make($request->input('user.password'));
         });
+        $user->drx_account_id = $request->get('user')['drx_account_id'];
         $user
             ->fill($request->collect('user')->except(['password', 'permissions', 'roles'])->toArray())
             ->fill(['permissions' => $permissions])

@@ -42,7 +42,9 @@ class UserPresenter extends Presenter implements Searchable, Personable
 
     public function company(): string
     {
-        return $this->DRXAccount->Name;
+        if ($this->DRXAccount)
+            return $this->DRXAccount->Name;
+        else return '';
     }
 
     /**

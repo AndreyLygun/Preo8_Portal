@@ -19,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'permissions',
+        'drx_account_id'
     ];
 
     /**
