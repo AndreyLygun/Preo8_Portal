@@ -57,16 +57,23 @@ class DRXClient extends ODataClient
 
     public function getEntity($EntityType, int $Id, $ExpandFields)
     {
-// dd($EntityType, $Id, $ExpandFields);
-        $query = $this->from($EntityType);
-        if ($ExpandFields)
-            $query = $query->expand($ExpandFields);
-        $entity = $query->find($Id);
-// dd($entity);
+        try {
+            $query = $this->from($EntityType);
+            if ($ExpandFields)
+                $query = $query->expand($ExpandFields);
+            $entity = $query->find($Id);
+        } catch (GuzzleException $e) {
+            return [
+                'error' => [
+                    'message' => $e->getMessage(),
+                    'errnum' => $e->getCode()
+                ]
+            ];
+        }
         return $entity;
     }
 
-    public function saveEntity($EntityType, $Entity, $ExpandFields=[], $CollectionFields=[])
+    public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
         $Id = (int)$Entity['Id'] ?? null;
         unset($Entity['Id']);
@@ -84,17 +91,9 @@ class DRXClient extends ODataClient
                 // ..исправлям баг|фичу, из-за которой поле Matrix начинает нумерацию строк с единицы
                 $Entity[$cf] = array_values($Entity[$cf]);
                 // ..потом очищаем поле на сервере DRX, чтоб заполнить его новыми значениями
-
-                try {
-                    if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
-                } catch (GuzzleException $ex) {
-                    dd($EntityType, $Id, $cf, $ex);
-                }
-
+                if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
             }
         }
-        //dd(json_encode($Entity));
-        Log::info(json_encode($Entity));
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
         } else {            // Создаём запись

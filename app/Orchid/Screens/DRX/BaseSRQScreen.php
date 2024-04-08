@@ -135,7 +135,8 @@ class BaseSRQScreen extends Screen
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
-        //       dd($this->EntityType, json_encode($this->entity), $this->ExpandFields(), $this->CollectionFields());
+        //  dd(json_encode($this->entity));
+        //  dd($this->EntityType, json_encode($this->entity), $this->ExpandFields(), $this->CollectionFields());
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         if ($submitToApproval) {
             $odata->callAPIfunction('ServiceRequests/StartDocumentReviewTask', ['requestId' => $entity['Id']]);
@@ -180,6 +181,14 @@ class BaseSRQScreen extends Screen
 
     public function layout(): iterable
     {
+        if (isset($this->query()['error'])) {
+            return [
+                Layout::rows([
+                    Label::make('error.message'),
+                    Label::make('error.errnum')
+                ])->title('Ошибка!')
+            ];
+        }
         $state = config('srq.LifeCycles')[$this->entity['RequestState']];
         return [
             Layout::modal('StatusDialog', [
