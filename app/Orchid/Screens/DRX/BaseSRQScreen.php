@@ -6,6 +6,7 @@ use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
+use Orchid\Screen\Layouts\Accordion;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
@@ -26,15 +27,17 @@ class BaseSRQScreen extends Screen
     protected $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
     protected $CollectionFields;                      // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
     protected $Title = '';
+    public $readOnly;
     public $entity;
+    public $approvalState;
+
 
 
     // Возвращает список полей-ссылок и полей-коллекций, который используются в форме. Нужен, чтобы OData-API вернул значения этих полей
     // Как правило, перекрытый метод в классе-наследнике добавляет свои поля к результату метода из класса-предка
     public function ExpandFields()
     {
-        $ExpandFields = ["Author", "DocumentKind", "Renter"];
-        return $ExpandFields;
+        return ["Author", "DocumentKind", "Renter"];
     }
 
     public function CollectionFields()
@@ -42,48 +45,46 @@ class BaseSRQScreen extends Screen
         return [];
     }
 
+    public function beforeSave() {
+
+    }
+
 
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity()
     {
-        $entity = [
+        return [
             "Renter" => ['Name' => Auth()->user()->DrxAccount->Name],
             "Creator" => Auth()->user()->name,
             "RequestState" => "Draft",
             'ValidFrom' => Carbon::today()->addDay(),
             'ValidTill' => Carbon::today()->addDay(),
             'ValidOn' => Carbon::today()->addDay(),
-
         ];
-        return $entity;
     }
 
-    public function query($id = null): iterable
+    public function query(int $id = null): iterable
     {
         if ($id) {
-            $odata = new DRXClient();
             try {
+                $odata = new DRXClient();
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
+                if (in_array($entity['RequestState'], ['OnReview', 'Declined', 'Approved'])) {
+                    $odata->setEntityReturnType(false);
+                    $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
+                    $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
+                    $approvalState = str_replace("\r\n", '', $state);
+                }
             } catch (GuzzleException $ex) {
-                dd($ex);
-                return [
-                    'error' => [
-                        'Message' => $ex->getMessage()
-                    ]
-                ];
+                return array('error' => ['Message' => $ex->getMessage(), 'Code' => $ex->getCode()]);
             }
         } else {
             $entity = $this->NewEntity();
         }
-
-        return ["entity" => $entity];
+        $readOnly = !in_array($entity['RequestState'], ['Draft', 'Declined']);
+        return ['entity' => $entity, 'readOnly' => $readOnly, 'approvalState' => $approvalState??''];
     }
 
-    /**
-     * The name of the screen displayed in the header.
-     *
-     * @return string|null
-     */
     public function name(): ?string
     {
         if (isset($this->entity['Id']))
@@ -92,34 +93,23 @@ class BaseSRQScreen extends Screen
             return $this->Title . ' (новая)';
     }
 
-    /**
-     * The screen's action buttons.
-     *
-     * @return \Orchid\Screen\Action[]
-     */
     public function commandBar(): iterable
     {
+        if (!isset($this->entity["RequestState"])) return [];
         $buttons = [];
-        if (!isset($this->entity["RequestState"])) return $buttons;
-//        $buttons[] = Button::make("Копировать");
         switch ($this->entity["RequestState"]) {
             case 'Draft':
-                if (isset($this->entity["Id"])) {
-//                    $buttons[] = Button::make("Удалить")->method("Delete")->confirm('Удалить заявку?');
-                    $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
-                }
+                $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
                 $buttons[] = Button::make("Сохранить")->method("Save");
                 break;
             case 'Active':
                 $buttons[] = Button::make("Одобрено")->disabled();
                 break;
-            case 'Obsolete':
-                $buttons[] = Button::make("Устарел")->disabled();
-                break;
             case 'OnReview':
-                $buttons[] = Button::make("На рассмотрении")->disabled();
+                $buttons[] = ModalToggle::make("На рассмотрении")->modal('StatusDialog')->class('btn btn-primary');
                 break;
-            case 'Prelimenary':
+            case 'Approved':
+                $buttons[] = Button::make("Согласован")->class('"btn btn-success');
                 break;
             case 'Declined':
                 $buttons[] = Button::make("Отказ")->disabled();
@@ -132,6 +122,7 @@ class BaseSRQScreen extends Screen
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
     public function SaveToDRX($submitToApproval = false)
     {
+        $this->beforeSave();
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
@@ -171,9 +162,10 @@ class BaseSRQScreen extends Screen
     public function asyncGetApprovalState(): array
     {
 //        $odata = new DRXClient();
-//        dd(123);
-//        $state = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus(requestId=172)')->get();
-//        dd($state);
+//        $odata->setEntityReturnType(false);
+//        $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => 172]);
+//        $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
+//dd($state);
         return [
             'xml' => 'state',
         ];
@@ -181,30 +173,26 @@ class BaseSRQScreen extends Screen
 
     public function layout(): iterable
     {
-        if (isset($this->query()['error'])) {
+        if (isset($this->error)) {
             return [
                 Layout::rows([
-                    Label::make('error.message'),
-                    Label::make('error.errnum')
+                    Label::make('error.Message'),
+                    Label::make('error.Code')
                 ])->title('Ошибка!')
             ];
         }
-        $state = config('srq.LifeCycles')[$this->entity['RequestState']];
-        return [
-            Layout::modal('StatusDialog', [
-                Layout::rows([
-                    Label::make('xml')
-                ]),
-            ])->async('asyncGetApprovalState'),
-            Layout::rows([
-                Input::make("entity.Id")->type("hidden"),
-                ModalToggle::make($state)
-                    ->modal('StatusDialog'),
-//                Label::make("entity.RequestState")->title("Состояние заявки")->horizontal(),
-                Label::make("entity.Renter.Name")->title("Название компании")->horizontal(),
-                Label::make("entity.Creator")->title("Автор заявки")->horizontal(),
-
-            ])
-        ];
+        $state = config('srq.RequestState')[$this->entity['RequestState']];
+        $layout = [];
+        if (in_array($this->entity['RequestState'], ['OnReview', 'Declined', 'Approved'])) {
+            $layout[] = Layout::accordion(["Статус рассмотрения заявки" => [
+                   Layout::view('AppovalStateView', ['approval_state' => $this->approvalState])
+            ]])->stayOpen(false);
+        }
+        $layout[] = Layout::rows([
+            Input::make("entity.Id")->type("hidden"),
+            Label::make("entity.Renter.Name")->title("Название компании")->horizontal(),
+            Label::make("entity.Creator")->title("Автор заявки")->horizontal()
+        ]);
+        return $layout;
     }
 }

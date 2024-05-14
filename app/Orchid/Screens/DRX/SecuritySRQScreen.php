@@ -10,12 +10,6 @@ use Carbon\Carbon;
 
 class SecuritySRQScreen extends BaseSRQScreen
 {
-    /**
-     * Fetch data to be displayed on the screen.
-     *
-     * @return array
-     */
-
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsSecuritySRQScreen";
     public $entity;
@@ -38,10 +32,9 @@ class SecuritySRQScreen extends BaseSRQScreen
      */
     public function layout(): iterable
     {
-        $readOnly = !in_array($this->entity["RequestState"], ["Draft", "Declined"]);
         $layout = Layout::rows([
-                Input::make("entity.ResponsibleName")->title("Ответственный сотрудник")->horizontal()->readonly($readOnly),
-                Input::make("entity.ResponsiblePhone")->title("Телефон сотрудника")->horizontal()->readonly($readOnly)->mask('+7 (999) 999-99-99'),
+                Input::make("entity.ResponsibleName")->title("Ответственный сотрудник")->horizontal()->readonly($this->readOnly),
+                Input::make("entity.ResponsiblePhone")->title("Телефон сотрудника")->horizontal()->readonly($this->readOnly)->mask('+7 (999) 999-99-99'),
             ]);
         return array_merge(parent::layout(), [$layout]);
     }

@@ -16,7 +16,10 @@ use Carbon\Carbon;
 class EntitiesListScreen extends Screen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $DRXEntityType = "IServiceRequestsBaseSRQs";
+    private $DRXEntityType = "IServiceRequestsBaseSRQs";
+    public $pagination;
+    public $error;
+    public $entites;
 
     //Возвращает список ссылочных свойств (через запятую), которые должны быть получены в запросе
     public function ExpandFields(): string
@@ -58,7 +61,7 @@ class EntitiesListScreen extends Screen
 
     public function layout(): iterable
     {
-        if (isset($this->query()['error'])) {
+        if (isset($this->error)) {
             return [
                 Layout::rows([
                     Label::make('error.message'),
@@ -93,7 +96,7 @@ class EntitiesListScreen extends Screen
                     ->cssClass(fn($item) => $item["RequestState"])->sort()
             ])
         ];
-        if ($pagination = ($this->query()['pagination'] ?? false) and ($pagination['last_page'] > 1)) {
+        if ($pagination = ($this->pagination ?? false) and ($pagination['last_page'] > 1)) {
            $Layout[] = Layout::view("pagination", ["pagination" => $pagination]);
         };
         return $Layout;

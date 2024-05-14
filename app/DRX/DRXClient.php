@@ -57,19 +57,10 @@ class DRXClient extends ODataClient
 
     public function getEntity($EntityType, int $Id, $ExpandFields)
     {
-        try {
-            $query = $this->from($EntityType);
-            if ($ExpandFields)
-                $query = $query->expand($ExpandFields);
-            $entity = $query->find($Id);
-        } catch (GuzzleException $e) {
-            return [
-                'error' => [
-                    'message' => $e->getMessage(),
-                    'errnum' => $e->getCode()
-                ]
-            ];
-        }
+        $query = $this->from($EntityType);
+        if ($ExpandFields)
+            $query = $query->expand($ExpandFields);
+        $entity = $query->find($Id);
         return $entity;
     }
 
@@ -97,6 +88,7 @@ class DRXClient extends ODataClient
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
         } else {            // Создаём запись
+            //dd($Entity);
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->post($Entity))[0];
         }
         return $Entity;
@@ -175,7 +167,6 @@ class DRXClient extends ODataClient
 
     public function callAPIfunction($functionName, $params)
     {
-//       dd($functionName, $params);
         $Entity = $this->from($functionName)->post($params);
         return $Entity;
     }

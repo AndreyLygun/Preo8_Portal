@@ -5,6 +5,7 @@ namespace App\Orchid\Screens\DRX;
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\CheckBox;
@@ -43,13 +44,22 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
             return [$value['Id']=>$value['Name']];
         };
         try {
-            Log::debug("Начало query($id) ");
+            Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало query ($id)");
             $result = parent::query($id);
             Log::debug("Середина query($id)");
             $odata = new DRXClient();
             if (isset($result['error'])) return $result;
-            $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction)->toArray();
-            $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
+
+            if (!Cache::has('LoadingSites')) {
+                $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction)->toArray();
+                Cache::put('LoadingSites', $result['LoadingSites'],  $seconds=1000);
+            } else $result['LoadingSites'] = Cache::get('LoadingSites');
+
+            if (!Cache::has('TimeSpans')) {
+                $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
+                Cache::put('TimeSpans', $result['TimeSpans'], $seconds=1000);
+            } $result['TimeSpans'] = Cache::get('TimeSpans');
+
         } catch (GuzzleException $ex) {
             return [
                 'error' => [
@@ -57,24 +67,16 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ]
             ];
         }
-        Log::debug("Конец query($id)");
+        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Конец query ($id)");
         return $result;
-    }
-
-    public function commandBar(): iterable
-    {
-        $buttons = parent::commandBar();
-        switch ($this->entity["RequestState"]) {
-            case 'Approved':
-                $buttons[] = Button::make("Сохранить")->method("Save");
-                break;
-        }
-        return $buttons;
     }
 
     public function layout(): iterable
     {
-        Log::debug("Начало layout()");
+        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало layout");
+        if (!isset($this->entity['RequestState'])) {
+            dd($this->query());
+        }
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
@@ -132,7 +134,7 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
             Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
             TextArea::make('entity.Visitors')->title('Грузчики')->horizontal(),
         ])->title('Сведения о перевозчике');
-        Log::debug("Конец layout()");
+        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Конец layout");
         return $layout;
     }
 }

@@ -46,12 +46,12 @@ class Pass4VisitorCarScreen extends SecuritySRQScreen
                 DateTimer::make("entity.ValidOnDateTime")->title("Дата и время въезда")->horizontal()
                     ->format("Y-m-d\TH:i:00+03:00")
 //                    ->serverformat('Y-m-d\TH:i:00+03:00')
-                    ->enableTime(true)->format24hr()->allowInput()->required(),
-                Input::make("entity.CarModel")->title("Модель автомобиля")->horizontal()->required(),
-                Input::make("entity.CarNumber")->title("Номер автомобиля")->horizontal()->required(),
-                CheckBox::make("entity.PrivateParking")->title("На парковку арендатора")->horizontal()
+                    ->enableTime(true)->format24hr()->allowInput()->required()->disabled($this->readOnly),
+                Input::make("entity.CarModel")->title("Модель автомобиля")->horizontal()->required()->disabled($this->readOnly),
+                Input::make("entity.CarNumber")->title("Номер автомобиля")->horizontal()->required()->readonly($this->readOnly),
+                CheckBox::make("entity.PrivateParking")->title("На парковку арендатора")->horizontal()->disabled($this->readOnly)
                     ->set('yesvalue', 'true')->set('novalue', 'false')->sendTrueOrFalse(),
-                TextArea::make("entity.Visitors")->title("Посетители")->horizontal()->rows(5)
+                TextArea::make("entity.Visitors")->title("Посетители")->horizontal()->rows(5)->readonly($this->readOnly)
                     ->help('Один посетитель (фамилия, имя, отчество) на одну строку. Разовые пропуска на них будут оформлены после согласования заявки.')
             ]);
         return $layout;
