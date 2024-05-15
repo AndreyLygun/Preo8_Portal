@@ -29,7 +29,7 @@ class BaseSRQScreen extends Screen
     protected $Title = '';
     public $readOnly;
     public $entity;
-    public $approvalState;
+    public $reviewStatus;
 
 
 
@@ -69,11 +69,11 @@ class BaseSRQScreen extends Screen
             try {
                 $odata = new DRXClient();
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
-                if (in_array($entity['RequestState'], ['OnReview', 'Declined', 'Approved'])) {
+                if (in_array($entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
                     $odata->setEntityReturnType(false);
                     $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
                     $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
-                    $approvalState = str_replace("\r\n", '', $state);
+                    $reviewStatus = str_replace(["\r\n", "{'status':",  "'}"], '', $state);
                 }
             } catch (GuzzleException $ex) {
                 return array('error' => ['Message' => $ex->getMessage(), 'Code' => $ex->getCode()]);
@@ -81,8 +81,8 @@ class BaseSRQScreen extends Screen
         } else {
             $entity = $this->NewEntity();
         }
-        $readOnly = !in_array($entity['RequestState'], ['Draft', 'Declined']);
-        return ['entity' => $entity, 'readOnly' => $readOnly, 'approvalState' => $approvalState??''];
+        $readOnly = !in_array($entity['RequestState'], ['Draft', 'Denied']);
+        return ['entity' => $entity, 'readOnly' => $readOnly, 'reviewStatus' => $reviewStatus??''];
     }
 
     public function name(): ?string
@@ -103,21 +103,18 @@ class BaseSRQScreen extends Screen
                 $buttons[] = Button::make("Сохранить")->method("Save");
                 break;
             case 'Active':
-                $buttons[] = Button::make("Одобрено")->disabled();
                 break;
             case 'OnReview':
-                $buttons[] = ModalToggle::make("На рассмотрении")->modal('StatusDialog')->class('btn btn-primary');
                 break;
             case 'Approved':
-                $buttons[] = Button::make("Согласован")->class('"btn btn-success');
                 break;
-            case 'Declined':
-                $buttons[] = Button::make("Отказ")->disabled();
+            case 'Denied':
+                $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
+                $buttons[] = Button::make("Сохранить")->method("Save");
                 break;
         }
         return $buttons;
     }
-
 
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
     public function SaveToDRX($submitToApproval = false)
@@ -126,8 +123,6 @@ class BaseSRQScreen extends Screen
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
-        //  dd(json_encode($this->entity));
-        //  dd($this->EntityType, json_encode($this->entity), $this->ExpandFields(), $this->CollectionFields());
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         if ($submitToApproval) {
             $odata->callAPIfunction('ServiceRequests/StartDocumentReviewTask', ['requestId' => $entity['Id']]);
@@ -159,18 +154,6 @@ class BaseSRQScreen extends Screen
         return redirect(route('drx.srqlist'));
     }
 
-    public function asyncGetApprovalState(): array
-    {
-//        $odata = new DRXClient();
-//        $odata->setEntityReturnType(false);
-//        $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => 172]);
-//        $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
-//dd($state);
-        return [
-            'xml' => 'state',
-        ];
-    }
-
     public function layout(): iterable
     {
         if (isset($this->error)) {
@@ -181,12 +164,12 @@ class BaseSRQScreen extends Screen
                 ])->title('Ошибка!')
             ];
         }
-        $state = config('srq.RequestState')[$this->entity['RequestState']];
+        $state = sprintf("&nbsp<span class='%s'>%s</span>", $this->entity['RequestState'], __($this->entity['RequestState']));
         $layout = [];
-        if (in_array($this->entity['RequestState'], ['OnReview', 'Declined', 'Approved'])) {
-            $layout[] = Layout::accordion(["Статус рассмотрения заявки" => [
-                   Layout::view('AppovalStateView', ['approval_state' => $this->approvalState])
-            ]])->stayOpen(false);
+        if (in_array($this->entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
+            $layout[] = Layout::accordion([
+                "Статус заявки: " . $state => [Layout::view('ApprovalStateView', ['approval_state' => $this->reviewStatus])]
+            ]);
         }
         $layout[] = Layout::rows([
             Input::make("entity.Id")->type("hidden"),

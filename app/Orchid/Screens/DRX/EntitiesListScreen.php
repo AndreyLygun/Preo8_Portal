@@ -48,11 +48,11 @@ class EntitiesListScreen extends Screen
             DropDown::make("Создать заявку...")->list([
                 Link::make("...на разовый пропуск")->route("drx.Pass4Visitors"),
                 Link::make("...на постоянный пропуск")->route("drx.PermanentPass4Employee"),
-                Link::make("...на временный доступ для сотрудника")->route("drx.Permission4Employee"),
+                Link::make("...на временный доступ для сотрудника")->route("drx.Permission4Employee")->hr(),
                 Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
                 Link::make("...на разовый автопропуск")->route("drx.Pass4VisitorCar"),
                 Link::make("...на постоянный автопропуск")->route("drx.PermanentPass4Car"),
-                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car"),
+                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
                 Link::make("...на разовое перемещение ТМЦ")->route("drx.Pass4AssetsMoving"),
                 Link::make("...на регулярное перемещение ТМЦ")->route("drx.Pass4PermanentAssetsMoving"),
             ])
@@ -92,7 +92,7 @@ class EntitiesListScreen extends Screen
                     ->cssClass(fn($item) => $item["RequestState"])
                     ->sort(),
                 ExtendedTD::make("RequestState", "Статус")
-                    ->render(fn($item) => config('srq.RequestState')[$item["RequestState"]])
+                    ->render(fn($item) => __($item["RequestState"]))
                     ->cssClass(fn($item) => $item["RequestState"])->sort()
             ])
         ];

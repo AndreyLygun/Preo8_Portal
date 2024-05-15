@@ -44,16 +44,15 @@ class Pass4PermanentAssetsMovingScreen extends SecuritySRQScreen
     public function layout(): iterable
     {
         Log::debug("Начало layout()");
-        $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
-            DateTimer::make('entity.ValidFrom')->title("Действует с")->horizontal()
+            DateTimer::make('entity.ValidFrom')->title("Действует с")->horizontal()->disabled($this->readOnly)
                 ->min(Carbon::today())->max(Carbon::today()->addYear(1))->enableTime(false)->format('Y-m-d')->serverFormat('Y-m-d\Z'),
-            DateTimer::make('entity.ValidTill')->title("Действует до")->horizontal()
+            DateTimer::make('entity.ValidTill')->title("Действует до")->horizontal()->disabled($this->readOnly)
                 ->min(Carbon::today())->max(Carbon::today()->addYear(1))->enableTime(false)->format('Y-m-d')->serverFormat('Y-m-d\Z'),
-            TextArea::make('entity.Assets')->title('Описание ТМЦ')->horizontal()->rows(5)->required(),
+            TextArea::make('entity.Assets')->title('Описание ТМЦ')->horizontal()->rows(5)->required()->readonly($this->readOnly),
             ExtendedMatrix::make('entity.Cars')
-                ->columns(['Модель' => 'Model', 'Гос.гомер' => 'Number', 'Примечание' => 'Note'])->title('Сведения об автомобилях')->readonly($readonly)
+                ->columns(['Модель' => 'Model', 'Гос.гомер' => 'Number', 'Примечание' => 'Note'])->title('Сведения об автомобилях')->readonly($this->readOnly)
         ])->title("Описание ТМЦ");
         $layout[] = Layout::rows([
                 TextArea::make('')->rows(5)->readonly(true)

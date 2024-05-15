@@ -7,5 +7,5 @@
     label[fontweight="Bold"] {font-weight: bold}
 </style>
 <div class="bg-white rounded shadow-sm p-4 py-4 d-flex flex-column">
- {!! $approval_state !!}
+ {!! $reviewStatus !!}
 </div>
