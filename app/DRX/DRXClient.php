@@ -66,16 +66,18 @@ class DRXClient extends ODataClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
-        $Id = (int)$Entity['Id'] ?? null;
+        $Id = isset($Entity['Id']) ? (int)$Entity['Id']:null;
         unset($Entity['Id']);
+        unset($Entity['Renter']);
         // обрабатываем странное поведение контрола Orchid Select, который возвращает строку вместо целого числа\
         // у нас такая хрень мешает в полях-ссылках (в терминах DRX), которые здесь выглядят как Select::make('entity.somefield.Id')
         // TODO нужно попытаться исправить это в коде контрола
         foreach ($Entity as $key => $field) {
-            if (isset($field['Id'])) {
+            if (is_array($field) && isset($field['Id'])) {
                 $Entity[$key]['Id'] = (int)$field['Id'];
             }
         }
+
         // Обрабатываем поля-коллекции из списка $this->CollectionFields
         foreach ($CollectionFields as $cf) {
             if (isset($Entity[$cf])) {
@@ -88,7 +90,6 @@ class DRXClient extends ODataClient
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
         } else {            // Создаём запись
-            //dd($Entity);
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->post($Entity))[0];
         }
         return $Entity;
@@ -167,6 +168,8 @@ class DRXClient extends ODataClient
 
     public function callAPIfunction($functionName, $params)
     {
+        log::error($functionName);
+        log::error($params);
         $Entity = $this->from($functionName)->post($params);
         return $Entity;
     }

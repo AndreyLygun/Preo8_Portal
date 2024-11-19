@@ -44,7 +44,7 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
             return [$value['Id']=>$value['Name']];
         };
         try {
-            Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало query ($id)");
+//            Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало query ($id)");
             $result = parent::query($id);
             Log::debug("Середина query($id)");
             $odata = new DRXClient();
@@ -74,9 +74,6 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
     public function layout(): iterable
     {
         Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало layout");
-        if (!isset($this->entity['RequestState'])) {
-            dd($this->query());
-        }
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
@@ -134,7 +131,7 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
             Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
             TextArea::make('entity.Visitors')->title('Грузчики')->horizontal(),
         ])->title('Сведения о перевозчике');
-        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Конец layout");
+//        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Конец layout");
         return $layout;
     }
 }

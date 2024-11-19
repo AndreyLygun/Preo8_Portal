@@ -21,7 +21,7 @@ class SecuritySRQScreen extends BaseSRQScreen
     public function NewEntity() {
         $entity = parent::NewEntity();
         $entity["ResponsibleName"] = Auth()->user()->name;
-        $entity["ValidTo"] = $entity["ValidFrom"] = $entity["ValidOn"] = Carbon::tomorrow();
+        $entity["ValidTill"] = $entity["ValidFrom"] = $entity["ValidOn"] = Carbon::tomorrow();
         return $entity;
     }
 

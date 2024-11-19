@@ -22,6 +22,12 @@ class Pass4VisitorsScreen extends SecuritySRQScreen
     protected $Title = "Заявка на разовый пропуск";
     protected $CollectionFields = [];
 
+    public function NewEntity()
+    {
+     $entity = parent::NewEntity();
+     return $entity;
+    }
+
     public function layout(): iterable
     {
         $readonly = $this->entity['RequestState'] != 'Draft';

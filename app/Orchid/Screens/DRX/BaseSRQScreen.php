@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
 use Orchid\Screen\Layouts\Accordion;
+use Orchid\Screen\Repository;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
@@ -63,17 +64,17 @@ class BaseSRQScreen extends Screen
         ];
     }
 
-    public function query(int $id = null): iterable
+    public function query( $id = null): iterable
     {
         if ($id) {
             try {
                 $odata = new DRXClient();
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
                 if (in_array($entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
-                    $odata->setEntityReturnType(false);
-                    $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
-                    $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
-                    $reviewStatus = str_replace(["\r\n", "{'status':",  "'}"], '', $state);
+//                    $odata->setEntityReturnType(false);
+//                    $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
+//                    $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
+//                    $reviewStatus = str_replace(["\r\n", "{'status':",  "'}"], '', $state);
                 }
             } catch (GuzzleException $ex) {
                 return array('error' => ['Message' => $ex->getMessage(), 'Code' => $ex->getCode()]);
@@ -119,10 +120,12 @@ class BaseSRQScreen extends Screen
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
     public function SaveToDRX($submitToApproval = false)
     {
+        $this->entity = \request()->get('entity');
         $this->beforeSave();
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
+
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         if ($submitToApproval) {
             $odata->callAPIfunction('ServiceRequests/StartDocumentReviewTask', ['requestId' => $entity['Id']]);
@@ -132,7 +135,6 @@ class BaseSRQScreen extends Screen
 
     public function Save()
     {
-        $this->entity = request()->get('entity');
         $this->entity = $this->SaveToDRX();
         Toast::info("Успешно сохранено");
         return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
@@ -140,7 +142,6 @@ class BaseSRQScreen extends Screen
 
     public function SubmitToApproval()
     {
-        $this->entity = request()->get('entity');
         $this->SaveToDRX(true);
         Toast::info("Заявка сохранена и отправлена на согласование");
         return redirect(route('drx.srqlist'));
@@ -172,6 +173,7 @@ class BaseSRQScreen extends Screen
             ]);
         }
         $layout[] = Layout::rows([
+            Input::make("entity.RequestState")->type("hidden"),
             Input::make("entity.Id")->type("hidden"),
             Label::make("entity.Renter.Name")->title("Название компании")->horizontal(),
             Label::make("entity.Creator")->title("Автор заявки")->horizontal()
