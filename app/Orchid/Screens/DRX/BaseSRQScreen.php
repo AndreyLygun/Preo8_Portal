@@ -64,19 +64,20 @@ class BaseSRQScreen extends Screen
         ];
     }
 
-    public function query( $id = null): iterable
+    public function query(int $id = null): iterable
     {
         if ($id) {
             try {
                 $odata = new DRXClient();
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
                 if (in_array($entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
-//                    $odata->setEntityReturnType(false);
-//                    $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
-//                    $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
-//                    $reviewStatus = str_replace(["\r\n", "{'status':",  "'}"], '', $state);
+                    $odata->setEntityReturnType(false);
+                    $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
+                    $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
+                    $reviewStatus = str_replace(["\r\n", "{'status':",  "'}"], '', $state);
                 }
             } catch (GuzzleException $ex) {
+                dd($ex);
                 return array('error' => ['Message' => $ex->getMessage(), 'Code' => $ex->getCode()]);
             }
         } else {

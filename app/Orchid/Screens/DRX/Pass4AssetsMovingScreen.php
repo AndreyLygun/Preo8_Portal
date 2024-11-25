@@ -73,7 +73,8 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
-        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало layout");
+//        Log::debug("Стр. ". __LINE__ . "@" . __FILE__ . ": Начало layout");
+//        dd($this->entity);
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([

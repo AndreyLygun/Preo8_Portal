@@ -168,8 +168,6 @@ class DRXClient extends ODataClient
 
     public function callAPIfunction($functionName, $params)
     {
-        log::error($functionName);
-        log::error($params);
         $Entity = $this->from($functionName)->post($params);
         return $Entity;
     }
