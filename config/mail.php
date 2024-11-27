@@ -37,13 +37,13 @@ return [
         'smtp' => [
             'transport' => 'smtp',
 //            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', 'smtp.yandex.ru'),
-            'port' => env('MAIL_PORT', 465),
-            'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
+            'host' => env('MAIL_HOST'),
+            'port' => env('MAIL_PORT', 587),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
-//            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+            'verify_peer' => env('MAIL_VERIFY_PEER', true),
         ],
 
         'ses' => [
@@ -99,8 +99,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'portal@preo8.ru'),
+        'name' => env('MAIL_FROM_NAME', 'Портал ПРЕО 8'),
     ],
 
     /*
@@ -123,3 +123,4 @@ return [
     ],
 
 ];
+

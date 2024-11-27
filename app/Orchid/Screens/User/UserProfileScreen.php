@@ -7,6 +7,7 @@ namespace App\Orchid\Screens\User;
 use App\Orchid\Layouts\User\ProfilePasswordLayout;
 use App\Orchid\Layouts\User\UserEditLayout;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Orchid\Access\Impersonation;
@@ -73,15 +74,16 @@ class UserProfileScreen extends Screen
      */
     public function layout(): iterable
     {
+//        dd(Auth::user()->hasAccess());
         return [
             Layout::block(UserEditLayout::class)
                 ->title(__('Profile Information'))
                 ->description(__("Update your account's profile information and email address."))
                 ->commands(
-                    Button::make(__('Save'))
+                    Auth::user()->hasAccess('platform.systems.users')?Button::make(__('Save'))
                         ->type(Color::BASIC())
                         ->icon('bs.check-circle')
-                        ->method('save')
+                        ->method('save'):null
                 ),
 
             Layout::block(ProfilePasswordLayout::class)
