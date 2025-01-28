@@ -2,6 +2,7 @@
 
 namespace App\Orchid\Screens\DRX;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
@@ -30,10 +31,8 @@ class EntitiesListScreen extends Screen
 
     public function query(): iterable
     {
-        Log::debug("Начало query() для списка");
         $odata = new DRXClient();
         $result = $odata->getList($this->DRXEntityType, $this->ExpandFields(), '-Created', 30);
-        Log::debug("Конец query() для списка");
         return $result;
     }
 
@@ -48,12 +47,14 @@ class EntitiesListScreen extends Screen
             DropDown::make("Создать заявку...")->list([
 //                Link::make("...на разовый пропуск")->route("drx.Pass4Visitors"),
 //                Link::make("...на постоянный пропуск")->route("drx.PermanentPass4Employee"),
-                Link::make("...на временный доступ для сотрудника")->route("drx.Permission4Employee")->hr(),
 //                Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
-//                Link::make("...на разовый автопропуск")->route("drx.Pass4VisitorCar"),
+                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
+                Link::make("...на дополнительный доступ")->route("drx.WorkPermission")->hr(),
+                Link::make("...на разовый автопропуск")->route("drx.Pass4VisitorCar")->hr(),
 //                Link::make("...на постоянный автопропуск")->route("drx.PermanentPass4Car"),
 //                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
-                Link::make("...на разовое перемещение ТМЦ")->route("drx.Pass4AssetsMoving"),
+                Link::make("...на разовый ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsMoving"),
+                Link::make("...на внутреннее перемещение ТМЦ")->route("drx.Pass4AssetsInternalMoving"),
 //                Link::make("...на регулярное перемещение ТМЦ")->route("drx.Pass4PermanentAssetsMoving"),
             ])
         ];

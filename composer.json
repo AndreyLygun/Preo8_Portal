@@ -17,6 +17,7 @@
         "saintsystems/odata-client": "dev-l10-compatibility"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.9.1",
         "laravel-lang/common": "^4.0",
         "laravel/pint": "^1.0",

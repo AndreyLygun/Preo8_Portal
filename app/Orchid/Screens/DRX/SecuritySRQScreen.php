@@ -25,6 +25,8 @@ class SecuritySRQScreen extends BaseSRQScreen
         return $entity;
     }
 
+
+
     /**
      * The screen's layout elements.
      *

@@ -27,9 +27,11 @@ use App\Orchid\Screens\DRX\StopPermanentPass4EmployeeScreen;// Блокиров�
 use App\Orchid\Screens\DRX\Pass4VisitorCarScreen;           // Разовый автопропуск
 use App\Orchid\Screens\DRX\PermanentPass4CarScreen;         // Псстоянный автопропуск
 use App\Orchid\Screens\DRX\StopPermanentPass4CarScreen;     // Блокировка автопропуска
-use App\Orchid\Screens\DRX\Pass4AssetsMovingScreen;         // Разовое Перемещение ТМЦ
-use App\Orchid\Screens\DRX\Pass4PermanentAssetsMovingScreen;// Разовое Перемещение ТМЦ
+use App\Orchid\Screens\DRX\WorkPermissionScreen;                  // Заявка на выполнение работ
 
+use App\Orchid\Screens\DRX\Pass4AssetsMovingScreen;         // Разовый ввоз-вывоз ТМЦ
+use App\Orchid\Screens\DRX\Pass4AssetsInternalMovingScreen; // Разовое внутреннее перемещение ТМЦ
+use App\Orchid\Screens\DRX\Pass4PermanentAssetsMovingScreen;// Разовое Перемещение ТМЦ
 
 
 
@@ -59,15 +61,17 @@ Route::screen("/srq/list", EntitiesListScreen::class)->name('drx.srqlist');
 // Люди
 Route::screen("/srq/IPass4VisitorDto/{id?}", Pass4VisitorsScreen::class)->name('drx.Pass4Visitors');
 Route::screen("/srq/IPermanentPass4EmployeeDto/{id?}", PermanentPass4EmployeeScreen::class)->name('drx.PermanentPass4Employee');
-Route::screen("/srq/IPermission4EmployeeDto/{id?}", Permission4EmployeeScreen::class)->name('drx.Permission4Employee');
 Route::screen("/srq/IStopPermanentPass4EmployeeDto/{id?}", StopPermanentPass4EmployeeScreen::class)->name('drx.StopPermanentPass4Employee');
+Route::screen("/srq/IPermission4EmployeeDto/{id?}", Permission4EmployeeScreen::class)->name('drx.Permission4Employee');
+Route::screen("/srq/IWorkPermissionDto/{id?}", WorkPermissionScreen::class)->name('drx.WorkPermission');
 
 // Машины
 Route::screen("/srq/IPass4VisitorCarDto/{id?}", Pass4VisitorCarScreen::class)->name('drx.Pass4VisitorCar');
 Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentPass4CarScreen::class)->name('drx.PermanentPass4Car');
 Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", StopPermanentPass4CarScreen::class)->name('drx.StopPermanentPass4Car');
-// Грузы
+// ТМЦ
 Route::screen("/srq/IPass4AssetsMovingDto/{id?}", Pass4AssetsMovingScreen::class)->name('drx.Pass4AssetsMoving');
+Route::screen("/srq/IPass4AssetsInternalMovingDto/{id?}", Pass4AssetsInternalMovingScreen::class)->name('drx.Pass4AssetsInternalMoving');
 Route::screen("/srq/IPass4PermanentAssetsMovingDto/{id?}", Pass4PermanentAssetsMovingScreen::class)->name('drx.Pass4PermanentAssetsMoving');
 
 

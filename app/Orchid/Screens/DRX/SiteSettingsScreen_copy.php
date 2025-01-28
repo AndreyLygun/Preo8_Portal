@@ -7,8 +7,10 @@ namespace App\Orchid\Screens\DRX;
 # Кнопка "Обновить" запрашивает состояние справочников с сервера DRX
 
 use App\DRX\ExtendedMatrix;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Mockery\Exception;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
@@ -22,10 +24,21 @@ use Carbon\Carbon;
 
 class SiteSettingsScreen extends Screen
 {
+    // Тип документа в сервисе интеграции, например IOfficialDocuments
+    public $DRXEntityType = "IServiceRequestsBaseSRQs";
+
+    //Возвращает список ссылочных свойств (через запятую), которые должны быть получены в запросе
+    public function ExpandFields(): string
+    {
+        return "Author,DocumentKind";
+    }
+
+
     public function query(): iterable
     {
-        $data = Storage::read('settings.json');
-        return json_decode($data, true);
+//        $sites = Cache::rememberForever('Sites', function() use ($odata) {
+//            return $odata->from('IServiceRequestsSites')->get();
+//        });
     }
 
     public function name(): ?string

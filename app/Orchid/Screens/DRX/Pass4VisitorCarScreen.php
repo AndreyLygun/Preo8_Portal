@@ -35,6 +35,12 @@ class Pass4VisitorCarScreen extends SecuritySRQScreen
         return $entity;
     }
 
+    public function beforeSave()
+    {
+        parent::beforeSave();
+        $this->NormalizeDate('ValidOnDateTime');
+    }
+
 
     // Описывает макет экрана
     public function layout(): iterable
@@ -43,10 +49,10 @@ class Pass4VisitorCarScreen extends SecuritySRQScreen
 
         $layout = parent::layout();
         $layout[] = Layout::rows([
-                DateTimer::make("entity.ValidOnDateTime")->title("Дата и время въезда")->horizontal()
-                    ->format("Y-m-d\TH:i:00+03:00")
-//                    ->serverformat('Y-m-d\TH:i:00+03:00')
-                    ->enableTime(true)->format24hr()->allowInput()->required()->disabled($this->readOnly),
+                DateTimer::make("entity.ValidOnDateTime")->title("Дата и время въезда.")->horizontal()
+                    ->format("Y-m-d H:i")->allowInput(true)
+                    ->withQuickDates(['Завтра'=>now()->addDay(), 'Послезавтра'=>now()->addDay(2)])
+                    ->enableTime(true)->format24hr()->required()->disabled($this->readOnly),
                 Input::make("entity.CarModel")->title("Модель автомобиля")->horizontal()->required()->disabled($this->readOnly),
                 Input::make("entity.CarNumber")->title("Номер автомобиля")->horizontal()->required()->readonly($this->readOnly),
                 CheckBox::make("entity.PrivateParking")->title("На парковку арендатора")->horizontal()->disabled($this->readOnly)

@@ -16,15 +16,15 @@ use Orchid\Support\Facades\Toast;
 
 
 
-class Pass4AssetsMovingScreen extends SecuritySRQScreen
+class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
 {
 
-    protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
-    protected $Title = 'Заявка на перемещение ТМЦ';
+    protected $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
+    protected $Title = 'Заявка на внутреннее перемещение ТМЦ';
 
     public function ExpandFields()
     {
-        $ExpandFields = ['LoadingSite', 'TimeSpan', 'Inventory'];
+        $ExpandFields = ['TimeSpan', 'Inventory'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
@@ -44,17 +44,10 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
         $IdNameFunction = function($value) {
             return [$value['Id']=>$value['Name']];
         };
-        $LoadingSites = collect($this->Sites)->where('Type', 'Loading')->mapWithKeys($IdNameFunction);
         $TimeSpans = collect($this->TimeSpans)->mapWithKeys($IdNameFunction);
         $layout = parent::layout();
         $readonly = $this->readOnly;
         $layout[] = Layout::rows([
-            Select::make('entity.MovingDirection')
-                ->title('Направление перемещения')
-                ->options(config('srq.MovingDirection'))->empty('')
-                ->required()
-                ->horizontal()
-                ->disabled($readonly),
             DateTimer::make('entity.ValidOn')
                 ->title("Дата перемещения")
                 ->format('d-m-Y')
@@ -65,14 +58,13 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ->min($this->EearliestDate(14))
                 ->help("Заявки &laquo;на сегодня&raquo; принимаются до 14:00. Время согласования заявки - 3 часа")
                 ->disabled($readonly),
-            Select::make('entity.LoadingSite.Id')
-                ->title('Место разгрузки')
-                ->options($LoadingSites)
-                ->required()
+            Input::make('entity.From')
+                ->title('Откуда')
                 ->horizontal()
+                ->required()
                 ->disabled($readonly),
-            Input::make('entity.Floor')
-                ->title('Этаж')
+            Input::make('entity.To')
+                ->title('Куда')
                 ->horizontal()
                 ->required()
                 ->disabled($readonly),
@@ -106,12 +98,6 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ->readonly($readonly)
         ])->title("Описание ТМЦ");
 
-        $layout[] = Layout::rows([
-            Input::make('entity.CarModel')->title('Модель автомобиля')->horizontal(),
-            Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
-            TextArea::make('entity.Visitors')->title('Грузчики')->horizontal(),
-            Button::make(__("Save"))->type(Color::BASIC)->method('saveCarrier')->style()->canSee($this->entity['RequestState']=='Approved'),
-        ]) ->title('Сведения о перевозчике');
         return $layout;
     }
 

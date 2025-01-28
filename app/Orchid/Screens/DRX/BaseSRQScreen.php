@@ -5,16 +5,20 @@ namespace App\Orchid\Screens\DRX;
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
-use Orchid\Screen\Layouts\Accordion;
-use Orchid\Screen\Repository;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
-use Orchid\Screen\Actions\ModalToggle;
+
+
+function IdNameFunction($value) {
+    return [$value['Id']=>$value['Name']];
+}
 
 
 class BaseSRQScreen extends Screen
@@ -30,9 +34,31 @@ class BaseSRQScreen extends Screen
     protected $Title = '';
     public $readOnly;
     public $entity;
+    public $Sites;
+    public $TimeSpans;
     public $reviewStatus;
 
 
+    // Получаем самую ранюю дату исполнения заявки в зависимости от текущего времени
+    public function EearliestDate($hour) {
+        $currentHour = Carbon::now()->hour;
+        if ($currentHour < $hour)
+            return Carbon::today();
+        else
+            return Carbon::today()->addDay(1);
+    }
+
+    // преобразовывает дату в формат, требуемый
+    public function NormalizeDate(string|array $fields) {
+        if (is_array($fields)) {
+            foreach ($fields as $field)
+                if (isset($this->entity[$field]))
+                    $this->entity[$field] = Carbon::parse($this->entity[$field])->format('Y-m-d\TH:i:00+03:00');
+        } else {
+            if (isset($this->entity[$fields]))
+                $this->entity[$fields] = Carbon::parse($this->entity[$fields])->format('Y-m-d\TH:i:00+03:00');;
+        }
+    }
 
     // Возвращает список полей-ссылок и полей-коллекций, который используются в форме. Нужен, чтобы OData-API вернул значения этих полей
     // Как правило, перекрытый метод в классе-наследнике добавляет свои поля к результату метода из класса-предка
@@ -46,10 +72,9 @@ class BaseSRQScreen extends Screen
         return [];
     }
 
-    public function beforeSave() {
-
+    public function beforeSave()
+    {
     }
-
 
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity()
@@ -66,25 +91,35 @@ class BaseSRQScreen extends Screen
 
     public function query(int $id = null): iterable
     {
-        if ($id) {
-            try {
-                $odata = new DRXClient();
+        $odata = new DRXClient();
+        try {
+            if ($id) {
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
                 if (in_array($entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
                     $odata->setEntityReturnType(false);
                     $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
                     $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
-                    $reviewStatus = str_replace(["\r\n", "{'status':",  "'}"], '', $state);
+                    $reviewStatus = str_replace(["\r\n", "{'status':", "'}"], '', $state);
                 }
-            } catch (GuzzleException $ex) {
-                dd($ex);
-                return array('error' => ['Message' => $ex->getMessage(), 'Code' => $ex->getCode()]);
+            } else {
+                $entity = $this->NewEntity();
             }
-        } else {
-            $entity = $this->NewEntity();
+            $Sites = Cache::rememberForever('Sites', function() use ($odata) {
+                return $odata->from('IServiceRequestsSites')->get();
+            });
+            $TimeSpans = Cache::rememberForever('TimeSpans', function() use ($odata) {
+                return $odata->from('IServiceRequestsTimeSpans')->get();
+            });
+            return [
+                'entity' => $entity,
+                'readOnly' => !in_array($entity['RequestState'], ['Draft', 'Denied']),
+                'Sites' => $Sites,
+                'TimeSpans' => $TimeSpans,
+                'reviewStatus' => $reviewStatus??''
+            ];
+        } catch (GuzzleException $ex) {
+            abort($ex->getCode(), $ex->getMessage());
         }
-        $readOnly = !in_array($entity['RequestState'], ['Draft', 'Denied']);
-        return ['entity' => $entity, 'readOnly' => $readOnly, 'reviewStatus' => $reviewStatus??''];
     }
 
     public function name(): ?string
@@ -119,14 +154,13 @@ class BaseSRQScreen extends Screen
     }
 
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
-    public function SaveToDRX($submitToApproval = false)
+    public function SaveToDRX($submitToApproval = false, $entity = null)
     {
-        $this->entity = \request()->get('entity');
+        $this->entity = $entity??\request()->get('entity');
         $this->beforeSave();
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
         $odata = new DRXClient();
-
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         if ($submitToApproval) {
             $odata->callAPIfunction('ServiceRequests/StartDocumentReviewTask', ['requestId' => $entity['Id']]);

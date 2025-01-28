@@ -38,6 +38,7 @@ class Pass4PermanentAssetsMovingScreen extends SecuritySRQScreen
         parent::beforeSave();
         if ($this->entity['Assets'] == null) $this->entity['Assets'] = '';
         if (!isset($this->entity['Cars'])) $this->entity['Cars'] = [];
+        $this->NormalizeDate(['ValidFrom', 'ValidTill']);
         //dd($this->entity);
     }
 
