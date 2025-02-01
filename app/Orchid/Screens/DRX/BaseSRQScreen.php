@@ -40,7 +40,8 @@ class BaseSRQScreen extends Screen
 
 
     // Получаем самую ранюю дату исполнения заявки в зависимости от текущего времени
-    public function EearliestDate($hour) {
+    public function EearliestDate($hour)
+    {
         $currentHour = Carbon::now()->hour;
         if ($currentHour < $hour)
             return Carbon::today();
@@ -49,7 +50,8 @@ class BaseSRQScreen extends Screen
     }
 
     // преобразовывает дату в формат, требуемый
-    public function NormalizeDate(string|array $fields) {
+    public function NormalizeDate(string|array $fields)
+    {
         if (is_array($fields)) {
             foreach ($fields as $field)
                 if (isset($this->entity[$field]))
@@ -72,6 +74,12 @@ class BaseSRQScreen extends Screen
         return [];
     }
 
+    // В наследуемых классах можно переопределить эту функцию, для адаптации данных из ODate к виду, подходящему для Layot()
+    public function afterQuery()
+    {
+    }
+
+    // В наследуемых классах можно переопределить эту функцию, для предварительной обработки сохраняемой $this->Entity
     public function beforeSave()
     {
     }
@@ -136,7 +144,8 @@ class BaseSRQScreen extends Screen
         $buttons = [];
         switch ($this->entity["RequestState"]) {
             case 'Draft':
-                $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
+                if (isset($this->entity["Id"]))
+                    $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
                 $buttons[] = Button::make("Сохранить")->method("Save");
                 break;
             case 'Active':
