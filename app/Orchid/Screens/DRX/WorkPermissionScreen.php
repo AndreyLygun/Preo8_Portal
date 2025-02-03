@@ -54,6 +54,9 @@ class WorkPermissionScreen extends SecuritySRQScreen
             CheckBox::make("entity.DisableAFA")
                 ->title("Требуется выключение пожарной сигнализации")
                 ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
+                ->indeterminate(!isset($this->entity["DisableAFA"]))
+//                ->required()
+                ->placeholder(!isset($this->entity["DisableAFA"])?"Укажите":"")
                 ->disabled($readonly)->sendTrueOrFalse()->horizontal(),
             TextArea::make('entity.Site')
                 ->title('Место выполнения работ')
