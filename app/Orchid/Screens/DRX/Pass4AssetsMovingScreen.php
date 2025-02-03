@@ -51,7 +51,6 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
         $this->NormalizeDate(['ValidOn']);
         if (isset($this->entity["ElevatorTimeSpan"]))
             $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value)=>(object)["Name" => (object) ["Id" => (int) $value]])->toArray();
-        //dd(json_encode($this->entity["ElevatorTimeSpan"]));
     }
 
     public function layout(): iterable
@@ -88,9 +87,10 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ->horizontal()
                 ->disabled($readonly),
             Input::make('entity.Floor')
-                ->title('Этаж')
+                ->title('Куда/откуда')
                 ->horizontal()
                 ->required()
+                ->help("Укажите блок, этаж, помещение")
                 ->disabled($readonly),
             CheckBox::make('entity.Elevator')
                 ->title('Требуется грузовой лифт')

@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
+use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
@@ -99,6 +100,7 @@ class BaseSRQScreen extends Screen
 
     public function query(int $id = null): iterable
     {
+//          dd(old());
         $odata = new DRXClient();
         try {
             if ($id) {
@@ -179,16 +181,24 @@ class BaseSRQScreen extends Screen
 
     public function Save()
     {
-        $this->entity = $this->SaveToDRX();
-        Toast::info("Успешно сохранено");
-        return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
+        try {
+            $this->entity = $this->SaveToDRX();
+            Toast::info("Успешно сохранено");
+            return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
+        } catch (GuzzleException $ex) {
+            Alert::error("При сохранении заявки произошла ошибка:" . $ex->getResponse()->getBody()->getContents());
+        }
     }
 
     public function SubmitToApproval()
     {
-        $this->SaveToDRX(true);
-        Toast::info("Заявка сохранена и отправлена на согласование");
-        return redirect(route('drx.srqlist'));
+        try {
+            $this->SaveToDRX(true);
+            Toast::info("Заявка сохранена и отправлена на согласование");
+            return redirect(route('drx.srqlist'));
+        } catch (GuzzleException $ex) {
+            Alert::error("При сохранении заявки произошла ошибка:" . $ex->getResponse()->getBody()->getContents());
+        }
     }
 
     public function Delete()
