@@ -51,7 +51,7 @@ class WorkPermissionScreen extends SecuritySRQScreen
                 ->rows(3)
                 ->required()
                 ->disabled($readonly),
-            CheckBox::make("DisableAFA")
+            CheckBox::make("entity.DisableAFA")
                 ->title("Требуется выключение пожарной сигнализации")
                 ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
                 ->disabled($readonly)->sendTrueOrFalse()->horizontal(),
