@@ -17,7 +17,6 @@ use Orchid\Screen\Fields\DateTimer;
 use Orchid\Support\Facades\Toast;
 
 
-
 class Pass4AssetsMovingScreen extends SecuritySRQScreen
 {
 
@@ -46,20 +45,19 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
     }
 
 
-
     public function beforeSave()
     {
         parent::beforeSave();
         $this->NormalizeDate(['ValidOn']);
         if (isset($this->entity["ElevatorTimeSpan"]))
-            $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value)=>(object)["Name" => (object) ["Id" => (int) $value]])->toArray();
+            $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value) => (object)["Name" => (object)["Id" => (int)$value]])->toArray();
     }
 
     public function layout(): iterable
     {
         //dd($this->entity);
-        $IdNameFunction = function($value) {
-            return [$value['Id']=>$value['Name']];
+        $IdNameFunction = function ($value) {
+            return [$value['Id'] => $value['Name']];
         };
         $LoadingSites = collect($this->Sites)->where('Type', 'Loading')->mapWithKeys($IdNameFunction);
         $TimeSpans = collect($this->TimeSpans)->mapWithKeys($IdNameFunction);
@@ -122,21 +120,22 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ->value('false')->set('yesvalue', 'true')->set('novalue', 'false')
                 ->disabled($readonly)->sendTrueOrFalse(),
             ExtendedMatrix::make('entity.Inventory')
-                ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity'])
+                ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity', 'Примечание' => 'Note'])
                 ->readonly($readonly)
         ])->title("Описание ТМЦ");
 
         $layout[] = Layout::rows([
-            Label::make('')->value('Сведения о перевозчике можно заполнить после согласования пропуска')->class("small mt-0 mb-0"),
+            Button::make(__("Save"))->method('saveCarrier')->class('btn btn-primary')->canSee($this->entity['RequestState'] == 'Approved'),
+            Label::make('')->value('Сведения о перевозчике можно заполнить после согласования пропуска')->class("small mt-0 mb-0")->canSee($this->entity['RequestState'] != 'Approved'),
             Input::make('entity.CarModel')->title('Модель автомобиля')->horizontal(),
             Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
-            TextArea::make('entity.Visitors')->title('Грузчики')->horizontal()->rows(3),
-            Button::make(__("Save"))->type(Color::BASIC)->method('saveCarrier')->style()->canSee($this->entity['RequestState']=='Approved'),
-        ]) ->title('Сведения о перевозчике');
+            TextArea::make('entity.Visitors')->title('Грузчики (по одному человеку на строку)')->horizontal()->rows(3)  ,
+        ])->title('Сведения о перевозчике');
         return $layout;
     }
 
-    public function saveCarrier(Request $request) {
+    public function saveCarrier(Request $request)
+    {
         Toast::info("ok, saved");
         $validated = $request->validate([
             'entity.Id' => '',

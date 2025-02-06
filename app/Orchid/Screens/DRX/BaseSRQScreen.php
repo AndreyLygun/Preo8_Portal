@@ -2,6 +2,7 @@
 
 namespace App\Orchid\Screens\DRX;
 
+use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
@@ -37,7 +38,7 @@ class BaseSRQScreen extends Screen
     public $entity;
     public $Sites;
     public $TimeSpans;
-    public $reviewStatus;
+    public $ApprovalStatus;
 
 
     // Получаем самую ранюю дату исполнения заявки в зависимости от текущего времени
@@ -100,16 +101,12 @@ class BaseSRQScreen extends Screen
 
     public function query(int $id = null): iterable
     {
-//          dd(old());
         $odata = new DRXClient();
         try {
             if ($id) {
                 $entity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
                 if (in_array($entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
-                    $odata->setEntityReturnType(false);
-                    $response = $odata->callAPIfunction('ServiceRequests/GetApprovalStatus', ["requestId" => $id]);
-                    $state = $response["\x00SaintSystems\OData\ODataResponse\x00decodedBody"]['value'];
-                    $reviewStatus = str_replace(["\r\n", "{'status':", "'}"], '', $state);
+                    $ApprovalStatus = (new ApprovalStatus($odata))->Get($id);
                 }
             } else {
                 $entity = $this->NewEntity();
@@ -125,7 +122,7 @@ class BaseSRQScreen extends Screen
                 'readOnly' => !in_array($entity['RequestState'], ['Draft', 'Denied']),
                 'Sites' => $Sites,
                 'TimeSpans' => $TimeSpans,
-                'reviewStatus' => $reviewStatus??''
+                'ApprovalStatus' =>$ApprovalStatus??null
             ];
         } catch (GuzzleException $ex) {
             abort($ex->getCode(), $ex->getMessage());
@@ -201,14 +198,6 @@ class BaseSRQScreen extends Screen
         }
     }
 
-    public function Delete()
-    {
-        $odata = new DRXClient();
-        $odata->deleteEntity($this->EntityType, request('entity.Id'));
-        Toast::info("Заявка удалена");
-        return redirect(route('drx.srqlist'));
-    }
-
     public function layout(): iterable
     {
         if (isset($this->error)) {
@@ -223,7 +212,7 @@ class BaseSRQScreen extends Screen
         $layout = [];
         if (in_array($this->entity['RequestState'], ['OnReview', 'Denied', 'Approved'])) {
             $layout[] = Layout::accordion([
-                "Статус заявки: " . $state => [Layout::view('ApprovalStateView', ['approval_state' => $this->reviewStatus])]
+                "Статус заявки: " . $state => [Layout::view('ApprovalStateView', ['reviewStatus' => $this->ApprovalStatus])]
             ]);
         }
         $layout[] = Layout::rows([
