@@ -9,8 +9,8 @@
         </div>
     @elseif($block["Status"] == 'Completed')
             @if($block['Result'] == 'Approved' or $block["Result"] == 'WithSuggestions')
-                <div class="text-success">{{ $block["BlockName"] }}: cогласовано в {{$block['CompletedAt']}}</div>
-                <div>Согласующий: {{$block['CompletedBy']["Name"]}}</div>
+                <div class="text-success"><b>{{ $block["BlockName"] }}</b>: cогласовано в {{$block['CompletedAt']}}</div>
+                <div><b>Согласующий:</b> {{$block['CompletedBy']["Name"]}}</div>
                 <div><b>Комментарий:</b>
                     @foreach($block["Texts"] as $text)
                         {{ $text["Body"] }}{{$loop->last?"":", "}}
@@ -18,8 +18,8 @@
                 </div>
             @endif
             @if($block["Result"] == 'ForRework')
-                <div class = "text-danger">{{ $block['BlockName'] }}: отказано в {{$block['CompletedAt']}}</div>
-                <div>Согласующий: {{$block['CompletedBy']['Name']}}</div>
+                <div class = "text-danger"><b>{{ $block['BlockName'] }}</b>: отказано в {{$block['CompletedAt']}}</div>
+                <div><b>Согласующий:</b> {{$block['CompletedBy']['Name']}}</div>
                 <div><b>Причина:</b>
                     @foreach($block["Texts"] as $text)
                         {{ $text["Body"] }}{{$loop->last?"":", "}}

@@ -63,9 +63,9 @@ class ApprovalStatus
             $process[$blockName]["Status"] = $a['Status'];
             $process[$blockName]["Performers"][] = $a['Performer'];
             $process[$blockName]["Texts"] = $a["Texts"];
-            $process[$blockName]["CreatedAt"] = Carbon::parse($a["Created"])->format('h:i d/m/y ');;
+            $process[$blockName]["CreatedAt"] = Carbon::parse($a["Created"])->locale('ru_RU')->translatedFormat('H:i d/m/y ');;
             $process[$blockName]["CompletedBy"] = $a["CompletedBy"];
-            $process[$blockName]["CompletedAt"] = Carbon::parse($a["Completed"])->format('h:i d/m/y ');
+            $process[$blockName]["CompletedAt"] = Carbon::parse($a["Completed"])->locale('ru_RU')->translatedFormat('H:i d/m/y ');
             $process[$blockName]["Result"] = $a["Result"];
         }
         return $process;
