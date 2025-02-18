@@ -7,6 +7,7 @@ namespace App\Orchid\Screens\DRX;
 # Кнопка "Обновить" запрашивает состояние справочников с сервера DRX
 
 use App\DRX\ExtendedMatrix;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Orchid\Screen\Actions\Button;
@@ -25,6 +26,7 @@ class SiteSettingsScreen extends Screen
     public function query(): iterable
     {
         $data = Storage::read('settings.json');
+        Cache::clear();
         return json_decode($data, true);
     }
 
