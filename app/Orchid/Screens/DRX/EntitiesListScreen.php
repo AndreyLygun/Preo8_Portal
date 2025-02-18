@@ -51,7 +51,7 @@ class EntitiesListScreen extends Screen
 //                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
                 Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr(),
                 Link::make("...на гостевой автопропуск")->route("drx.Pass4VisitorCar")->hr(),
-                Link::make("...на постоянный автопропуск")->route("drx.PermanentPass4Car"),
+                Link::make("...на оформление/блокировку постоянного автопропуска")->route("drx.PermanentPass4Car"),
 //                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
                 Link::make("...на разовый ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsMoving"),
                 Link::make("...на внутреннее перемещение ТМЦ")->route("drx.Pass4AssetsInternalMoving"),

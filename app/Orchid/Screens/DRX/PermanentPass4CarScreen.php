@@ -22,7 +22,7 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsPermanentPass4Cars";
-    public $Title = "Заявка на постоянный автопропуск";
+    public $Title = "Заявка на оформление/блокировку постоянного автопропуска";
 
     // Описывает макет экрана
     public function layout(): iterable
