@@ -13,25 +13,19 @@ use Orchid\Screen\Fields\Input;
 
 class StopPermanentPass4CarScreen extends SecuritySRQScreen
 {
-    /**
-     * Fetch data to be displayed on the screen.
-     *
-     * @return array
-     */
-
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsStopPermanentPass4Employees";
-    public $Title = "Заявка на временный доступ для сотрудника";
+    public $Title = "Блокировка постоянного автопропуска";
 
     // Описывает макет экрана
     public function layout(): iterable
     {
         $layout = parent::layout();
-        array_pop($layout);
+        //array_pop($layout);
         $layout[] = Layout::rows([
-            Input::make("entity.CarNumber")->title("ФИО сотрудника")->horizontal(),
-            Input::make("entity.ParkingPlace")->title("Номер пропуска сотрудника")->horizontal(),
-        ])->title('Пропуск для блокировки');
+            Input::make("entity.CarNumber")->title("Госномер")
+                ->horizontal()->help('Госномер автомобиля, пропуск для которого нужно заблокировать.'),
+        ])->title('Сведения об автомобиле');
         return $layout;
     }
 }

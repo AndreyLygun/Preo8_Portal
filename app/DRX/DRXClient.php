@@ -69,9 +69,7 @@ class DRXClient extends ODataClient
         $Id = isset($Entity['Id']) ? (int)$Entity['Id']:null;
         unset($Entity['Id']);
         unset($Entity['Renter']);
-        // обрабатываем странное поведение контрола Orchid Select, который возвращает строку вместо целого числа\
-        // у нас такая хрень мешает в полях-ссылках (в терминах DRX), которые здесь выглядят как Select::make('entity.somefield.Id')
-        // TODO нужно попытаться исправить это в коде контрола
+        // API Directum требует, чтобы в Id было целое число, а не строка
         foreach ($Entity as $key => $field) {
             if (is_array($field) && isset($field['Id'])) {
                 $Entity[$key]['Id'] = (int)$field['Id'];
