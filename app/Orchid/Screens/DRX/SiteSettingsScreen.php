@@ -6,28 +6,25 @@ namespace App\Orchid\Screens\DRX;
 # Информация считывается из JSON-файлов, хранящихся на веб-сервере
 # Кнопка "Обновить" запрашивает состояние справочников с сервера DRX
 
+use App\DRX\Databooks;
 use App\DRX\ExtendedMatrix;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
-use Orchid\Screen\Actions\DropDown;
-use Orchid\Screen\Actions\Link;
-use App\DRX\DRXClient;
-use App\DRX\ExtendedTD;
 use Orchid\Support\Facades\Layout;
-use Carbon\Carbon;
 
 
 class SiteSettingsScreen extends Screen
 {
     public function query(): iterable
     {
-        $data = Storage::read('settings.json');
         Cache::clear();
-        return json_decode($data, true);
+        $result['PassSites'] = Databooks::GetSites('Pass');
+        $result['LoadingSites'] = Databooks::GetSites('Loading');
+        $result['SectionSites'] = Databooks::GetSites('RenterSite');
+        $result['ParkingSites'] = Databooks::GetSites('ParkingSite');
+        $result['TimeSpans'] = Databooks::GetTimeSpans();
+        return $result;
     }
 
     public function name(): ?string
@@ -35,41 +32,20 @@ class SiteSettingsScreen extends Screen
         return 'Информация о БЦ';
     }
 
-    public function commandBar(): iterable
-    {
-        return [
-            Button::make('Обновить данные')->method('Update')
-        ];
-    }
-
-    public function Update() {
-        $IdNameFunction = function(array $value) {
-            return [$value['Id']=>$value['Name']];
-        };
-        $odata = new DRXClient();
-        $result['LoadingSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Loading')->get()->mapWithKeys($IdNameFunction)->toArray();
-        $result['SectionSites'] = $odata->from('IServiceRequestsSites')->where('Type', 'Section')->get()->mapWithKeys($IdNameFunction)->toArray();
-        $result['TimeSpans'] = $odata->from('IServiceRequestsTimeSpans')->get()->mapWithKeys($IdNameFunction);
-        Storage::write('settings.json', json_encode($result));
-    }
-
     public function layout(): iterable
     {
-//        dd($this->query());
-        if (isset($this->query()['error'])) {
-            return [
-                Layout::rows([
-                    Label::make('error.message'),
-                    Label::make('error.errnum')
-                ])->title('Ошибка!')
-            ];
-        }
         $Layout = [
             Layout::rows([
-                ExtendedMatrix::make("LoadingSites")->readonly()->title("Места разгрузки")->columns(['Значение'=>'Value']),
-                ExtendedMatrix::make("SectionSites")->readonly()->title("Секции здания"),
-                ExtendedMatrix::make("TimeSpans")->readonly()->title("Периоды перемещения крупногабаритных грузов")
-            ])
+                Label::make('')->title('Списке мест можно изменить в Directum RX. После изменения зайдите на эту страницу снова.'),
+                ExtendedMatrix::make("PassSites")->readonly()->title("Места входа-выхода")->columns(['Название'=>'Value']),
+                ExtendedMatrix::make("LoadingSites")->readonly()->title("Места загрузки-разгрузки")->columns(['Название'=>'Value']),
+                ExtendedMatrix::make("SectionSites")->readonly()->title("Уровни парковки")->columns(['Название'=>'Value']),
+                ExtendedMatrix::make("ParkingSites")->readonly()->title("Уровни парковки")->columns(['Название'=>'Value']),
+            ])->title("Места в бизнес-центре"),
+            Layout::rows([
+                ExtendedMatrix::make("TimeSpans")->readonly()->title("Места")->columns(['Значение'=>'Value']),
+            ])->title("Время использования лифтов"),
+
         ];
         return $Layout;
     }

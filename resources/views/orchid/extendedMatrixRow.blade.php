@@ -1,7 +1,6 @@
 <tr>
     @foreach($columns as $column)
-
-        <th class="p-0 align-middle">
+        <td class="p-0 align-middle">
             @if(is_string($row))
                 {!! $row !!}
             @else
@@ -13,7 +12,7 @@
                         ->name($keyValue ? $column : "[$key][$column]")->readonly($readonly??false)
                 !!}
             @endif
-        </th>
+        </td>
         @if ($loop->last && $removableRows && !($readonly??false))
             <th class="no-border text-center align-middle">
                 <a href="#"
