@@ -37,14 +37,14 @@ class SiteSettingsScreen extends Screen
         $Layout = [
             Layout::rows([
                 Label::make('')->title('Список мест можно изменить в Directum RX. После изменения зайдите на эту страницу снова.'),
-                ExtendedMatrix::make("SectionSites")->readonly()->title("Этажи здания")->columns(['Название'=>'Value']),
-                ExtendedMatrix::make("PassSites")->readonly()->title("Места входа-выхода")->columns(['Название'=>'Value']),
-                ExtendedMatrix::make("LoadingSites")->readonly()->title("Места загрузки-разгрузки")->columns(['Название'=>'Value']),
-                ExtendedMatrix::make("ParkingSites")->readonly()->title("Уровни парковки")->columns(['Название'=>'Value']),
+                ExtendedMatrix::make("SectionSites")->readonly()->columns(['Этажи здания'=>'Value']),
+                ExtendedMatrix::make("PassSites")->readonly()->columns(['Места входа-выхода'=>'Value']),
+                ExtendedMatrix::make("LoadingSites")->readonly()->columns(['Места загрузки-разгрузки'=>'Value']),
+                ExtendedMatrix::make("ParkingSites")->readonly()->columns(['Уровни парковки'=>'Value']),
             ])->title("Места в бизнес-центре"),
             Layout::rows([
                 Label::make('')->title('Список интервалов можно изменить в Directum RX. После изменения зайдите на эту страницу снова.'),
-                ExtendedMatrix::make("TimeSpans")->readonly()->title("Места")->columns(['Значение'=>'Value']),
+                ExtendedMatrix::make("TimeSpans")->readonly()->columns(['Интервал'=>'Value']),
             ])->title("Время использования лифтов"),
 
         ];
