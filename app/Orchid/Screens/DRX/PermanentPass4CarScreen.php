@@ -38,7 +38,9 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
     {
         $layout = parent::layout();
         $layout[] = PermanentPass4CarListener::class;
-        $layout[] = Layout::rows([TextArea::make('entity.Note')->title("Примечание")->rows(10)->horizontal()]);
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()])
+            ->disabled($this->readOnly);
         return $layout;
     }
 }

@@ -52,7 +52,7 @@ class PermanentPass4CarListener extends Listener
                 ->title('Номер автомобиля')->horizontal()
                 ->required()->disabled($readOnly),
             ExtendedSelect::make('entity.ParkingFloor.Id')->required()->intValue(true)
-                ->title('Парковка (уровень)')->horizontal()->empty('Укажите этаж')
+                ->title('Парковка (уровень)')->horizontal()->disabled($readOnly)
                 ->options(Databooks::GetSites('ParkingSite')),
             Input::make("entity.ParkingPlace")->required()
                 ->title('Парковочное место')->horizontal()
