@@ -25,13 +25,13 @@ class SecuritySRQScreen extends BaseSRQScreen
         return $entity;
     }
 
+    public function beforeSave()
+    {
+        parent::beforeSave();
+        parent::NormalizeDate(['ValidFrom', 'ValidTill', 'ValidOn']);
+    }
 
 
-    /**
-     * The screen's layout elements.
-     *
-     * @return \Orchid\Screen\Layout[]|string[]
-     */
     public function layout(): iterable
     {
         $layout = Layout::rows([

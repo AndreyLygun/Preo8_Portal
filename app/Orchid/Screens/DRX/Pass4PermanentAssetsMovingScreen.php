@@ -2,17 +2,9 @@
 
 namespace App\Orchid\Screens\DRX;
 
-use App\DRX\DRXClient;
 use Carbon\Carbon;
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Log;
-use Orchid\Screen\Fields\CheckBox;
-use Orchid\Screen\Fields\Label;
-use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
-use Orchid\Screen\Fields\Input;
-use Orchid\Screen\Fields\Matrix;
 use App\DRX\ExtendedMatrix;
 use Orchid\Screen\Fields\DateTimer;
 
@@ -44,7 +36,6 @@ class Pass4PermanentAssetsMovingScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
-        Log::debug("Начало layout()");
         $layout = parent::layout();
         $layout[] = Layout::rows([
             DateTimer::make('entity.ValidFrom')->title("Действует с")->horizontal()->disabled($this->readOnly)
@@ -60,7 +51,7 @@ class Pass4PermanentAssetsMovingScreen extends SecuritySRQScreen
                     ->placeholder('При перещении ТМЦ обязуемся убирать за собой упаковочную тару, не загромождать проходы в зонах общего пользования. Сохранность оборудования, интерьера Здания по маршруту движения гарантируем. В случае порчи или нанесения повреждений обязуемся возместить ущерб.')
             ]
         );
-        Log::debug("Конец layout()");
+        $layout[] = Layout::rows([TextArea::make('entity.Note')->title("Примечание")->rows(10)->horizontal()]);
         return $layout;
     }
 }

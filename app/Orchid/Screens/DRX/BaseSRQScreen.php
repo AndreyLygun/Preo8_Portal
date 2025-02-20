@@ -6,8 +6,6 @@ use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
@@ -41,17 +39,16 @@ class BaseSRQScreen extends Screen
     public $ApprovalStatus;
 
 
-    // Получаем самую ранюю дату исполнения заявки в зависимости от текущего времени
+    // Получаем самую ранюю дату исполнения заявки (сегодня или завтра) в зависимости от текущего времени
     public function EearliestDate($hour)
     {
-        $currentHour = Carbon::now()->hour;
-        if ($currentHour < $hour)
+        if (Carbon::now()->hour < $hour)
             return Carbon::today();
         else
             return Carbon::today()->addDay(1);
     }
 
-    // преобразовывает дату в формат, требуемый
+    // преобразовывает дату в формат, требуемый для OData
     public function NormalizeDate(string|array $fields)
     {
         if (is_array($fields)) {
@@ -76,7 +73,7 @@ class BaseSRQScreen extends Screen
         return [];
     }
 
-    // В наследуемых классах можно переопределить эту функцию, для адаптации данных из ODate к виду, подходящему для Layot()
+    // В наследуемых классах можно переопределить эту функцию, для адаптации данных из ODate к виду, подходящему для Layout()
     public function afterQuery()
     {
     }
@@ -84,6 +81,7 @@ class BaseSRQScreen extends Screen
     // В наследуемых классах можно переопределить эту функцию, для предварительной обработки сохраняемой $this->Entity
     public function beforeSave()
     {
+        // $this->Entity["FieldName"] = "NewValue";
     }
 
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
@@ -111,17 +109,17 @@ class BaseSRQScreen extends Screen
             } else {
                 $entity = $this->NewEntity();
             }
-            $Sites = Cache::rememberForever('Sites', function() use ($odata) {
-                return $odata->from('IServiceRequestsSites')->get();
-            });
-            $TimeSpans = Cache::rememberForever('TimeSpans', function() use ($odata) {
-                return $odata->from('IServiceRequestsTimeSpans')->get();
-            });
+//            $Sites = Cache::rememberForever('Sites', function() use ($odata) {
+//                return $odata->from('IServiceRequestsSites')->get();
+//            });
+//            $TimeSpans = Cache::rememberForever('TimeSpans', function() use ($odata) {
+//                return $odata->from('IServiceRequestsTimeSpans')->get();
+//            });
             return [
                 'entity' => $entity,
                 'readOnly' => !in_array($entity['RequestState'], ['Draft', 'Denied']),
-                'Sites' => $Sites,
-                'TimeSpans' => $TimeSpans,
+//                'Sites' => $Sites,
+//                'TimeSpans' => $TimeSpans,
                 'ApprovalStatus' =>$ApprovalStatus??null
             ];
         } catch (GuzzleException $ex) {
@@ -168,6 +166,7 @@ class BaseSRQScreen extends Screen
         $this->beforeSave();
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
+//        dd($this->entity);
         $odata = new DRXClient();
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         if ($submitToApproval) {

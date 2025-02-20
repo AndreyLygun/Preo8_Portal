@@ -2,10 +2,6 @@
 namespace App\DRX;
 
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Mockery\Exception;
-use Orchid\Screen\Repository;
 use SaintSystems\OData\ODataClient;
 use SaintSystems\OData\Query\Builder;
 use SaintSystems\OData\Query\IProcessor;
@@ -85,6 +81,7 @@ class DRXClient extends ODataClient
                 if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
             }
         }
+//        dd(json_encode($Entity));
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
         } else {            // Создаём запись
