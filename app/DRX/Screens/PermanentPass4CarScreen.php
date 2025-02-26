@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Screens\DRX;
+namespace App\DRX\Screens;
 
 use App\DRX\Layouts\PermanentPass4CarListener;
 use Carbon\Carbon;
@@ -39,8 +39,8 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
         $layout = parent::layout();
         $layout[] = PermanentPass4CarListener::class;
         $layout[] = Layout::rows([TextArea::make('entity.Note')
-            ->title("Примечание")->rows(10)->horizontal()])
-            ->disabled($this->readOnly);
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
         return $layout;
     }
 }

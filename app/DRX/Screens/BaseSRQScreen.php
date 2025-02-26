@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Screens\DRX;
+namespace App\DRX\Screens;
 
 use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
@@ -109,17 +109,10 @@ class BaseSRQScreen extends Screen
             } else {
                 $entity = $this->NewEntity();
             }
-//            $Sites = Cache::rememberForever('Sites', function() use ($odata) {
-//                return $odata->from('IServiceRequestsSites')->get();
-//            });
-//            $TimeSpans = Cache::rememberForever('TimeSpans', function() use ($odata) {
-//                return $odata->from('IServiceRequestsTimeSpans')->get();
-//            });
+
             return [
                 'entity' => $entity,
                 'readOnly' => !in_array($entity['RequestState'], ['Draft', 'Denied']),
-//                'Sites' => $Sites,
-//                'TimeSpans' => $TimeSpans,
                 'ApprovalStatus' =>$ApprovalStatus??null
             ];
         } catch (GuzzleException $ex) {

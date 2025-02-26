@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Orchid\Screens\DRX;
+namespace App\DRX\Screens;
 
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;

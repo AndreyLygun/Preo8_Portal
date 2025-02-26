@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Orchid\Screens\DRX;
+namespace App\DRX\Screens;
 
-use GuzzleHttp\Exception\GuzzleException;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\DropDown;

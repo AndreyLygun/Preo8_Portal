@@ -2,11 +2,9 @@
 
 namespace App\DRX;
 
-use App\DRX;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Http\Client\HttpClientException;
-use Mockery\Exception;
+
 
 
 class ApprovalStatus
@@ -40,7 +38,7 @@ class ApprovalStatus
         // возвращает
         if (!isset($taskId)) return null;
         try {
-            $asignments = $this->odata->from('IEntityApprovalAssignments')
+            $asignments = $this->odata->from('IAssignments') //IEntityApprovalAssignments
                 ->where('Task/Id', $taskId)
                 ->where('Status', '!=', 'Aborted')
                 ->order(array(['Id', 'asc']))

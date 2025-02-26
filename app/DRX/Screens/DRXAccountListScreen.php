@@ -1,15 +1,11 @@
 <?php
 
-namespace App\Orchid\Screens\DRX;
+namespace App\DRX\Screens;
 
 use App\DRX\DRXClient;
 use App\DRX\ExtendedTD;
 use App\Models\DrxAccount;
-use Carbon\Carbon;
-use Orchid\Platform\Models\User;
-use Orchid\Screen\Action;
 use Orchid\Screen\Actions\Button;
-use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Layout;
@@ -53,11 +49,6 @@ class DRXAccountListScreen extends Screen
     public function update() {
         $odata = new DRXClient();
         $result = $odata->getList('IServiceRequestsRenters', ['Login'], 'Name');
-        dd($result);
-        foreach ($result['entities'] as $account) {
-
-        }
-        Toast::info($m);
     }
 
     /**

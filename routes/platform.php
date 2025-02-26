@@ -17,23 +17,24 @@ use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
 
-use App\Orchid\Screens\DRX\SiteSettingsScreen;
-use App\Orchid\Screens\DRX\EntitiesListScreen;
+use App\DRX\Screens\SiteSettingsScreen;
+use App\DRX\Screens\EntitiesListScreen;
 
-use App\Orchid\Screens\DRX\Pass4VisitorsScreen;             // Разовый пропуск
-use App\Orchid\Screens\DRX\PermanentPass4EmployeeScreen;    // Пропуск для сотрудника
-use App\Orchid\Screens\DRX\Permission4EmployeeScreen;       // Допуск для сотрудника
-use App\Orchid\Screens\DRX\StopPermanentPass4EmployeeScreen;// Блокировка пропуска сотрудника
-use App\Orchid\Screens\DRX\Pass4VisitorCarScreen;           // Разовый автопропуск
-use App\Orchid\Screens\DRX\PermanentPass4CarScreen;         // Псстоянный автопропуск
-use App\Orchid\Screens\DRX\StopPermanentPass4CarScreen;     // Блокировка автопропуска
-use App\Orchid\Screens\DRX\WorkPermissionScreen;                  // Заявка на выполнение работ
+use App\DRX\Screens\Pass4VisitorsScreen;             // Разовый пропуск
+use App\DRX\Screens\PermanentPass4EmployeeScreen;    // Пропуск для сотрудника
+use App\DRX\Screens\Permission4EmployeeScreen;       // Допуск для сотрудника
+use App\DRX\Screens\StopPermanentPass4EmployeeScreen;// Блокировка пропуска сотрудника
+use App\DRX\Screens\Pass4VisitorCarScreen;           // Разовый автопропуск
+use App\DRX\Screens\PermanentPass4CarScreen;         // Псстоянный автопропуск
+use App\DRX\Screens\StopPermanentPass4CarScreen;     // Блокировка автопропуска
+use App\DRX\Screens\WorkPermissionScreen;                  // Заявка на выполнение работ
 
-use App\Orchid\Screens\DRX\Pass4AssetsMovingScreen;         // Разовый ввоз-вывоз ТМЦ
-use App\Orchid\Screens\DRX\Pass4AssetsInternalMovingScreen; // Разовое внутреннее перемещение ТМЦ
-use App\Orchid\Screens\DRX\Pass4PermanentAssetsMovingScreen;// Разовое Перемещение ТМЦ
+use App\DRX\Screens\Pass4AssetsMovingScreen;         // Разовый ввоз-вывоз ТМЦ
+use App\DRX\Screens\Pass4AssetsInternalMovingScreen; // Разовое внутреннее перемещение ТМЦ
+use App\DRX\Screens\Pass4PermanentAssetsMovingScreen;// Разовое Перемещение ТМЦ
 
-
+use App\DRX\Screens\DRXAccountListScreen;
+use App\DRX\Screens\DRXAccountScreen;
 
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
@@ -51,11 +52,7 @@ use Tabuna\Breadcrumbs\Trail;
 */
 
 // Main
-
-Route::screen("/srq/settings", SiteSettingsScreen::class)
-    ->name('drx.sitesettings');
-
-
+Route::screen("/srq/settings", SiteSettingsScreen::class)->name('drx.sitesettings');
 Route::screen("/srq/list", EntitiesListScreen::class)->name('drx.srqlist');
 
 // Люди
@@ -79,18 +76,10 @@ Route::screen("/srq/IPass4PermanentAssetsMovingDto/{id?}", Pass4PermanentAssetsM
 //Route::screen("/srq/IPermanentPass4CarsDto/{id?}", PermanentPass4CarsSRQScreen::class)
 //    ->name('drx.PermanentPass4Carsto');
 
+Route::screen("/srq/renters", DRXAccountListScreen::class)->name('drx.renters');
+Route::screen("/srq/renter/{drxAccount}", DRXAccountScreen::class)->name('drx.renter');
 
-
-
-
-
-Route::screen("/srq/renters", \App\Orchid\Screens\DRX\DRXAccountListScreen::class)
-    ->name('drx.renters');
-Route::screen("/srq/renter/{drxAccount}", \App\Orchid\Screens\DRX\DRXAccountScreen::class)
-    ->name('drx.renter');
-
-Route::screen('/main', EntitiesListScreen::class)
-    ->name('platform.main');
+Route::screen('/main', EntitiesListScreen::class)->name('platform.main');
 
 // Platform > Profile
 Route::screen('profile', UserProfileScreen::class)

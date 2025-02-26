@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Orchid\Screens\DRX;
+namespace App\DRX\Screens;
 
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\CheckBox;
+use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
@@ -15,16 +16,15 @@ use Orchid\Screen\Fields\DateTimer;
 use Orchid\Support\Facades\Toast;
 
 
-
-class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
+class Pass4AssetsMovingScreen extends SecuritySRQScreen
 {
 
-    protected $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
-    protected $Title = 'Заявка на внутреннее перемещение ТМЦ';
+    protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
+    protected $Title = 'Заявка на перемещение ТМЦ';
 
     public function ExpandFields()
     {
-        $ExpandFields = ['Inventory', 'ElevatorTimeSpan($expand=Name)'];
+        $ExpandFields = ['LoadingSite', 'TimeSpan', 'Inventory', 'ElevatorTimeSpan($expand=Name)'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
@@ -43,23 +43,32 @@ class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
         return $query;
     }
 
+
     public function beforeSave()
     {
         parent::beforeSave();
         $this->NormalizeDate(['ValidOn']);
         if (isset($this->entity["ElevatorTimeSpan"]))
-            $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value)=>(object)["Name" => (object) ["Id" => (int) $value]])->toArray();
+            $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value) => (object)["Name" => (object)["Id" => (int)$value]])->toArray();
     }
 
     public function layout(): iterable
     {
-        $IdNameFunction = function($value) {
-            return [$value['Id']=>$value['Name']];
+        //dd($this->entity);
+        $IdNameFunction = function ($value) {
+            return [$value['Id'] => $value['Name']];
         };
+        $LoadingSites = collect($this->Sites)->where('Type', 'Loading')->mapWithKeys($IdNameFunction);
         $TimeSpans = collect($this->TimeSpans)->mapWithKeys($IdNameFunction);
         $layout = parent::layout();
         $readonly = $this->readOnly;
         $layout[] = Layout::rows([
+            Select::make('entity.MovingDirection')
+                ->title('Направление перемещения')
+                ->options(config('srq.MovingDirection'))->empty('')
+                ->required()
+                ->horizontal()
+                ->disabled($readonly),
             DateTimer::make('entity.ValidOn')
                 ->title("Дата перемещения")
                 ->format('d-m-Y')
@@ -70,14 +79,14 @@ class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
                 ->min($this->EearliestDate(14))
                 ->help("Заявки &laquo;на сегодня&raquo; принимаются до 14:00. Время согласования заявки - 3 часа")
                 ->disabled($readonly),
-            Input::make('entity.From')
-                ->title('Откуда')
-                ->horizontal()
+            Select::make('entity.LoadingSite.Id')
+                ->title('Место разгрузки')
+                ->options($LoadingSites)
                 ->required()
-                ->help("Укажите блок, этаж, помещение")
+                ->horizontal()
                 ->disabled($readonly),
-            Input::make('entity.To')
-                ->title('Куда')
+            Input::make('entity.Floor')
+                ->title('Куда/откуда')
                 ->horizontal()
                 ->required()
                 ->help("Укажите блок, этаж, помещение")
@@ -110,14 +119,22 @@ class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
                 ->value('false')->set('yesvalue', 'true')->set('novalue', 'false')
                 ->disabled($readonly)->sendTrueOrFalse(),
             ExtendedMatrix::make('entity.Inventory')
-                ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity'])
+                ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity', 'Примечание' => 'Note'])
                 ->readonly($readonly)
         ])->title("Описание ТМЦ");
 
+        $layout[] = Layout::rows([
+            Button::make(__("Save"))->method('saveCarrier')->class('btn btn-primary')->canSee($this->entity['RequestState'] == 'Approved'),
+            Label::make('')->value('Сведения о перевозчике можно заполнить после согласования пропуска')->class("small mt-0 mb-0")->canSee($this->entity['RequestState'] != 'Approved'),
+            Input::make('entity.CarModel')->title('Модель автомобиля')->horizontal(),
+            Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
+            TextArea::make('entity.Visitors')->title('Грузчики (по одному человеку на строку)')->horizontal()->rows(3)  ,
+        ])->title('Сведения о перевозчике');
         return $layout;
     }
 
-    public function saveCarrier(Request $request) {
+    public function saveCarrier(Request $request)
+    {
         Toast::info("ok, saved");
         $validated = $request->validate([
             'entity.Id' => '',
