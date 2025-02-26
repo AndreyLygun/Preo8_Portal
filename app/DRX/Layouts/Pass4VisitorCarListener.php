@@ -34,8 +34,9 @@ class Pass4VisitorCarListener extends Listener
                 ->format("d-m-Y")->serverFormat("d-m-Y")
                 ->withQuickDates(['Завтра' => now()->addDay(), 'Послезавтра' => now()->addDay(2)])
                 ->required()->disabled($readOnly),
-            DateTimer::make("entity.ValidOnDateTime")->title("Время въезда.")->horizontal()
-                ->format("d-m-Y H:i")->serverFormat("d-m-Y H:i")->format24hr()
+            DateTimer::make("entity.ValidOnDateTime")
+                ->title("Время въезда.")->horizontal()->placeholder('Укажите время')
+                ->format("H:i")->serverFormat("d-m-Y H:i")->format24hr()
                 ->noCalendar()->required()->disabled($readOnly),
             Select::make("entity.ParkingType")
                 ->title("Вид парковочного места")->horizontal()
@@ -50,7 +51,7 @@ class Pass4VisitorCarListener extends Listener
             Input::make("entity.ParkingPlace")->required()
                 ->title('Парковочное место')->horizontal()
                 ->required($Private)->canSee($Private)
-                ->disabled($readOnly),
+                ->readonly($readOnly),
             Input::make("entity.Duration")
                 ->title("Продолжительность парковки (час)")->horizontal()
                 ->value(1)->type('number')->min(0)->max(8)->step(0.5)

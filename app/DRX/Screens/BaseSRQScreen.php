@@ -175,6 +175,7 @@ class BaseSRQScreen extends Screen
             Toast::info("Успешно сохранено");
             return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
         } catch (GuzzleException $ex) {
+            //dd($ex);
             Alert::error("При сохранении заявки произошла ошибка:" . $ex->getResponse()->getBody()->getContents());
         }
     }

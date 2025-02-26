@@ -44,9 +44,15 @@ class Pass4VisitorCarScreen extends SecuritySRQScreen
     {
         $layout = parent::layout();
         $layout[] = Pass4VisitorCarListener::class;
-        $layout[] = Layout::rows([Input::make("entity.CarModel")->title("Модель автомобиля")->horizontal()->required()->disabled($this->readOnly),
-            Input::make("entity.CarNumber")->title("Номер автомобиля")->horizontal()->required()->readonly($this->readOnly),
-            TextArea::make("entity.Visitors")->title("Посетители")->horizontal()->rows(5)->readonly($this->readOnly)
+        $layout[] = Layout::rows([Input::make("entity.CarModel")
+            ->title("Модель автомобиля")->horizontal()
+            ->required()->readonly($this->readOnly),
+            Input::make("entity.CarNumber")
+                ->title("Номер автомобиля")->horizontal()
+                ->required()->readonly($this->readOnly),
+            TextArea::make("entity.Visitors")
+                ->title("Посетители")->horizontal()
+                ->rows(5)->readonly($this->readOnly)
                 ->help('Один посетитель (фамилия, имя, отчество) на одну строку. Разовые пропуска на них будут оформлены после согласования заявки.')])
             ->title("Автомобиль и посетители");
         $layout[] = Layout::rows([TextArea::make('entity.Note')
