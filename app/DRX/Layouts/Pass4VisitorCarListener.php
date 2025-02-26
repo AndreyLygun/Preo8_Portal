@@ -25,7 +25,7 @@ class Pass4VisitorCarListener extends Listener
         ];
         $readOnly = $this->query->get('readOnly');
         $entity = $this->query->get('entity');
-        $PrivateParking = $entity["ParkingType"] == "PrivateParking";
+        $PrivateParking = $entity["ParkingType"]??"CommonParking" == "PrivateParking";
         return [Layout::rows([
             DateTimer::make("entity.ValidOn")
                 ->title("Дата въезда.")->horizontal()

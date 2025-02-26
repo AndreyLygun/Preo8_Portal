@@ -25,7 +25,7 @@ class Pass4VisitorCarScreen extends SecuritySRQScreen
     public function NewEntity()
     {
         $entity = parent::NewEntity();
-        $entity['PrivateParking'] = false;
+        $entity["ParkingType"] = "CommonParking";
         return $entity;
     }
 
