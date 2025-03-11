@@ -19,6 +19,7 @@ use App\Orchid\Screens\User\UserProfileScreen;
 
 use App\DRX\Screens\SiteSettingsScreen;
 use App\DRX\Screens\EntitiesListScreen;
+use App\DRX\Screens\ParkingListScreen;
 
 use App\DRX\Screens\Pass4VisitorsScreen;             // Разовый пропуск
 use App\DRX\Screens\PermanentPass4EmployeeScreen;    // Пропуск для сотрудника
@@ -54,6 +55,7 @@ use Tabuna\Breadcrumbs\Trail;
 // Main
 Route::screen("/srq/settings", SiteSettingsScreen::class)->name('drx.sitesettings');
 Route::screen("/srq/list", EntitiesListScreen::class)->name('drx.srqlist');
+Route::screen("/srq/parking", ParkingListScreen::class)->name('drx.parking');
 
 // Люди
 Route::screen("/srq/IPass4VisitorDto/{id?}", Pass4VisitorsScreen::class)->name('drx.Pass4Visitors');

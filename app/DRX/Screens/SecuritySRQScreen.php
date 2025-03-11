@@ -15,7 +15,7 @@ class SecuritySRQScreen extends BaseSRQScreen
     public $entity;
 
     public function ExpandFields() {
-        return parent::ExpandFields();
+        return array_merge(parent::ExpandFields(), ['ParkingPlace($select=Id,Name)']);
     }
 
     public function NewEntity() {

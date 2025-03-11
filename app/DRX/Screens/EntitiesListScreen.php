@@ -44,7 +44,7 @@ class EntitiesListScreen extends Screen
         return [
             DropDown::make("Создать заявку...")->list([
 //                Link::make("...на разовый пропуск")->route("drx.Pass4Visitors"),
-//                Link::make("...на постоянный пропуск")->route("drx.PermanentPass4Employee"),
+                Link::make("...на постоянный пропуск")->route("drx.PermanentPass4Employee"),
 //                Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
 //                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
                 Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr(),

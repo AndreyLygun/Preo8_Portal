@@ -2,8 +2,11 @@
 
 namespace App\DRX\Screens;
 
+use App\DRX\Databooks;
 use App\DRX\Layouts\PermanentPass4CarListener;
 use Carbon\Carbon;
+use Orchid\Screen\Fields\Input;
+use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 
@@ -11,11 +14,9 @@ use Orchid\Support\Facades\Layout;
 class PermanentPass4CarScreen extends SecuritySRQScreen
 {
 
-
-
     public function ExpandFields()
     {
-        $ExpandFields = ['ParkingFloor'];
+        $ExpandFields = ['ParkingPlace'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
@@ -37,7 +38,23 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
     public function layout(): iterable
     {
         $layout = parent::layout();
-        $layout[] = PermanentPass4CarListener::class;
+        $layout[] = Layout::rows([
+            Input::make('entity.CarModel')->title('Модель автомобиля')
+                ->horizontal()->required()
+                ->disabled($this->readOnly),
+            Input::make('entity.CarNumber')
+                ->title('Номер автомобиля')->horizontal()
+                ->required()->disabled($this->readOnly),
+            Select::make('entity.ParkingPlace.Id')
+                ->title('Парковочное место')->horizontal()
+                ->disabled($this->readOnly)->required()
+                ->help('Если в списке отображаются не все ваши парковочные места, обратитесь в администрацию БЦ')
+                ->options(Databooks::GetParkingPlaces()),
+            Select::make("entity.NeedPrintedPass")
+                ->title('Требуется ламинированный пропуск')->horizontal()
+                ->options(Databooks::GetYesNo())
+                ->disabled($this->readOnly)
+        ]);
         $layout[] = Layout::rows([TextArea::make('entity.Note')
             ->title("Примечание")->rows(10)->horizontal()
             ->disabled($this->readOnly)]);

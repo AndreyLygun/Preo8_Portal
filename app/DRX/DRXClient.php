@@ -81,7 +81,6 @@ class DRXClient extends ODataClient
                 if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
             }
         }
-//        dd(json_encode($Entity));
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
         } else {            // Создаём запись
@@ -103,7 +102,7 @@ class DRXClient extends ODataClient
             $request = $this->from($DRXEntity)
                 ->take($p['per_page'] * $p['page'])
                 ->skip($p['per_page'] * ($p['page'] - 1))
-                ->where('Id', '>', 0)   // Обходим баг в сервисе интеграции DRX. Без этого условия параметры take skip не работают
+                ->where('Id', '>', 0)   // Обходим баг в сервисе интеграции DRX. Без этого условия параметры 'take' и 'skip' не работают
                 ->order($this->OrderBy($orderBy));
             if ($ExpandFields) $request = $request->expand($ExpandFields);
             $entities = $request->get();
