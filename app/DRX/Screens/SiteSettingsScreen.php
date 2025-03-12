@@ -6,7 +6,7 @@ namespace App\DRX\Screens;
 # Информация считывается из JSON-файлов, хранящихся на веб-сервере
 # Кнопка "Обновить" запрашивает состояние справочников с сервера DRX
 
-use App\DRX\Databooks;
+use App\DRX\Helpers\Databooks;
 use App\DRX\ExtendedMatrix;
 use Illuminate\Support\Facades\Cache;
 use Orchid\Screen\Fields\Label;

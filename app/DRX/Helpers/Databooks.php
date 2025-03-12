@@ -1,11 +1,12 @@
 <?php
 
 
-namespace App\DRX;
+namespace App\DRX\Helpers;
 
 // Класс для получения из Directum справочной информации. В основном - нечасто меняющейся (поэтому кэшируем)
 
 use App\Models\DrxAccount;
+use App\DRX\DRXClient;
 use Illuminate\Support\Facades\Cache;
 
 class Databooks
@@ -22,7 +23,7 @@ class Databooks
     }
 
     // Возвращает логин арендатора в Directum
-    public static function GetLogin()
+    public static function GetRenterLogin()
     {
         return DrxAccount::find(auth()->user()->drx_account_id)->DRX_Login;
     }
@@ -30,10 +31,9 @@ class Databooks
     public static function GetParkingPlaces($odata = null)
     {
         $odata = $odata ?? (new DRXClient());
-        $places = $odata->from('IServiceRequestsSites')
+        $places = $odata->from('IServiceRequestsParkingPlaces')
             ->select('Id, Name')
-            ->where('Renter/Login/LoginName', self::GetLogin())
-            ->where('Type', 'ParkingSite')
+            ->where('Renter/Login/LoginName', self::GetRenterLogin())
             ->order('Index')
             ->get();
         return collect($places)->mapWithKeys(fn($v) => [$v['Id'] => $v['Name']]);

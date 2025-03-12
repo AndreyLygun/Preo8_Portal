@@ -14,7 +14,6 @@
         "laravel/tinker": "^2.8",
         "orchid/fortify": "^0.0.12",
         "orchid/platform": "^14.0",
-        "phpoffice/phpspreadsheet": "*",
         "saintsystems/odata-client": "dev-l10-compatibility"
     },
     "require-dev": {

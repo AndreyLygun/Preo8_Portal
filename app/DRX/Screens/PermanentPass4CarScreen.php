@@ -2,7 +2,7 @@
 
 namespace App\DRX\Screens;
 
-use App\DRX\Databooks;
+use App\DRX\Helpers\Databooks;
 use App\DRX\Layouts\PermanentPass4CarListener;
 use Carbon\Carbon;
 use Orchid\Screen\Fields\Input;
@@ -14,15 +14,16 @@ use Orchid\Support\Facades\Layout;
 class PermanentPass4CarScreen extends SecuritySRQScreen
 {
 
+
+    // Тип документа в сервисе интеграции, например IOfficialDocuments
+    protected $EntityType = "IServiceRequestsPermanentPass4Cars";
+    public $Title = "Заявка на оформление/продление постоянного автопропуска";
+
     public function ExpandFields()
     {
         $ExpandFields = ['ParkingPlace'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
-
-    // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsPermanentPass4Cars";
-    public $Title = "Заявка на оформление/продление постоянного автопропуска";
 
     public function NewEntity()
     {

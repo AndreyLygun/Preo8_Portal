@@ -48,8 +48,8 @@ class EntitiesListScreen extends Screen
 //                Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
 //                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
                 Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr(),
-                Link::make("...на гостевой автопропуск")->route("drx.Pass4VisitorCar")->hr(),
-                Link::make("...на оформление постоянного автопропуска")->route("drx.PermanentPass4Car"),
+                Link::make("...на гостевую парковку")->route("drx.Pass4VisitorCar")->hr(),
+                Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car"),
                 Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
                 Link::make("...на разовый ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsMoving"),
                 Link::make("...на внутреннее перемещение ТМЦ")->route("drx.Pass4AssetsInternalMoving"),
@@ -78,7 +78,7 @@ class EntitiesListScreen extends Screen
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["DocumentKind"]["Name"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
                     ->sort(),
-                ExtendedTD::make("DocumentKind.Name", "Автор")
+                ExtendedTD::make("Creator", "Автор")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["Creator"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
                     ->sort(),
