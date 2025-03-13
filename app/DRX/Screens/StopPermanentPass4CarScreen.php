@@ -3,6 +3,7 @@
 namespace App\DRX\Screens;
 
 
+use App\DRX\DRXClient;
 use App\DRX\Helpers\Databooks;
 use Carbon\Carbon;
 use Orchid\Screen\Fields\DateTimer;
@@ -20,7 +21,7 @@ class StopPermanentPass4CarScreen extends SecuritySRQScreen
 
     public function ExpandFields()
     {
-        $ExpandFields = ['ParkingFloor'];
+        $ExpandFields = ['PermanentPass4Car'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
@@ -29,25 +30,29 @@ class StopPermanentPass4CarScreen extends SecuritySRQScreen
     {
         $readOnly = $this->readOnly;
         $layout = parent::layout();
+        $odata = new DRXClient();
+        $permanentPasses = $odata->from('IServiceRequestsPermanentPass4Cars')
+            ->expand('ParkingPlace')
+//            ->where('ValidTill', '>', date('y-m-d'))
+            ->order('ValidTill', 'desc')
+            ->get()->where('ValidTill', '>', Carbon::today()->addDays(-1))
+            ->mapWithKeys(fn($v) => [$v['Id'] => $v['Subject']]);
+
         //array_pop($layout);
+        $actions = [
+            'StopPass' => 'Заблокировать пропуск',
+            'NewPaper' => 'Изготовить бумажный пропуск',
+            'NewNFC' => 'Оформить новый электронный пропуск'
+        ];
         $layout[] = Layout::rows([
             DateTimer::make('entity.ValidTill')
                 ->title('Заблокировать пропуск с')->horizontal()->hr()
                 ->format('Y-m-d')->serverFormat('Y-m-d')
                 ->enableTime(false)->min(Carbon::today())
                 ->required()->disabled($readOnly),
-            Input::make('entity.CarModel')->title('Модель автомобиля')
-                ->horizontal()->required()
-                ->disabled($readOnly),
-            Input::make('entity.CarNumber')
-                ->title('Номер автомобиля')->horizontal()
-                ->required()->disabled($readOnly),
-            Select::make('entity.ParkingFloor.Id')->required()
-                ->title('Парковка (уровень)')->horizontal()->empty('Укажите этаж')
-                ->options(Databooks::GetSites('ParkingSite')),
-            Input::make("entity.ParkingPlace")->required()
-                ->title('Парковочное место')->horizontal()
-                ->disabled($readOnly),
+            Select::make('entity.PermanentPass4Car.Id')
+                ->title('Пропуск для блокировки')->horizontal()->empty('Выберите пропуск, который нужно заблокировать')
+                ->options($permanentPasses)
         ])->title('Сведения об автомобиле');
         $layout[] = Layout::rows([TextArea::make('entity.Note')->title("Примечание")->rows(10)->horizontal()]);
         return $layout;

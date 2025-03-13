@@ -40,7 +40,8 @@ class ParkingListScreen extends Screen
         $permanentPasses = $odata->from('IServiceRequestsPermanentPass4Cars')
             ->expand('ParkingPlace')
 //            ->where('ValidTill', '>', date('y-m-d'))
-            ->order('ValidTill', 'desc')->get();
+            ->order('ValidTill', 'desc')
+            ->get()->where('ValidTill', '>', Carbon::today()->addDays(-1));;
 
 //        dd($permanentPasses, $visitorPasses);
         return ['PermanentPasses' => $permanentPasses, 'VisitorPasses' => $visitorPasses];
@@ -70,7 +71,7 @@ class ParkingListScreen extends Screen
             ExtendedTD::make("Id", "№")
                 ->render(fn($item) => $item["Id"])
                 ->cssClass(fn($item) => $item["RequestState"])
-                ->width("60"),
+                ->width("100"),
             ExtendedTD::make("Subject", "Автомобиль")
                 ->render(fn($item) => "<a href='/srq/IPass4VisitorCarDto/{$item["Id"]}'>{$item["Subject"]}</a>")
                 ->cssClass(fn($item) => $item["RequestState"])
@@ -96,7 +97,7 @@ class ParkingListScreen extends Screen
             ExtendedTD::make("Id", "№")
                 ->render(fn($item) => $item["Id"])
                 ->cssClass(fn($item) => $item["RequestState"])
-                ->width("60"),
+                ->width("100"),
             ExtendedTD::make("Subject", "Автомобиль")
                 ->render(fn($item) => "<a href='/srq/IPermanentPass4CarDto/{$item["Id"]}'>{$item["CarModel"]} / {$item["CarNumber"]}</a>")
                 ->cssClass(fn($item) => $item["RequestState"])

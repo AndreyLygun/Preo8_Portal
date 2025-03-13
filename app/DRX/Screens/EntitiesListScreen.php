@@ -73,7 +73,7 @@ class EntitiesListScreen extends Screen
                 ExtendedTD::make("Id", "№")
                     ->render(fn($item) => $item["Id"])
                     ->cssClass(fn($item) => $item["RequestState"])
-                    ->width("80"),
+                    ->width("100"),
                 ExtendedTD::make("DocumentKind.Name", "Вид заявки")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["DocumentKind"]["Name"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
