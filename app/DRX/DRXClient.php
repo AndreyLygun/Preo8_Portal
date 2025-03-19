@@ -62,8 +62,7 @@ class DRXClient extends ODataClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
-//        dd($Entity);
-        $Id = isset($Entity['Id']) ? (int)$Entity['Id']:null;
+        $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
         unset($Entity['Id']);
         unset($Entity['Renter']);
         // API Directum требует, чтобы в Id было целое число, а не строка, поэтому ниже такой странный костыль
@@ -72,15 +71,14 @@ class DRXClient extends ODataClient
                 $Entity[$key]['Id'] = (int)$field['Id'];
             }
         }
-
         // Обрабатываем поля-коллекции из списка $this->CollectionFields
         foreach ($CollectionFields as $cf) {
             if (isset($Entity[$cf])) {
                 // ..исправлям баг|фичу, из-за которой поле Matrix начинает нумерацию строк с единицы
                 $Entity[$cf] = array_values($Entity[$cf]);
-                // ..потом очищаем поле на сервере DRX, чтоб заполнить его новыми значениями
-                if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
             }
+            // ..потом очищаем поле на сервере DRX, чтоб заполнить его новыми значениями
+            if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
         }
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];

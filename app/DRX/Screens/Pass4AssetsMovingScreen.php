@@ -2,6 +2,8 @@
 
 namespace App\DRX\Screens;
 
+use App\DRX\Helpers\Databooks;
+use App\DRX\Helpers\Functions;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\CheckBox;
@@ -58,8 +60,6 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
         $IdNameFunction = function ($value) {
             return [$value['Id'] => $value['Name']];
         };
-        $LoadingSites = collect($this->Sites)->where('Type', 'Loading')->mapWithKeys($IdNameFunction);
-        $TimeSpans = collect($this->TimeSpans)->mapWithKeys($IdNameFunction);
         $layout = parent::layout();
         $readonly = $this->readOnly;
         $layout[] = Layout::rows([
@@ -70,18 +70,14 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ->horizontal()
                 ->disabled($readonly),
             DateTimer::make('entity.ValidOn')
-                ->title("Дата перемещения")
-                ->format('d-m-Y')
-                ->serverFormat('d-m-Y')
-                ->required()
-                ->horizontal()
-                ->enableTime(false)
-                ->min($this->EearliestDate(14))
+                ->title("Дата перемещения")->horizontal()
+                ->format('d-m-Y')->serverFormat('d-m-Y')
+                ->min(Functions::EearliestDate(14))
                 ->help("Заявки &laquo;на сегодня&raquo; принимаются до 14:00. Время согласования заявки - 3 часа")
-                ->disabled($readonly),
+                ->disabled($readonly)->required(),
             Select::make('entity.LoadingSite.Id')
                 ->title('Место разгрузки')
-                ->options($LoadingSites)
+                ->options(Databooks::GetSites('Loading'))
                 ->required()
                 ->horizontal()
                 ->disabled($readonly),
@@ -98,7 +94,7 @@ class Pass4AssetsMovingScreen extends SecuritySRQScreen
                 ->disabled($readonly)->sendTrueOrFalse(),
             Select::make('entity.ElevatorTimeSpan')
                 ->title('Время использования лифта')
-                ->options($TimeSpans)
+                ->options(Databooks::GetTimeSpans())
                 ->horizontal()
                 ->empty('Выберите время использование лифта')
                 ->help('Можно выбрать до двух интервалов')
