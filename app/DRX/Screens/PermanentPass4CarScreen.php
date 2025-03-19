@@ -5,6 +5,7 @@ namespace App\DRX\Screens;
 use App\DRX\Helpers\Databooks;
 use App\DRX\Layouts\PermanentPass4CarListener;
 use Carbon\Carbon;
+use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
@@ -35,6 +36,15 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
         return $entity;
     }
 
+    public function commandBar(): iterable
+    {
+        $commandBar = parent::commandBar();
+        if (($this->entity["RequestState"] ?? '') === 'Approved') {
+            $commandBar[] = Button::make("Заблокировать")->method("BlockPass");
+        }
+        return $commandBar;
+    }
+
     // Описывает макет экрана
     public function layout(): iterable
     {
@@ -54,11 +64,21 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
             Select::make("entity.NeedPrintedPass")
                 ->title('Требуется ламинированный пропуск')->horizontal()
                 ->options(Databooks::GetYesNo())
+                ->disabled($this->readOnly),
+            Select::make("entity.NeedNFCPass")
+                ->title('Требуется ламинированный пропуск')->horizontal()
+                ->options(Databooks::GetYesNo())
                 ->disabled($this->readOnly)
         ]);
         $layout[] = Layout::rows([TextArea::make('entity.Note')
             ->title("Примечание")->rows(10)->horizontal()
             ->disabled($this->readOnly)]);
         return $layout;
+    }
+
+    public function BlockPass() {
+        $this->entity['RequestState'] = 'Done';
+        $this->entity['VaildTill'] = Carbon::today()->addDays(-1);
+        parent::SubmitToApproval('Заявка на блокировку пропуска отправлена');
     }
 }

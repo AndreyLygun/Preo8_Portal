@@ -157,11 +157,12 @@ class BaseSRQScreen extends Screen
         }
     }
 
-    public function SubmitToApproval()
+    public function SubmitToApproval($message = null)
     {
+        $message = $message??"Заявка сохранена и отправлена на согласование";
         try {
             $this->SaveToDRX(true);
-            Toast::info("Заявка сохранена и отправлена на согласование");
+            Toast::info($message);
             return redirect(route('drx.srqlist'));
         } catch (GuzzleException $ex) {
             Alert::error("При сохранении заявки произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
