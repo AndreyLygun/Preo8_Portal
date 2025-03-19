@@ -98,9 +98,8 @@ class PermanentPass4EmployeeScreen extends SecuritySRQScreen
     {
         $this->entity = array_merge($this->entity, request()->input('entity')??[]);
         if (!$request->hasFile('EmployeesList')) return;
-        $fileName = $request->file('EmployeesList')->path();
         try {
-            $res = ImportExcel::Basic($fileName, ['Name', 'Position']);
+            $res = ImportExcel::Basic($request->file('EmployeesList'), ['Name', 'Position']);
             $this->entity['Employees'] = $res;
             Toast::info('Данные из файла импортированы. Не забудьте сохранить заявку.');
         } catch (LaravelExcelException $ex) {
