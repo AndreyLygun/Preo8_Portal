@@ -21,13 +21,17 @@
         @endforeach
 
         @if(!($readonly??false))
-            <tr class="add-row">
+            <tr class="add-row pt-3">
                 <th colspan="{{ count($columns) }}" class="text-center p-0">
-                    <a href="#" data-action="matrix#addRow" class="btn btn-block small text-muted">
-                        <x-orchid-icon path="bs.plus-circle" class="me-2"/>
+                    <div class="btn-group" role="group">
+                        <a href="#" data-action="matrix#addRow" class="btn btn-outline btn-block small">
+                            <span>{{ __('Add row') }}</span>
+                        </a>
+                        @foreach($extraButtons??[] as $button)
+                            {!! $button->class('btn btn-outline btn-block small text-nowrap')->toHtml() !!}
+                        @endforeach
+                    </div>
 
-                        <span>{{ __('Add row') }}</span>
-                    </a>
                 </th>
             </tr>
         @endif

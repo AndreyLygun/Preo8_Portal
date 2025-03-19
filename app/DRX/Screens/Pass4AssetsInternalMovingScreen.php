@@ -2,6 +2,7 @@
 
 namespace App\DRX\Screens;
 
+use App\DRX\Helpers\Databooks;
 use Illuminate\Http\Request;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
@@ -9,9 +10,9 @@ use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Support\Color;
 use App\DRX\ExtendedMatrix;
+use App\DRX\Helpers\Functions;
 use Orchid\Screen\Fields\DateTimer;
 use Orchid\Support\Facades\Toast;
-
 
 
 class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
@@ -44,7 +45,6 @@ class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
     public function beforeSave()
     {
         parent::beforeSave();
-        $this->NormalizeDate(['ValidOn']);
         if (isset($this->entity["ElevatorTimeSpan"]))
             $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value)=>(object)["Name" => (object) ["Id" => (int) $value]])->toArray();
     }
@@ -54,20 +54,16 @@ class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
         $IdNameFunction = function($value) {
             return [$value['Id']=>$value['Name']];
         };
-        $TimeSpans = collect($this->TimeSpans)->mapWithKeys($IdNameFunction);
+        $TimeSpans = Databooks::GetTimeSpans();
         $layout = parent::layout();
         $readonly = $this->readOnly;
         $layout[] = Layout::rows([
             DateTimer::make('entity.ValidOn')
-                ->title("Дата перемещения")
-                ->format('d-m-Y')
-                ->serverFormat('d-m-Y')
-                ->required()
-                ->horizontal()
-                ->enableTime(false)
-                ->min($this->EearliestDate(14))
-                ->help("Заявки &laquo;на сегодня&raquo; принимаются до 14:00. Время согласования заявки - 3 часа")
-                ->disabled($readonly),
+                ->title("Дата перемещения")->horizontal()
+                ->format('d-m-Y')->serverFormat('d-m-Y')
+                ->required()->disabled($readonly)
+                ->min(Functions::EearliestDate(14))
+                ->help("Заявки &laquo;на сегодня&raquo; принимаются до 14:00. Время согласования заявки - 3 часа"),
             Input::make('entity.From')
                 ->title('Откуда')
                 ->horizontal()
@@ -86,13 +82,11 @@ class Pass4AssetsInternalMovingScreen extends SecuritySRQScreen
                 ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
                 ->disabled($readonly)->sendTrueOrFalse(),
             Select::make('entity.ElevatorTimeSpan')
-                ->title('Время использования лифта')
-                ->options($TimeSpans)
-                ->horizontal()
+                ->title('Время использования лифта')->horizontal()
+                ->options(Databooks::GetTimeSpans())
                 ->empty('Выберите время использование лифта')
                 ->help('Можно выбрать до двух интервалов')
-                ->multiple(true)
-                ->maximumSelectionLength(2)
+                ->multiple(true)->maximumSelectionLength(2)
                 ->disabled($readonly),
             CheckBox::make('entity.StorageRoom')
                 ->title('Через комнату временного хранения')
