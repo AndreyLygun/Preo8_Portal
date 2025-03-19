@@ -12,6 +12,7 @@ use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Actions\ModalToggle;
 use Orchid\Screen\Fields\Attach;
 use Orchid\Screen\Fields\Input;
+use Orchid\Screen\Fields\Label;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
@@ -69,8 +70,8 @@ class PermanentPass4EmployeeScreen extends SecuritySRQScreen
                 ->addButton($clearButton)
                 ->addButton($modalToggeButton),
             Input::make('EmployeePhoto')->type('file')
-                ->title('Прикрепите файл с фотографиями сотрудников')
-                ->help('Файл в формате JPEG (для одной фотографии) или ZIP-архив с фотографиями.')
+                ->title('Файл с фотографиями сотрудников: ' . $this->entity['EmployeePhotoFileName'])
+                ->help('Прикрепите файл в формате JPEG (для одной фотографии) или ZIP-архив с фотографиями.')
                 ->accept('.zip, .jpg, .jpeg')
                 ->canSee(!$readonly),
         ])->title('Сведения о сотрудниках');
@@ -90,13 +91,13 @@ class PermanentPass4EmployeeScreen extends SecuritySRQScreen
 
     public function Clear(Request $request)
     {
-        $this->entity = array_merge($this->entity, $request->input('entity')??[]);
+        $this->entity = array_merge($this->entity, $request->input('entity') ?? []);
         $this->entity['Employees'] = [];
     }
 
     public function FillFromExcell(Request $request)
     {
-        $this->entity = array_merge($this->entity, request()->input('entity')??[]);
+        $this->entity = array_merge($this->entity, request()->input('entity') ?? []);
         if (!$request->hasFile('EmployeesList')) return;
         try {
             $res = ImportExcel::Basic($request->file('EmployeesList'), ['Name', 'Position']);
