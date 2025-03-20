@@ -82,7 +82,7 @@ class PermanentPass4EmployeeScreen extends SecuritySRQScreen
                     ->title('Выберите файл Excel')
                     ->accept('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel')
                     ->required(),
-                Link::make('Пример файла для заполнения')->href('/assets/employees.xlsx')
+                Link::make('Пример файла для заполнения')->href('/assets/employees.xlsx')->download()
             ]),
         ]);
 
