@@ -3,6 +3,7 @@
 namespace App\DRX\Screens;
 
 
+use App\DRX\Helpers\Functions;
 use Carbon\Carbon;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\DateTimer;
@@ -61,27 +62,19 @@ class WorkPermissionScreen extends SecuritySRQScreen
                 ->required()
                 ->disabled($readonly)->help("Укажите блок, этаж, помещение"),
             DateTimer::make('entity.FromDateTime')
-                ->title("Начало работ")
-                ->format('d-m-Y H:i')
-                ->serverFormat('d-m-Y H:i')
-                ->min($this->EearliestDate(9))
+                ->title("Начало работ")->horizontal()
+                ->format('d-m-Y H:i')->serverFormat('d-m-Y H:i')
+                ->min(Carbon::today()->addDay(1))
                 ->allowInput()->value(Carbon::today()->addDay(1)->addHour(9))
-                ->required()
-                ->horizontal()
                 ->enableTime()->format24hr()
-                ->min($this->EearliestDate(14))
-                ->disabled($readonly),
+                ->required()->disabled($readonly),
             DateTimer::make('entity.TillDateTime')->title("Окончания работ")->horizontal()
-                ->title("Окончание работ")
-                ->format('d-m-Y H:i')
-                ->serverFormat('d-m-Y H:i')
-                ->min($this->EearliestDate(9))
+                ->title("Окончание работ")->horizontal()
+                ->format('d-m-Y H:i')->serverFormat('d-m-Y H:i')
+                ->min(Carbon::today()->addDay(1))
                 ->allowInput()->value(Carbon::today()->addDay(1)->addHour(18))
-                ->required()
-                ->horizontal()
                 ->enableTime()->format24hr()
-                ->min($this->EearliestDate(14))
-                ->disabled($readonly),
+                ->required()->disabled($readonly),
         ])->title('Работы');
         $layout[] = Layout::rows([
             Input::make('entity.Contractor')->title('Организация-исполнитель')

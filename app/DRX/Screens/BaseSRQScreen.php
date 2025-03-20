@@ -54,7 +54,7 @@ class BaseSRQScreen extends Screen
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity()
     {
-        return [
+        $newEntity = [
             "Renter" => ['Name' => Auth()->user()->DrxAccount->Name],
             "Creator" => Auth()->user()->name,
             "RequestState" => "Draft",
@@ -62,6 +62,7 @@ class BaseSRQScreen extends Screen
             'ValidTill' => Carbon::today()->addDay(),
             'ValidOn' => Carbon::today()->addDay(),
         ];
+        return array_merge( $newEntity, $this->entity??[]);
     }
 
     public function query(int $id = null): iterable
@@ -80,6 +81,7 @@ class BaseSRQScreen extends Screen
                 $ApprovalStatus = (new ApprovalStatus($odata))->Get($id);
             }
         } catch (GuzzleException $ex) {
+            return abort(404, 'Text');
             abort($ex->getCode(), $ex->getMessage());
         }
         return [
@@ -137,7 +139,7 @@ class BaseSRQScreen extends Screen
             if (\request()->hasFile($binaryField)) {
                 $file = \request()->file($binaryField);
                 $encoded = base64_encode($file->getContent());
-                $odata->from("{$this->EntityType}({$this->entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
+                $odata->from("{$this->EntityType}({$entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
             }
         }
 
@@ -152,7 +154,9 @@ class BaseSRQScreen extends Screen
         try {
             $this->entity = $this->SaveToDRX();
             Toast::info("Успешно сохранено");
+            return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
         } catch (GuzzleException $ex) {
+            dd($ex);
             Alert::error("При сохранении заявки произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
         }
     }
@@ -167,6 +171,7 @@ class BaseSRQScreen extends Screen
         } catch (GuzzleException $ex) {
             Alert::error("При сохранении заявки произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
         }
+        return redirect()->route();
     }
 
     public function layout(): iterable
