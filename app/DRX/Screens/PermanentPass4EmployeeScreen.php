@@ -70,7 +70,7 @@ class PermanentPass4EmployeeScreen extends SecuritySRQScreen
                 ->addButton($clearButton)
                 ->addButton($modalToggeButton),
             Input::make('EmployeePhoto')->type('file')
-                ->title('Файл с фотографиями сотрудников: ' . $this->entity['EmployeePhotoFileName'])
+                ->title('Файл с фотографиями сотрудников: ' . ($this->entity['EmployeePhotoFileName']??'-'))
                 ->help('Прикрепите файл в формате JPEG (для одной фотографии) или ZIP-архив с фотографиями.')
                 ->accept('.zip, .jpg, .jpeg')
                 ->canSee(!$readonly),

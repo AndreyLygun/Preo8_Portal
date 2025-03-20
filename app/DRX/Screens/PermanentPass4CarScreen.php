@@ -18,7 +18,7 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsPermanentPass4Cars";
-    public $Title = "Заявка на оформление/продление постоянного автопропуска";
+    public $Title = "Заявка на оформление постоянного автопропуска";
 
     public function ExpandFields()
     {
@@ -32,7 +32,6 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
         $entity['Action'] = "NewPass";
         $entity['ValidFrom'] = Carbon::today()->addDay();
         $entity['ValidTill'] = Carbon::today()->addDay(365);
-        $entity['NeedPrintedPass'] = "No";
         return $entity;
     }
 
@@ -58,17 +57,23 @@ class PermanentPass4CarScreen extends SecuritySRQScreen
                 ->required()->disabled($this->readOnly),
             Select::make('entity.ParkingPlace.Id')
                 ->title('Парковочное место')->horizontal()
+                ->empty()
                 ->disabled($this->readOnly)->required()
                 ->help('Если в списке отображаются не все ваши парковочные места, обратитесь в администрацию БЦ')
                 ->options(Databooks::GetParkingPlaces()),
             Select::make("entity.NeedPrintedPass")
                 ->title('Требуется ламинированный пропуск')->horizontal()
+                ->empty('')->required()
                 ->options(Databooks::GetYesNo())
                 ->disabled($this->readOnly),
             Select::make("entity.NeedNFCPass")
-                ->title('Требуется ламинированный пропуск')->horizontal()
+                ->title('Требуется электронный пропуск')->horizontal()
+                ->empty('')->required()
                 ->options(Databooks::GetYesNo())
-                ->disabled($this->readOnly)
+                ->disabled($this->readOnly),
+            TextArea::make('visitors')
+            ->title('Водители')->horizontal()
+            ->rows(3)
         ]);
         $layout[] = Layout::rows([TextArea::make('entity.Note')
             ->title("Примечание")->rows(10)->horizontal()
