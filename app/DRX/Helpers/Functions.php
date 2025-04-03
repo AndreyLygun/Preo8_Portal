@@ -8,7 +8,7 @@ use Carbon\Carbon;
 // Если текущее время меньше указанного часа, возвращаем сегодняшнюю дату.
 // Если текущее время больше указанного часа, возвращаем завтрашнюю дату.
 class Functions {
-    public static function EearliestDate($hour)
+    public static function Eear_liest_Date(int $hour, int $deltaDays=1)
     {
         if (Carbon::now()->hour < $hour)
             return Carbon::today();

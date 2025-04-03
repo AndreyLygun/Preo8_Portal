@@ -58,7 +58,6 @@ class ParkingListScreen extends Screen
             DropDown::make("Создать заявку...")->list([
                 Link::make("...на гостевую парковку")->route("drx.Pass4VisitorCar")->hr(),
                 Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car"),
-                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
             ])
         ];
     }

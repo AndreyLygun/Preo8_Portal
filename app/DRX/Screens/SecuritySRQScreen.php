@@ -12,6 +12,7 @@ class SecuritySRQScreen extends BaseSRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsSecuritySRQScreen";
+    protected $TestField = ['BaseSRQ'];
     public $entity;
 
     public function ExpandFields() {
@@ -35,8 +36,13 @@ class SecuritySRQScreen extends BaseSRQScreen
     public function layout(): iterable
     {
         $layout = Layout::rows([
-                Input::make("entity.ResponsibleName")->title("Ответственный сотрудник")->horizontal()->readonly($this->readOnly),
-                Input::make("entity.ResponsiblePhone")->title("Телефон сотрудника")->horizontal()->readonly($this->readOnly)->mask('+7 (999) 999-99-99'),
+                Input::make("entity.ResponsibleName")
+                    ->title("Ответственный сотрудник")->horizontal()
+                    ->readonly($this->readOnly)->required(),
+                Input::make("entity.ResponsiblePhone")
+                    ->title("Телефон сотрудника")->horizontal()
+                    ->readonly($this->readOnly)->required()
+                    ->mask('+7 (999) 999-99-99'),
             ]);
         return array_merge(parent::layout(), [$layout]);
     }

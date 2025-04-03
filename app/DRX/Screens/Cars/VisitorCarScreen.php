@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DRX\Screens;
+namespace App\DRX\Screens\Cars;
 
 
 use App\DRX\Layouts\Pass4VisitorCarListener;
@@ -8,9 +8,10 @@ use Carbon\Carbon;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
+use App\DRX\Screens\SecuritySRQScreen;
 
 
-class Pass4VisitorCarScreen extends SecuritySRQScreen
+class VisitorCarScreen extends SecuritySRQScreen
 {
     /**
      * Fetch data to be displayed on the screen.

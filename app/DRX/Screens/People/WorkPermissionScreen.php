@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DRX\Screens;
+namespace App\DRX\Screens\People;
 
 
 use App\DRX\Helpers\Functions;
@@ -10,6 +10,7 @@ use Orchid\Screen\Fields\DateTimer;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
+use App\DRX\Screens\SecuritySRQScreen;
 
 
 class WorkPermissionScreen extends SecuritySRQScreen
@@ -84,6 +85,11 @@ class WorkPermissionScreen extends SecuritySRQScreen
                 ->disabled($readonly)
             ->horizontal(),
         ])->title('Исполнитель');
+        $layout[] = Layout::rows([
+            TextArea::make('entity.Note')->title('Примечание')->rows(5)
+                ->disabled($readonly)
+                ->horizontal(),
+        ]);
         return $layout;
     }
 }

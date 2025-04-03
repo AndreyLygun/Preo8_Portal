@@ -16,6 +16,7 @@ use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
 use App\DRX\Helpers\NormalizeDate;
+use App\DRX\Helpers\CollectParentsProperty;
 
 class BaseSRQScreen extends Screen
 {
@@ -23,6 +24,7 @@ class BaseSRQScreen extends Screen
 
     protected $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
     protected $CollectionFields;                      // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected $ExpandFields = ["Author", "DocumentKind", "Renter"];
     protected $Title = '';
     public $readOnly;
     public $entity;
@@ -32,8 +34,9 @@ class BaseSRQScreen extends Screen
     // Как правило, перекрытый метод в классе-наследнике добавляет свои поля к результату метода из класса-предка
     public function ExpandFields()
     {
-        return ["Author", "DocumentKind", "Renter"];
+        return $this->ExpandFields;
     }
+
 
     public function CollectionFields()
     {
@@ -67,7 +70,6 @@ class BaseSRQScreen extends Screen
 
     public function query(int $id = null): iterable
     {
-
         try {
             $odata = new DRXClient();
             if ($id) {
@@ -132,6 +134,7 @@ class BaseSRQScreen extends Screen
         $this->entity['CreatorMail'] = Auth()->user()->email;
 
         $odata = new DRXClient();
+        //dd(json_encode($this->entity));
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // Сохраняем бинарные данные
 

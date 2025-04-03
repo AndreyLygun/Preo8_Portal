@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DRX\Screens;
+namespace App\DRX\Screens\People;
 
 
 use Orchid\Support\Facades\Layout;

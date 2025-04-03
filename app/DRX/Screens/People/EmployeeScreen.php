@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DRX\Screens;
+namespace App\DRX\Screens\People;
 
 
 use App\DRX\ExtendedMatrix;
@@ -17,9 +17,10 @@ use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
 use function App\DRX\Helpers\Import;
+use App\DRX\Screens\SecuritySRQScreen;
 
 
-class PermanentPass4EmployeeScreen extends SecuritySRQScreen
+class EmployeeScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsPermanentPass4Employees";

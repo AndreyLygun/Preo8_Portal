@@ -54,4 +54,13 @@ class Databooks
         return collect(["Yes" => "Да", "No" => "Нет"]);
     }
 
+    public static function GetMovingDirection()
+    {
+        return collect([
+            'MovingIn' => 'Ввоз',
+            'MovingOut' => 'Вывоз',
+        ]);
+    }
+
+
 }

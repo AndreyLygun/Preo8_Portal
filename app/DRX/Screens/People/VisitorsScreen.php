@@ -1,14 +1,15 @@
 <?php
 
-namespace App\DRX\Screens;
+namespace App\DRX\Screens\People;
 
 use Carbon\Carbon;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\DateTimer;
+use App\DRX\Screens\SecuritySRQScreen;
 
 
-class Pass4VisitorsScreen extends SecuritySRQScreen
+class VisitorsScreen extends SecuritySRQScreen
 {
     /**
      * Fetch data to be displayed on the screen.
@@ -20,6 +21,7 @@ class Pass4VisitorsScreen extends SecuritySRQScreen
     protected $EntityType = "IServiceRequestsPass4Visitors";
     protected $Title = "Заявка на разовый пропуск";
     protected $CollectionFields = [];
+
 
     public function NewEntity()
     {
@@ -35,6 +37,7 @@ class Pass4VisitorsScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
+        dd($this->TestField());
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([

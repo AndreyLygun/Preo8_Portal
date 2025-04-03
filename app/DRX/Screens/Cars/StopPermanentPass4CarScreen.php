@@ -17,7 +17,7 @@ class StopPermanentPass4CarScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsStopPermanentPass4Cars";
-    public $Title = "Блокировка постоянного автопропуска";
+    public $Title = "Изменение постоянного автопропуска";
 
     public function ExpandFields()
     {
@@ -40,9 +40,10 @@ class StopPermanentPass4CarScreen extends SecuritySRQScreen
 
         //array_pop($layout);
         $actions = [
-            'StopPass' => 'Заблокировать пропуск',
             'NewPaper' => 'Изготовить бумажный пропуск',
-            'NewNFC' => 'Оформить новый электронный пропуск'
+            'NewDriver' => 'Добавить водителя в пропуск',
+            'NewCar' => 'Добавить автомобиль в пропуск',
+            'NewNFC' => 'Оформить электронный пропуск взамен утерянного или испорченного'
         ];
         $layout[] = Layout::rows([
             DateTimer::make('entity.ValidTill')

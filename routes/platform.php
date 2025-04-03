@@ -21,18 +21,22 @@ use App\DRX\Screens\SiteSettingsScreen;
 use App\DRX\Screens\EntitiesListScreen;
 use App\DRX\Screens\ParkingListScreen;
 
-use App\DRX\Screens\Pass4VisitorsScreen;             // Разовый пропуск
-use App\DRX\Screens\PermanentPass4EmployeeScreen;    // Пропуск для сотрудника
-use App\DRX\Screens\Permission4EmployeeScreen;       // Допуск для сотрудника
-use App\DRX\Screens\StopPermanentPass4EmployeeScreen;// Блокировка пропуска сотрудника
-use App\DRX\Screens\Pass4VisitorCarScreen;           // Разовый автопропуск
-use App\DRX\Screens\PermanentPass4CarScreen;         // Псстоянный автопропуск
-use App\DRX\Screens\StopPermanentPass4CarScreen;     // Блокировка автопропуска
-use App\DRX\Screens\WorkPermissionScreen;                  // Заявка на выполнение работ
+use App\DRX\Screens\People\VisitorsScreen;             // Разовый пропуск
+use App\DRX\Screens\People\EmployeeScreen;    // Пропуск для сотрудника
+use App\DRX\Screens\People\AdditionalPermissionScreen;       // Допуск для сотрудника
+use App\DRX\Screens\People\WorkPermissionScreen;                  // Заявка на выполнение работ
 
-use App\DRX\Screens\Pass4AssetsMovingScreen;         // Разовый ввоз-вывоз ТМЦ
-use App\DRX\Screens\Pass4AssetsInternalMovingScreen; // Разовое внутреннее перемещение ТМЦ
-use App\DRX\Screens\Pass4PermanentAssetsMovingScreen;// Разовое Перемещение ТМЦ
+//use App\DRX\Screens\People\StopPermanentPass4EmployeeScreen;// Блокировка пропуска сотрудника
+
+use App\DRX\Screens\Cars\VisitorCarScreen;           // Разовый автопропуск
+use App\DRX\Screens\Cars\PermanentCarScreen;         // Псстоянный автопропуск
+//use App\DRX\Screens\StopPermanentPass4CarScreen;     // Блокировка автопропуска
+
+
+
+use App\DRX\Screens\Assets\AssetsInOutScreen;         // Разовый ввоз-вывоз ТМЦ
+use App\DRX\Screens\Assets\AssetsInternalScreen; // Разовое внутреннее перемещение ТМЦ
+use App\DRX\Screens\Assets\AssetsPermanentScreen;// Разовое Перемещение ТМЦ
 
 use App\DRX\Screens\DRXAccountListScreen;
 use App\DRX\Screens\DRXAccountScreen;
@@ -58,25 +62,25 @@ Route::screen("/srq/list", EntitiesListScreen::class)->name('drx.srqlist');
 Route::screen("/srq/parking", ParkingListScreen::class)->name('drx.parking');
 
 // Люди
-Route::screen("/srq/IPass4VisitorDto/{id?}", Pass4VisitorsScreen::class)->name('drx.Pass4Visitors');
-Route::screen("/srq/IPermanentPass4EmployeeDto/{id?}", PermanentPass4EmployeeScreen::class)->name('drx.PermanentPass4Employee');
-Route::screen("/srq/IStopPermanentPass4EmployeeDto/{id?}", StopPermanentPass4EmployeeScreen::class)->name('drx.StopPermanentPass4Employee');
-Route::screen("/srq/IPermission4EmployeeDto/{id?}", Permission4EmployeeScreen::class)->name('drx.Permission4Employee');
+Route::screen("/srq/IPass4VisitorDto/{id?}", VisitorsScreen::class)->name('drx.Pass4Visitors');
+Route::screen("/srq/IPermanentPass4EmployeeDto/{id?}", EmployeeScreen::class)->name('drx.PermanentPass4Employee');
+Route::screen("/srq/IPermission4EmployeeDto/{id?}", AdditionalPermissionScreen::class)->name('drx.Permission4Employee');
 Route::screen("/srq/IWorkPermissionDto/{id?}", WorkPermissionScreen::class)->name('drx.WorkPermission');
+//Route::screen("/srq/IStopPermanentPass4EmployeeDto/{id?}", StopPermanentPass4EmployeeScreen::class)->name('drx.StopPermanentPass4Employee');
 
 // Машины
-Route::screen("/srq/IPass4VisitorCarDto/{id?}", Pass4VisitorCarScreen::class)->name('drx.Pass4VisitorCar');
-Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentPass4CarScreen::class)->name('drx.PermanentPass4Car');
-Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", StopPermanentPass4CarScreen::class)->name('drx.StopPermanentPass4Car');
+Route::screen("/srq/IPass4VisitorCarDto/{id?}", VisitorCarScreen::class)->name('drx.Pass4VisitorCar');
+Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentCarScreen::class)->name('drx.PermanentPass4Car');
+//Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", StopPermanentPass4CarScreen::class)->name('drx.StopPermanentPass4Car');
+
 // ТМЦ
-Route::screen("/srq/IPass4AssetsMovingDto/{id?}", Pass4AssetsMovingScreen::class)->name('drx.Pass4AssetsMoving');
-Route::screen("/srq/IPass4AssetsInternalMovingDto/{id?}", Pass4AssetsInternalMovingScreen::class)->name('drx.Pass4AssetsInternalMoving');
-Route::screen("/srq/IPass4PermanentAssetsMovingDto/{id?}", Pass4PermanentAssetsMovingScreen::class)->name('drx.Pass4PermanentAssetsMoving');
+Route::screen("/srq/IPass4AssetsMovingDto/{id?}", AssetsInOutScreen::class)->name('drx.Pass4AssetsMoving');
+Route::screen("/srq/IPass4AssetsInternalMovingDto/{id?}", AssetsInternalScreen::class)->name('drx.Pass4AssetsInternalMoving');
+Route::screen("/srq/IPass4AssetsPermanentMovingDto/{id?}", AssetsPermanentScreen::class)->name('drx.Pass4AssetsPermanentMoving');
 
 
 
-//Route::screen("/srq/IPermanentPass4CarsDto/{id?}", PermanentPass4CarsSRQScreen::class)
-//    ->name('drx.PermanentPass4Carsto');
+//Route::screen("/srq/IPermanentPass4CarsDto/{id?}", PermanentPass4CarsSRQScreen::class)->name('drx.PermanentPass4Carsto');
 
 Route::screen("/srq/renters", DRXAccountListScreen::class)->name('drx.renters');
 Route::screen("/srq/renter/{drxAccount}", DRXAccountScreen::class)->name('drx.renter');

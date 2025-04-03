@@ -46,14 +46,14 @@ class EntitiesListScreen extends Screen
 //                Link::make("...на разовый пропуск")->route("drx.Pass4Visitors"),
                 Link::make("...на постоянный пропуск")->route("drx.PermanentPass4Employee"),
 //                Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
-//                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
-                Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr(),
+                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
+                Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr()->horizontal(),
                 Link::make("...на гостевую парковку")->route("drx.Pass4VisitorCar")->hr(),
-                Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car"),
-                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
+                Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car")->hr()->horizontal(),
+//                Link::make("...на блокировку постоянного автопропуска")->route("drx.StopPermanentPass4Car")->hr(),
                 Link::make("...на разовый ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsMoving"),
                 Link::make("...на внутреннее перемещение ТМЦ")->route("drx.Pass4AssetsInternalMoving"),
-//                Link::make("...на регулярное перемещение ТМЦ")->route("drx.Pass4PermanentAssetsMoving"),
+                Link::make("...на регулярный ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsPermanentMoving"),
             ])
         ];
     }

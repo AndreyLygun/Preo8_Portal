@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DRX\Screens;
+namespace App\DRX\Screens\Cars;
 
 use App\DRX\Helpers\Databooks;
 use App\DRX\Layouts\PermanentPass4CarListener;
@@ -10,9 +10,10 @@ use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
+use App\DRX\Screens\SecuritySRQScreen;
 
 
-class PermanentPass4CarScreen extends SecuritySRQScreen
+class PermanentCarScreen extends SecuritySRQScreen
 {
 
 
