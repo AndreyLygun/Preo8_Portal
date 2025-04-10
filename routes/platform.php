@@ -30,7 +30,8 @@ use App\DRX\Screens\People\WorkPermissionScreen;                  // Заявк�
 
 use App\DRX\Screens\Cars\VisitorCarScreen;           // Разовый автопропуск
 use App\DRX\Screens\Cars\PermanentCarScreen;         // Псстоянный автопропуск
-//use App\DRX\Screens\StopPermanentPass4CarScreen;     // Блокировка автопропуска
+use App\DRX\Screens\Cars\ChangePermanentPass4CarScreen;     // Блокировка автопропуска
+use App\DRX\Screens\Cars\ChangePermanentParkingScreen;
 
 
 
@@ -70,8 +71,9 @@ Route::screen("/srq/IWorkPermissionDto/{id?}", WorkPermissionScreen::class)->nam
 
 // Машины
 Route::screen("/srq/IPass4VisitorCarDto/{id?}", VisitorCarScreen::class)->name('drx.Pass4VisitorCar');
-Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentCarScreen::class)->name('drx.PermanentPass4Car');
-//Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", StopPermanentPass4CarScreen::class)->name('drx.StopPermanentPass4Car');
+//Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentCarScreen::class)->name('drx.PermanentPass4Car');
+//Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", ChangePermanentPass4CarScreen::class)->name('drx.ChangePermanentPass4Car');
+Route::screen("/srq/IChangePermanentParkingDto/{id?}", ChangePermanentParkingScreen::class)->name('drx.ChangePermanentParking');
 
 // ТМЦ
 Route::screen("/srq/IPass4AssetsMovingDto/{id?}", AssetsInOutScreen::class)->name('drx.Pass4AssetsMoving');

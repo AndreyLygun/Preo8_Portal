@@ -11,6 +11,7 @@ use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Matrix;
 use Orchid\Screen\Fields\Select;
+use Orchid\Screen\Fields\TextArea;
 use Orchid\Screen\Layouts\Columns;
 use Orchid\Screen\Layouts\Listener;
 use Orchid\Screen\Repository;
@@ -18,25 +19,50 @@ use Orchid\Support\Facades\Layout;
 
 class PermanentPass4EmployeeListener extends Listener
 {
-    protected $targets = ['clear'];
+    protected $targets = [];//['ChangeCar', 'ChangeDrivers'];
 
     protected function layouts(): iterable
     {
+        $readOnly = false;
+        $changeCar = true; //$this->query['entity']['ChangeCar']??'NoChange' !== 'NoChange';
+        $changeDrivers = true; //$this->query['entity']['ChangeDrivers']??'NoChange' !== 'NoChange';
         $layout[] = Layout::rows([
-            Matrix::make('entity.Employees')->columns(['ФИО' => 'Name', 'Должность' => 'Position']),
-            Button::make('Очистить')->confirm('Спиок сотрудников будет очищен. Продолжать?')->action('Clear'),
-            Input::make('files')->type('file')->title('Заполнить из Excel'),
-//            ModalToggle::make('Заполнить из файла Excel')
-//                ->modal('Excel')
-//                ->method('FillFromExcell')
-//                ->icon('full-screen')
+            Select::make('ChangeCar')
+                ->title('Изменение автомобиля')->horizontal()->value('NoChange')
+                ->options([
+                    'Add' => 'Добавить автомобиль на парковку',
+                    'Remove' => 'Исключить автомобиль с парковки',
+                    'NoChange' => 'Без изменений',
+                ])
+                ->disabled($readOnly),
+            Input::make('entity.CarModel')->title('Модель автомобиля')
+                ->horizontal()->required()
+                ->canSee($changeCar)
+                ->disabled($readOnly),
+            Input::make('entity.CarNumber')
+                ->title('Номер автомобиля')->horizontal()
+                ->canSee($changeCar)
+                ->required()->disabled($readOnly),
+            Select::make("entity.NeedPrintedPass")
+                ->title('Изготовить ламинированный пропуск')->horizontal()->hr()
+                ->canSee($changeCar)
+                ->empty('')->required()
+                ->options(Databooks::GetYesNo())
+                ->disabled($readOnly),
+            Select::make('ChangeDrivers')
+                ->title('Изменение водителей')->horizontal()->value('NoChange')
+                ->options([
+                    'Add' => 'Добавить водителей в пропуск на парковку',
+                    'Remove' => 'Исключить водителей с пропуска на парковку',
+                    'NoChange' => 'Без изменений',
+                ])
+                ->disabled($readOnly),
+            TextArea::make('visitors')
+                ->title('Водители')->horizontal()
+                ->canSee($changeDrivers)
+                ->help('Если вы хотите добавить водителей в пропуск, укажите их ФИО')
+                ->rows(3),
         ]);
-//        $layout[] = Layout::modal('Excel', [
-//            Layout::rows([
-//                Input::make('files')->type('file')->title('Выберите файл Excel'),
-//                Label::make()->title("Требования к файлу: первая строка: заголовок, первая колонка: ФИО, вторая колонка: должность"),
-//            ]),
-//        ]);
         return $layout;
     }
 

@@ -78,23 +78,23 @@ class AssetsInternalScreen extends SecuritySRQScreen
                 ->required()
                 ->help("Укажите блок, этаж, помещение")
                 ->disabled($readonly),
-            CheckBox::make('entity.Elevator')
-                ->title('Требуется грузовой лифт')
-                ->horizontal()
-                ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
-                ->disabled($readonly)->sendTrueOrFalse(),
+            Select::make("entity.Elevator")
+                ->title('Через грузовой лифт')->horizontal()
+                ->empty('')->required()
+                ->options(Databooks::GetYesNo())
+                ->disabled($this->readOnly),
             Select::make('entity.ElevatorTimeSpan')
                 ->title('Время использования лифта')->horizontal()
                 ->options(Databooks::GetTimeSpans())
                 ->empty('Выберите время использование лифта')
-                ->help('Можно выбрать до двух интервалов')
-                ->multiple(true)->maximumSelectionLength(2)
+                ->help('Можно выбрать до трех интервалов')
+                ->multiple(true)->maximumSelectionLength(3)
                 ->disabled($readonly),
-            CheckBox::make('entity.StorageRoom')
-                ->title('Через комнату временного хранения')
-                ->horizontal()
-                ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
-                ->disabled($readonly)->sendTrueOrFalse(),
+            Select::make("entity.StorageRoom")
+                ->title('Через комнату временного хранения')->horizontal()
+                ->empty('')->required()
+                ->options(Databooks::GetYesNo())
+                ->disabled($this->readOnly),
         ])->title('Сведения о перемещении');
 
         $layout[] = Layout::rows([

@@ -43,8 +43,19 @@ class ParkingListScreen extends Screen
             ->order('ValidTill', 'desc')
             ->get()->where('ValidTill', '>', Carbon::today()->addDays(-1));;
 
-//        dd($permanentPasses, $visitorPasses);
-        return ['PermanentPasses' => $permanentPasses, 'VisitorPasses' => $visitorPasses];
+        $parkingPlaces = $odata->from('IServiceRequestsParkingPlaces')
+            ->expand('Renter,Cars,Drivers')
+            ->where('Renter/Login/LoginName', '=', Databooks::GetRenterLogin())
+            ->order('Index')
+            ->get()->toArray();
+        foreach($parkingPlaces as $key => $place) {
+            $parkingPlaces[$key]['CarsString'] = join("<br>", array_map(fn($car) => $car['Model'] . ' / ' . $car['Number'], $place["Cars"]));
+            $parkingPlaces[$key]['DriversString'] = join("<br>", array_map(fn($driver) => $driver['Name'], $place["Drivers"]));
+        }
+        //dd($parkingPlaces);
+
+        return ['PermanentPasses' => $permanentPasses, 'VisitorPasses' => $visitorPasses, 'ParkingPlaces' => $parkingPlaces];
+
     }
 
     public function name(): ?string
@@ -57,7 +68,7 @@ class ParkingListScreen extends Screen
         return [
             DropDown::make("Создать заявку...")->list([
                 Link::make("...на гостевую парковку")->route("drx.Pass4VisitorCar")->hr(),
-                Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car"),
+//                Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car"),
             ])
         ];
     }
@@ -92,23 +103,41 @@ class ParkingListScreen extends Screen
                 ->cssClass(fn($item) => $item["RequestState"])->sort()
         ])->title('Гостевая парковка (сегодня и на последующие дни)');
 
-        $Layout[] = Layout::table("PermanentPasses", [
-            ExtendedTD::make("Id", "№")
-                ->render(fn($item) => $item["Id"])
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->width("100"),
-            ExtendedTD::make("Subject", "Автомобиль")
-                ->render(fn($item) => "<a href='/srq/IPermanentPass4CarDto/{$item["Id"]}'>{$item["CarModel"]} / {$item["CarNumber"]}</a>")
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->sort()->width("50%"),
-            ExtendedTD::make("ParkingPlace", "Парковочное место")
-                ->render(fn($item) => $item['ParkingPlace']['Name'] ?? '')
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->sort()->width("50%"),
-            ExtendedTD::make("RequestState", "Статус")
-                ->render(fn($item) => __($item["RequestState"]))
-                ->cssClass(fn($item) => $item["RequestState"])->sort()
-        ])->title('Постоянная парковка');
+        $Layout[] = Layout::table('ParkingPlaces', [
+            ExtendedTD::make("Name", "Название/<br>электронный пропуск")
+                ->render(fn($item) => $item["Name"] . '<br>' . ($item['NfcNumber']?'№ ' . $item['NfcNumber'] : 'Пропуск не оформлен'))
+//                ->cssClass(fn($item) => $item["RequestState"])
+                ->width("30%"),
+            ExtendedTD::make("Сars", "Автомобили")
+                ->render(fn($item) => $item['CarsString'])
+                ->width("30%"),
+            ExtendedTD::make("Drivers", "Водители")
+                ->render(fn($item) => $item['DriversString'])
+                ->width("30%"),
+            ExtendedTD::make("", "")
+                ->render(fn($item) => $item['NfcNumber']
+                    ? Link::make('Внести изменения')->route('drx.ChangePermanentParking', ['parkingplace' => $item['Id']])->class('btn btn-primary')
+                    : Link::make('Оформить пропуск')->route('drx.ChangePermanentParking', ['parkingplace' => $item['Id']])->class('btn btn-primary'))
+                ->width("10%")
+        ])->title('Парковочные места');
+
+//        $Layout[] = Layout::table("PermanentPasses", [
+//            ExtendedTD::make("Id", "№")
+//                ->render(fn($item) => $item["Id"])
+//                ->cssClass(fn($item) => $item["RequestState"])
+//                ->width("100"),
+//            ExtendedTD::make("ParkingPlace", "Парковочное место")
+//                ->render(fn($item) => $item['ParkingPlace']['Name'] ?? '')
+//                ->cssClass(fn($item) => $item["RequestState"])
+//                ->sort()->width("50%"),
+//            ExtendedTD::make("Subject", "Автомобили")
+//                ->render(fn($item) => $item["CarsString"])
+//                ->cssClass(fn($item) => $item["RequestState"])
+//                ->sort()->width("50%"),
+//            ExtendedTD::make("RequestState", "Статус")
+//                ->render(fn($item) => __($item["RequestState"]))
+//                ->cssClass(fn($item) => $item["RequestState"])->sort()
+//        ])->title('Постоянная парковка');
         return $Layout;
     }
 }
