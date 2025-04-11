@@ -4,15 +4,19 @@ namespace App\DRX\Screens\Assets;
 
 use App\DRX\Helpers\Databooks;
 use App\DRX\Helpers\Functions;
+use App\DRX\Helpers\ImportExcel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Exceptions\LaravelExcelException;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\Link;
+use Orchid\Screen\Actions\ModalToggle;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
+use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Support\Color;
@@ -26,7 +30,7 @@ class AssetsInOutScreen extends SecuritySRQScreen
 {
 
     protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
-    protected $Title = 'Заявка на перемещение ТМЦ';
+    protected $Title = 'Разовый ввоз-вывоз ТМЦ';
 
     public function ExpandFields()
     {
@@ -43,8 +47,11 @@ class AssetsInOutScreen extends SecuritySRQScreen
     {
         $query = parent::query($id);
         if (isset($query["entity"]["ElevatorTimeSpan"])) {
-            $ElevatorTimeSpan = collect($query["entity"]["ElevatorTimeSpan"])->map(fn($value) => $value["Name"]["Id"]);
-            $query["entity"]["ElevatorTimeSpan"] = $ElevatorTimeSpan->toArray();
+            $ElevatorTimeSpans = ($query["entity"]["ElevatorTimeSpan"]);
+            if (isset($ElevatorTimeSpans[0]['Name'])) {
+                $ElevatorTimeSpan = collect($ElevatorTimeSpans)->map(fn($value) => $value["Name"]["Id"]);
+                $query["entity"]["ElevatorTimeSpan"] = $ElevatorTimeSpan->toArray();
+            }
         }
         return $query;
     }
@@ -69,7 +76,6 @@ class AssetsInOutScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
-        //dd($this->entity);
         $IdNameFunction = function ($value) {
             return [$value['Id'] => $value['Name']];
         };
@@ -115,6 +121,14 @@ class AssetsInOutScreen extends SecuritySRQScreen
                 ->disabled($this->readOnly),
         ])->title('Сведения о перемещении');
 
+        $modalToggeButton = ModalToggle::make('Заполнить из Excel')
+            ->modal('Excel')
+            ->method('FillFromExcell', ['entity' => $this->entity])
+            ->icon('bs.table');
+        $clearButton = Button::make('Очистить')
+            ->icon('full-screen')
+            ->method('ClearInventory', ['entity' => $this->entity]);
+
         $layout[] = Layout::rows([
             Select::make("entity.BuildingMaterials")
                 ->title('Среди ТМЦ есть стройматериалы')->horizontal()
@@ -124,7 +138,12 @@ class AssetsInOutScreen extends SecuritySRQScreen
             ExtendedMatrix::make('entity.Inventory')
                 ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity', 'Примечание' => 'Note'])
                 ->readonly($readonly)
+                ->addButton($clearButton)
+                ->addButton($modalToggeButton),
         ])->title("Описание ТМЦ");
+
+        $layout[] = ImportExcel::MakeModalExcel('Список ТМЦ', '/assets/inventory.xlsx');
+
 
         $layout[] = Layout::rows([
             Button::make(__("Save"))->method('saveCarrier')->class('btn btn-primary')->canSee($this->entity['RequestState'] == 'Approved'),
@@ -146,5 +165,24 @@ class AssetsInOutScreen extends SecuritySRQScreen
             'entity.Visitors' => ''
         ]);
         $this->SaveToDRX(false, $validated["entity"]);
+    }
+
+    public function ClearInventory(Request $request)
+    {
+        $this->entity = array_merge($this->entity, $request->input('entity') ?? []);
+        $this->entity['Inventory'] = [];
+    }
+
+    public function FillFromExcell(Request $request)
+    {
+        $this->entity = array_merge($this->entity, request()->input('entity') ?? []);
+        if (!$request->hasFile('ExcelFile')) return;
+        try {
+            $res = ImportExcel::Basic($request->file('ExcelFile'), ['Name', 'Size', 'Quantity', 'Note']);
+            $this->entity['Inventory'] = $res;
+            Toast::info('Данные из файла импортированы. Не забудьте сохранить заявку.');
+        } catch (LaravelExcelException $ex) {
+            Alert::error(stripcslashes($ex->getMessage()));
+        }
     }
 }

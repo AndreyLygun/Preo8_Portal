@@ -15,7 +15,7 @@ class AssetsPermanentScreen extends SecuritySRQScreen
 {
 
     protected $EntityType = 'IServiceRequestsPass4AssetsPermanentMovings';
-    protected $Title = 'Заявка на регулярное перемещение ТМЦ';
+    protected $Title = 'Регулярный ввоз-вывоз ТМЦ';
 
     public function ExpandFields()
     {

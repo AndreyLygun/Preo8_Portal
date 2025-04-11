@@ -24,7 +24,7 @@ class EmployeeScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsPermanentPass4Employees";
-    public $Title = "Заявка на постоянный пропуск";
+    public $Title = "Пропуск для сотрудника";
 
     public function CollectionFields()
     {
@@ -76,16 +76,7 @@ class EmployeeScreen extends SecuritySRQScreen
                 ->accept('.zip, .jpg, .jpeg')
                 ->canSee(!$readonly),
         ])->title('Сведения о сотрудниках');
-        $layout[] = Layout::modal('Excel', [
-            Layout::rows([
-                Input::make('EmployeesList')
-                    ->type('file')
-                    ->title('Выберите файл Excel')
-                    ->accept('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel')
-                    ->required(),
-                Link::make('Пример файла для заполнения')->href('/assets/employees.xlsx')->download()->target('_blank')
-            ]),
-        ]);
+        $layout[] = ImportExcel::MakeModalExcel('Выберите файл Excel', '/assets/employees.xlsx');
 
         return $layout;
     }
@@ -99,9 +90,9 @@ class EmployeeScreen extends SecuritySRQScreen
     public function FillFromExcell(Request $request)
     {
         $this->entity = array_merge($this->entity, request()->input('entity') ?? []);
-        if (!$request->hasFile('EmployeesList')) return;
+        if (!$request->hasFile('ExcelFile')) return;
         try {
-            $res = ImportExcel::Basic($request->file('EmployeesList'), ['Name', 'Position']);
+            $res = ImportExcel::Basic($request->file('ExcelFile'), ['Name', 'Position']);
             $this->entity['Employees'] = $res;
             Toast::info('Данные из файла импортированы. Не забудьте сохранить заявку.');
         } catch (LaravelExcelException $ex) {

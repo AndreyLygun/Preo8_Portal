@@ -21,7 +21,7 @@ class AssetsInternalScreen extends SecuritySRQScreen
 {
 
     protected $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
-    protected $Title = 'Заявка на внутреннее перемещение ТМЦ';
+    protected $Title = 'Внутреннее перемещение ТМЦ';
 
     public function ExpandFields()
     {

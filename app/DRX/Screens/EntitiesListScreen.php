@@ -44,7 +44,7 @@ class EntitiesListScreen extends Screen
         return [
             DropDown::make("Создать заявку...")->list([
 //                Link::make("...на разовый пропуск")->route("drx.Pass4Visitors"),
-                Link::make("...на постоянный пропуск")->route("drx.PermanentPass4Employee"),
+                Link::make("...на пропуск для сотрудника")->route("drx.PermanentPass4Employee")->hr()->horizontal(),
 //                Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
 //                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
 //                Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr()->horizontal(),
@@ -53,7 +53,7 @@ class EntitiesListScreen extends Screen
 //                Link::make("...на изменение постоянной парковки")->route("drx.ChangePermanentPass4Car")->hr()->horizontal(),
                 Link::make("...на разовый ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsMoving"),
                 Link::make("...на внутреннее перемещение ТМЦ")->route("drx.Pass4AssetsInternalMoving"),
-//                Link::make("...на регулярный ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsPermanentMoving"),
+                Link::make("...на регулярный ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsPermanentMoving"),
             ])
         ];
     }
