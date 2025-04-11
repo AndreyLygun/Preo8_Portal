@@ -6,7 +6,9 @@ use App\DRX\Helpers\Databooks;
 use App\DRX\Helpers\Functions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Select;
@@ -54,6 +56,15 @@ class AssetsInOutScreen extends SecuritySRQScreen
         $this->NormalizeDate(['ValidOn']);
         if (isset($this->entity["ElevatorTimeSpan"]))
             $this->entity["ElevatorTimeSpan"] = collect($this->entity["ElevatorTimeSpan"])->map(fn($value) => (object)["Name" => (object)["Id" => (int)$value]])->toArray();
+    }
+
+
+    public function commandBar(): iterable
+    {
+        $buttons = parent::commandBar();
+        if (isset($this->entity["Id"]))
+            $buttons[] = Link::make('Копировать')->route(Route::currentRouteName(), ['fromId' => $this->entity['Id']]);
+        return $buttons;
     }
 
     public function layout(): iterable

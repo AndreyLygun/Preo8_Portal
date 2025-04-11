@@ -60,7 +60,7 @@ class EmployeeScreen extends SecuritySRQScreen
         $modalToggeButton = ModalToggle::make('Заполнить из Excel')
             ->modal('Excel')
             ->method('FillFromExcell')
-            ->icon('bs.full-screen');
+            ->icon('bs.table');
         $clearButton = Button::make('Очистить')
             ->icon('full-screen')
             ->method('Clear');

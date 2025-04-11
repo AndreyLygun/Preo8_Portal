@@ -6,8 +6,9 @@ use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
+use Orchid\Screen\Actions\Link;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
@@ -16,7 +17,6 @@ use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
 use App\DRX\Helpers\NormalizeDate;
-use App\DRX\Helpers\CollectParentsProperty;
 
 class BaseSRQScreen extends Screen
 {
@@ -57,6 +57,17 @@ class BaseSRQScreen extends Screen
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity()
     {
+        // Копируем заявку из другой
+        if ($fromId = \request()->input('fromId')) {
+            $odata = new DRXClient();
+            try {
+                $fromEntity = $odata->getEntity($this->EntityType, $fromId, $this->ExpandFields());
+                unset($fromEntity['Id']);
+            } catch (\Exception $ex) {
+                $fromEntity = [];
+            }
+        }
+        // Заполняем поля по умолчанию
         $newEntity = [
             "Renter" => ['Name' => Auth()->user()->DrxAccount->Name],
             "Creator" => Auth()->user()->name,
@@ -65,7 +76,7 @@ class BaseSRQScreen extends Screen
             'ValidTill' => Carbon::today()->addDay(),
             'ValidOn' => Carbon::today()->addDay(),
         ];
-        return array_merge( $newEntity, $this->entity??[]);
+        return array_merge($fromEntity ?? [], $newEntity, $this->entity ?? []);
     }
 
     public function query(int $id = null): iterable
@@ -73,9 +84,9 @@ class BaseSRQScreen extends Screen
         try {
             $odata = new DRXClient();
             if ($id) {
-                $currentEntity = $this->entity??[];
-                $storedEntity  = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
-                $entity = array_merge($storedEntity, $currentEntity );
+                $currentEntity = $this->entity ?? [];
+                $storedEntity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
+                $entity = array_merge($storedEntity, $currentEntity);
             } else {
                 $entity = $this->NewEntity();
             }
@@ -105,6 +116,7 @@ class BaseSRQScreen extends Screen
     {
         if (!isset($this->entity["RequestState"])) return [];
         $buttons = [];
+
         switch ($this->entity["RequestState"]) {
             case 'Draft':
                 if (isset($this->entity["Id"]))
@@ -165,7 +177,7 @@ class BaseSRQScreen extends Screen
 
     public function SubmitToApproval($message = null)
     {
-        $message = $message??"Заявка сохранена и отправлена на согласование";
+        $message = $message ?? "Заявка сохранена и отправлена на согласование";
         try {
             $this->SaveToDRX(true);
             Toast::info($message);
