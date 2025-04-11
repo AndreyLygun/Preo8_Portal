@@ -66,6 +66,7 @@ class DRXClient extends ODataClient
         unset($Entity['Id']);
         unset($Entity['Renter']);
         // API Directum требует, чтобы в Id было целое число, а не строка, поэтому ниже такой странный костыль
+//dd(json_encode($Entity));
         foreach ($Entity as $key => $field) {
             if (is_array($field) && isset($field['Id'])) {
                 $Entity[$key]['Id'] = (int)$field['Id'];
