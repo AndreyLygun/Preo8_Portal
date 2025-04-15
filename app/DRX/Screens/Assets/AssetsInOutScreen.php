@@ -146,11 +146,18 @@ class AssetsInOutScreen extends SecuritySRQScreen
 
 
         $layout[] = Layout::rows([
-            Button::make(__("Save"))->method('saveCarrier')->class('btn btn-primary')->canSee($this->entity['RequestState'] == 'Approved'),
-            Label::make('')->value('Сведения о перевозчике можно заполнить после согласования пропуска')->class("small mt-0 mb-0")->canSee($this->entity['RequestState'] != 'Approved'),
-            Input::make('entity.CarModel')->title('Модель автомобиля')->horizontal(),
-            Input::make('entity.CarNumber')->title('Номер автомобиля')->horizontal(),
-            TextArea::make('entity.Visitors')->title('Грузчики (по одному человеку на строку)')->horizontal()->rows(3)  ,
+            Button::make(__("Save"))
+                ->method('saveCarrier')->class('btn btn-primary')
+                ->canSee(in_array($this->entity['RequestState'], ['OnReview', 'Approved'])),
+            Label::make('')->value('Сведения о перевозчике можно внести или изменить в любой момент до фактического въезда')->class("small mt-0 mb-0")->canSee($this->entity['RequestState'] != 'Approved'),
+            Input::make('entity.CarModel')
+                ->title('Модель автомобиля')->horizontal()
+            ->help("Если во время создания заявки модель и номер автомобиля неизвестны, их можно заполнить позже - до въезда"),
+            Input::make('entity.CarNumber')
+                ->title('Номер автомобиля')->horizontal(),
+            TextArea::make('entity.Visitors')
+                ->title('Грузчики (по одному человеку на строку)')->horizontal()->rows(3)
+                ->help("Если во время создания заявки имена грузчиков неизвестны, их можно указать позже - до въезда"),
         ])->title('Сведения о перевозчике');
         return $layout;
     }

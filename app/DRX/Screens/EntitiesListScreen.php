@@ -3,6 +3,7 @@
 namespace App\DRX\Screens;
 
 use Orchid\Screen\Fields\Label;
+use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
@@ -68,6 +69,10 @@ class EntitiesListScreen extends Screen
                 ])->title('Ошибка!')
             ];
         }
+        $DocumentKinds = [
+            'InOutAssets' => 'Разовый ввоз-вывоз ТМЦ',
+            'InternalMovingAssets' => 'Внутреннее перемещение ТМЦ',
+        ];
         $Layout = [
             Layout::table("entities", [
                 ExtendedTD::make("Id", "№")
@@ -77,18 +82,22 @@ class EntitiesListScreen extends Screen
                 ExtendedTD::make("DocumentKind.Name", "Вид заявки")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["DocumentKind"]["Name"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
+//                    ->filter(Select::make()->options($DocumentKinds))
                     ->sort(),
                 ExtendedTD::make("Creator", "Автор")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["Creator"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
+//                    ->filter(ServiceRequestsFilter::class)
                     ->sort(),
                 ExtendedTD::make("Subject", "Содержание")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["Subject"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
+//                    ->filter()
                     ->sort()->width("50%"),
                 ExtendedTD::make("Created", "Cоздан")
                     ->render(fn($item) => Carbon::parse($item["Created"])->format('d/m/y'))
                     ->cssClass(fn($item) => $item["RequestState"])
+//                    ->filter()
                     ->sort(),
                 ExtendedTD::make("RequestState", "Статус")
                     ->render(fn($item) => __($item["RequestState"]))
@@ -96,7 +105,7 @@ class EntitiesListScreen extends Screen
             ])
         ];
         if ($pagination = ($this->pagination ?? false) and ($pagination['last_page'] > 1)) {
-           $Layout[] = Layout::view("pagination", ["pagination" => $pagination]);
+            $Layout[] = Layout::view("pagination", ["pagination" => $pagination]);
         };
         return $Layout;
     }

@@ -2,6 +2,8 @@
 namespace App\DRX;
 
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
+use SaintSystems\OData\GuzzleHttpProvider;
 use SaintSystems\OData\ODataClient;
 use SaintSystems\OData\Query\Builder;
 use SaintSystems\OData\Query\IProcessor;
@@ -44,10 +46,16 @@ class DRXClient extends ODataClient
         $url = config('srq.url');
         $login = Auth()->user()->DrxAccount->DRX_Login;
         $password = Auth()->user()->DrxAccount->DRX_Password;
-        //dd($url, $login, $password);
-        parent::__construct($url, function ($request) use ($login, $password) {
+        $httpProvider = new GuzzleHttpProvider();
+        $httpProvider->setExtraOptions(['defaults' => [
+            'verify' => 'false'
+        ]]);
+        parent::__construct($url,
+            function ($request) use ($login, $password) {
             $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
-        });
+        },
+            $httpProvider
+        );
         $this->postProcessor = new PostProcessor();
     }
 
@@ -97,6 +105,7 @@ class DRXClient extends ODataClient
     public function getList($DRXEntity, $ExpandFields = [], $orderBy = '', $perPage = 100000)
     {
         try {
+            $filter = $this->filterBy(request()->input('filter')??[]);
             $total = $this->from($DRXEntity)->count();
             $p = $this->pagination($total, $perPage);
             $request = $this->from($DRXEntity)
@@ -105,6 +114,11 @@ class DRXClient extends ODataClient
                 ->where('Id', '>', 0)   // Обходим баг в сервисе интеграции DRX. Без этого условия параметры 'take' и 'skip' не работают
                 ->order($this->OrderBy($orderBy));
             if ($ExpandFields) $request = $request->expand($ExpandFields);
+            if ($filter) {
+                foreach($filter as $f ) {
+                    $request = $request->where('id', '!=', 12345);
+                }
+            }
             $entities = $request->get();
         } catch (GuzzleException $e) {
             return [
@@ -120,6 +134,11 @@ class DRXClient extends ODataClient
         ];
     }
 
+    protected function filterBy($filter = [])
+    {
+        //if ($filter) dd($filter);
+        return $filter;
+    }
 
     // выбираем из строки запроса параметр sort и преваращаем его в параметры для odata-order
     protected function OrderBy($orderBy = 'Id')
