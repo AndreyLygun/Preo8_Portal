@@ -51,11 +51,12 @@ class VisitorCarScreen extends SecuritySRQScreen
             Input::make("entity.CarNumber")
                 ->title("Номер автомобиля")->horizontal()
                 ->required()->readonly($this->readOnly),
-            TextArea::make("entity.Visitors")
-                ->title("Посетители")->horizontal()
-                ->rows(5)->readonly($this->readOnly)
-                ->help('Один посетитель (фамилия, имя, отчество) на одну строку. Разовые пропуска на них будут оформлены после согласования заявки.')])
-            ->title("Автомобиль и посетители");
+//            TextArea::make("entity.Visitors")
+//                ->title("Посетители")->horizontal()
+//                ->rows(5)->readonly($this->readOnly)
+//                ->help('Один посетитель (фамилия, имя, отчество) на одну строку. Разовые пропуска на них будут оформлены после согласования заявки.')
+        ])
+            ->title("Автомобиль");
         $layout[] = Layout::rows([TextArea::make('entity.Note')
             ->title("Примечание")->rows(10)->horizontal()
             ->disabled($this->readOnly)]);

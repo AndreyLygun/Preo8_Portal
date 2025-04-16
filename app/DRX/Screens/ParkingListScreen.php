@@ -3,11 +3,7 @@
 namespace App\DRX\Screens;
 
 use App\DRX\Helpers\Databooks;
-use App\Models\DrxAccount;
-use Orchid\Screen\Actions\Button;
-use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
-use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use App\DRX\DRXClient;
 use App\DRX\ExtendedTD;
@@ -26,35 +22,23 @@ class ParkingListScreen extends Screen
     public function query(): iterable
     {
         $odata = new DRXClient();
-//        $LoginName = Databooks::GetRenterLogin();
-//        $parkingPlaces = $odata->from("IServiceRequestsSites")
-//            ->where('Type', 'ParkingSite')
-//            ->where('Renter/Login/LoginName', $LoginName)
-//            ->order('Index')->get();
         $visitorPasses = $odata->from('IServiceRequestsPass4VisitorCars')
             ->expand('ParkingPlace')
-//            ->where('Creator', '=', "Андрей Лыгун")
-//            ->where('ValidTill', '>', Carbon::today())
             ->order('ValidTill', 'desc')
             ->get()->where('ValidTill', '>', Carbon::today()->addDays(-1));
-        $permanentPasses = $odata->from('IServiceRequestsPermanentPass4Cars')
-            ->expand('ParkingPlace')
-//            ->where('ValidTill', '>', date('y-m-d'))
-            ->order('ValidTill', 'desc')
-            ->get()->where('ValidTill', '>', Carbon::today()->addDays(-1));;
 
         $parkingPlaces = $odata->from('IServiceRequestsParkingPlaces')
             ->expand('Renter,Cars,Drivers')
             ->where('Renter/Login/LoginName', '=', Databooks::GetRenterLogin())
             ->order('Index')
             ->get()->toArray();
-        foreach($parkingPlaces as $key => $place) {
+        foreach ($parkingPlaces as $key => $place) {
             $parkingPlaces[$key]['CarsString'] = join("<br>", array_map(fn($car) => $car['Model'] . ' / ' . $car['Number'], $place["Cars"]));
             $parkingPlaces[$key]['DriversString'] = join("<br>", array_map(fn($driver) => $driver['Name'], $place["Drivers"]));
         }
         //dd($parkingPlaces);
 
-        return ['PermanentPasses' => $permanentPasses, 'VisitorPasses' => $visitorPasses, 'ParkingPlaces' => $parkingPlaces];
+        return ['VisitorPasses' => $visitorPasses, 'ParkingPlaces' => $parkingPlaces];
 
     }
 
@@ -66,10 +50,7 @@ class ParkingListScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            DropDown::make("Создать заявку...")->list([
-                Link::make("...на гостевую парковку")->route("drx.Pass4VisitorCar")->hr(),
-//                Link::make("...на постоянную парковку")->route("drx.PermanentPass4Car"),
-            ])
+            Link::make("Создать заявку на гостевую парковку")->route("drx.Pass4VisitorCar")->class('btn btn-primary')
         ];
     }
 
@@ -105,7 +86,7 @@ class ParkingListScreen extends Screen
 
         $Layout[] = Layout::table('ParkingPlaces', [
             ExtendedTD::make("Name", "Название/<br>электронный пропуск")
-                ->render(fn($item) => $item["Name"] . '<br>' . ($item['NfcNumber']?'№ ' . $item['NfcNumber'] : 'Пропуск не оформлен'))
+                ->render(fn($item) => $item["Name"] . '<br>' . ($item['NfcNumber'] ? '№ ' . $item['NfcNumber'] : 'Пропуск не оформлен'))
 //                ->cssClass(fn($item) => $item["RequestState"])
                 ->width("30%"),
             ExtendedTD::make("Сars", "Автомобили")
@@ -121,23 +102,6 @@ class ParkingListScreen extends Screen
                 ->width("10%")
         ])->title('Парковочные места');
 
-//        $Layout[] = Layout::table("PermanentPasses", [
-//            ExtendedTD::make("Id", "№")
-//                ->render(fn($item) => $item["Id"])
-//                ->cssClass(fn($item) => $item["RequestState"])
-//                ->width("100"),
-//            ExtendedTD::make("ParkingPlace", "Парковочное место")
-//                ->render(fn($item) => $item['ParkingPlace']['Name'] ?? '')
-//                ->cssClass(fn($item) => $item["RequestState"])
-//                ->sort()->width("50%"),
-//            ExtendedTD::make("Subject", "Автомобили")
-//                ->render(fn($item) => $item["CarsString"])
-//                ->cssClass(fn($item) => $item["RequestState"])
-//                ->sort()->width("50%"),
-//            ExtendedTD::make("RequestState", "Статус")
-//                ->render(fn($item) => __($item["RequestState"]))
-//                ->cssClass(fn($item) => $item["RequestState"])->sort()
-//        ])->title('Постоянная парковка');
         return $Layout;
     }
 }

@@ -5,6 +5,8 @@ namespace App\DRX\Screens\Assets;
 use App\DRX\Helpers\Databooks;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Select;
 use Orchid\Support\Facades\Layout;
@@ -27,6 +29,14 @@ class AssetsInternalScreen extends SecuritySRQScreen
     {
         $ExpandFields = ['Inventory', 'ElevatorTimeSpan($expand=Name)'];
         return array_merge(parent::ExpandFields(), $ExpandFields);
+    }
+
+    public function commandBar(): iterable
+    {
+        $buttons = parent::commandBar();
+        if (isset($this->entity["Id"]))
+            $buttons[] = Link::make('Копировать')->route(Route::currentRouteName(), ['fromId' => $this->entity['Id']]);
+        return $buttons;
     }
 
     public function CollectionFields()
