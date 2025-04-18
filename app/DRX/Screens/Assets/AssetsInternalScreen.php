@@ -108,11 +108,10 @@ class AssetsInternalScreen extends SecuritySRQScreen
         ])->title('Сведения о перемещении');
 
         $layout[] = Layout::rows([
-            CheckBox::make("entity.BuildingMaterials")
-                ->title('Среди ТМЦ есть стройматериалы')
-                ->horizontal()
-                ->value('false')->set('yesvalue', 'true')->set('novalue', 'false')
-                ->disabled($readonly)->sendTrueOrFalse(),
+            Select::make("entity.BuildingMaterials")
+                ->title('Среди ТМЦ есть стройматериалы')->horizontal()
+                ->options(Databooks::GetYesNo())->empty('')
+                ->disabled($this->readOnly)->required(),
             ExtendedMatrix::make('entity.Inventory')
                 ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity'])
                 ->readonly($readonly)
