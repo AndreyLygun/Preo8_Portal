@@ -148,6 +148,7 @@ class BaseSRQScreen extends Screen
             case 'Active':
                 break;
             case 'OnReview':
+                $commands[] = Button::make('Отменить согласование')->method('AbortFlowTask');
                 break;
             case 'Approved':
                 break;
@@ -207,6 +208,22 @@ class BaseSRQScreen extends Screen
         }
         return redirect()->route();
     }
+
+    public function AbortFlowTask()
+    {
+        try {
+            $odata = new DRXClient();
+            $odata->callAPIfunction('ServiceRequests/AbortDocumentReviewTask', [
+                'requestId' => $this->entity['Id'],
+                'Reason' => Carbon::now()->toDateTimeString() . ' Сотрудник арендатора ' . auth()->user()->name . 'отменил согласование'
+            ]);
+            Toast::info('Запрос на отмену согласования отправлен.');
+            return redirect(route('drx.srqlist'));
+        } catch (GuzzleException $ex) {
+            Alert::error("При отмене согласования произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
+        }
+    }
+
 
     public function layout(): iterable
     {
