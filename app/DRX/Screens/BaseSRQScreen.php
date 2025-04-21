@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
@@ -22,8 +23,28 @@ class BaseSRQScreen extends Screen
 {
     use NormalizeDate;
 
+//    public function __construct()
+//    {
+//    public $fields = [
+//        'RequestState' => [
+//            'type' => 'hidden',
+//        ],
+//        'Id' => [
+//            'type' => 'hidden',        ],
+//        'Renter.Name' => [
+//            'type' => 'Label',
+//            'title' => 'Название компании',
+//            'default' => function() {Auth()->user()->DrxAccount->Name;}
+//        ],
+//        'Creator' => [
+//            'type' => 'Label',
+//            'title' => 'Автор заявки'
+//        ]
+//    ];
+//    }
+
     protected $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
-    protected $CollectionFields;                      // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected $CollectionFields;                            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
     protected $ExpandFields = ["Author", "DocumentKind", "Renter"];
     protected $Title = '';
     public $readOnly;
@@ -76,6 +97,7 @@ class BaseSRQScreen extends Screen
             'ValidTill' => Carbon::today()->addDay(),
             'ValidOn' => Carbon::today()->addDay(),
         ];
+        //  dd(array_merge($fromEntity ?? [], $newEntity, $this->entity ?? []));
         return array_merge($fromEntity ?? [], $newEntity, $this->entity ?? []);
     }
 
@@ -94,7 +116,6 @@ class BaseSRQScreen extends Screen
                 $ApprovalStatus = (new ApprovalStatus($odata))->Get($id);
             }
         } catch (GuzzleException $ex) {
-            return abort(404, 'Text');
             abort($ex->getCode(), $ex->getMessage());
         }
         return [
@@ -115,13 +136,14 @@ class BaseSRQScreen extends Screen
     public function commandBar(): iterable
     {
         if (!isset($this->entity["RequestState"])) return [];
-        $buttons = [];
+        $commands = [];
+        $dropdownList = [];
 
         switch ($this->entity["RequestState"]) {
             case 'Draft':
                 if (isset($this->entity["Id"]))
-                    $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
-                $buttons[] = Button::make("Сохранить")->method("Save");
+                    $commands[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
+                $commands[] = Button::make("Сохранить")->method("Save");
                 break;
             case 'Active':
                 break;
@@ -130,11 +152,12 @@ class BaseSRQScreen extends Screen
             case 'Approved':
                 break;
             case 'Denied':
-                $buttons[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
-                $buttons[] = Button::make("Сохранить")->method("Save");
+                $commands[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
+                $commands[] = Button::make("Сохранить")->method("Save");
                 break;
         }
-        return $buttons;
+//        $commands[]  = DropDown::make('Действия')->list($dropdownList);
+        return $commands;
     }
 
     //TODO: исправить сохранение инициатора заявки: сейчас сохраняется арендатор вместо сотрудника
@@ -148,7 +171,6 @@ class BaseSRQScreen extends Screen
         $odata = new DRXClient();
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // Сохраняем бинарные данные
-
         foreach ($this->BinaryFields() as $binaryField) {
             if (\request()->hasFile($binaryField)) {
                 $file = \request()->file($binaryField);
@@ -156,7 +178,6 @@ class BaseSRQScreen extends Screen
                 $odata->from("{$this->EntityType}({$entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
             }
         }
-
         if ($submitToApproval) {
             $odata->callAPIfunction('ServiceRequests/StartDocumentReviewTask', ['requestId' => $entity['Id']]);
         }
@@ -170,7 +191,6 @@ class BaseSRQScreen extends Screen
             Toast::info("Успешно сохранено");
             return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
         } catch (GuzzleException $ex) {
-            dd($ex);
             Alert::error("При сохранении заявки произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
         }
     }

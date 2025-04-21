@@ -1,6 +1,7 @@
 <?php
 namespace App\DRX;
 
+use Barryvdh\Debugbar\Facades\Debugbar;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use SaintSystems\OData\GuzzleHttpProvider;
@@ -87,7 +88,8 @@ class DRXClient extends ODataClient
                 $Entity[$cf] = array_values($Entity[$cf]);
             }
             // ..потом очищаем поле на сервере DRX, чтоб заполнить его новыми значениями
-            if ($Id) $this->delete("{$EntityType}({$Id})/$cf");
+            if ($Id && isset($Entity[$cf]))
+                $this->delete("{$EntityType}({$Id})/$cf");
         }
         if ($Id) {            // Обновляем запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
