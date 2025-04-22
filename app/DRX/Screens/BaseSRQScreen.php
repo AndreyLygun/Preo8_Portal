@@ -4,13 +4,9 @@ namespace App\DRX\Screens;
 
 use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Route;
-use Orchid\Screen\Actions\DropDown;
-use Orchid\Screen\Actions\Link;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
@@ -173,7 +169,6 @@ class BaseSRQScreen extends Screen
         $this->entity['CreatorMail'] = Auth()->user()->email;
 
         $odata = new DRXClient();
-        Debugbar::debug($this->entity);
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // Сохраняем бинарные данные
         foreach ($this->BinaryFields() as $binaryField) {
