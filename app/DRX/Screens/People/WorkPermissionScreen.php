@@ -3,10 +3,12 @@
 namespace App\DRX\Screens\People;
 
 
+use App\DRX\Helpers\Databooks;
 use App\DRX\Helpers\Functions;
 use Carbon\Carbon;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\DateTimer;
+use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
@@ -24,12 +26,6 @@ class WorkPermissionScreen extends SecuritySRQScreen
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     protected $EntityType = "IServiceRequestsWorkPermissions";
     public $Title = "Заявка на проведение работ";
-
-    public function ExpandFields()
-    {
-        $ExpandFields = ['Sites'];
-        return array_merge(parent::ExpandFields(), $ExpandFields);
-    }
 
     public function beforeSave()
     {
@@ -50,13 +46,11 @@ class WorkPermissionScreen extends SecuritySRQScreen
                 ->rows(3)
                 ->required()
                 ->disabled($readonly),
-            CheckBox::make("entity.DisableAFA")
-                ->title("Требуется выключение пожарной сигнализации")
-                ->value('true')->set('yesvalue', 'true')->set('novalue', 'false')
-                ->indeterminate(!isset($this->entity["DisableAFA"]))
-//                ->required()
-                ->placeholder(!isset($this->entity["DisableAFA"])?"Укажите":"")
-                ->disabled($readonly)->sendTrueOrFalse()->horizontal(),
+            Select::make("entity.DisableAFA")
+                    ->title('Требуется выключение пожарной сигнализации')->horizontal()
+                    ->empty('')->required()
+                    ->options(Databooks::GetYesNo())
+                    ->disabled($this->readOnly),
             TextArea::make('entity.Site')
                 ->title('Место выполнения работ')
                 ->horizontal()

@@ -4,6 +4,7 @@ namespace App\DRX\Screens;
 
 use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
@@ -17,30 +18,32 @@ use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
+use Orchid\Support\Color;
 use App\DRX\Helpers\NormalizeDate;
 
 class BaseSRQScreen extends Screen
 {
     use NormalizeDate;
 
-//    public function __construct()
+//    Функция должна возвращать список полей данного объекта, которыми обменимваемся с сервисом интеграции Directum RX
+//    public function fields()
 //    {
-//    public $fields = [
-//        'RequestState' => [
-//            'type' => 'hidden',
-//        ],
-//        'Id' => [
-//            'type' => 'hidden',        ],
-//        'Renter.Name' => [
-//            'type' => 'Label',
-//            'title' => 'Название компании',
-//            'default' => function() {Auth()->user()->DrxAccount->Name;}
-//        ],
-//        'Creator' => [
-//            'type' => 'Label',
-//            'title' => 'Автор заявки'
-//        ]
-//    ];
+//        $fields = [
+//            'RequestState' => [
+//                'type' => 'hidden',
+//            ],
+//            'Id' => [
+//                'type' => 'hidden',        ],
+//            'Renter.Name' => [
+//                'type' => 'Label',
+//                'title' => 'Название компании',
+//                'default' => function() {Auth()->user()->DrxAccount->Name;}
+//            ],
+//            'Creator' => [
+//                'type' => 'Label',
+//                'title' => 'Автор заявки'
+//            ]
+//        ];
 //    }
 
     protected $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
@@ -116,7 +119,7 @@ class BaseSRQScreen extends Screen
                 $ApprovalStatus = (new ApprovalStatus($odata))->Get($id);
             }
         } catch (GuzzleException $ex) {
-            abort($ex->getCode(), $ex->getMessage());
+            Alert::error("При подключении к серверу произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
         }
         return [
             'entity' => $entity,
@@ -143,7 +146,7 @@ class BaseSRQScreen extends Screen
             case 'Draft':
                 if (isset($this->entity["Id"]))
                     $commands[] = Button::make("Отправить на согласование")->method("SubmitToApproval");
-                $commands[] = Button::make("Сохранить")->method("Save");
+                $commands[] = Button::make("Сохранить")->method("Save")->type(Color::PRIMARY);
                 break;
             case 'Active':
                 break;
@@ -170,6 +173,7 @@ class BaseSRQScreen extends Screen
         $this->entity['CreatorMail'] = Auth()->user()->email;
 
         $odata = new DRXClient();
+        Debugbar::debug($this->entity);
         $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // Сохраняем бинарные данные
         foreach ($this->BinaryFields() as $binaryField) {
@@ -215,7 +219,7 @@ class BaseSRQScreen extends Screen
             $odata = new DRXClient();
             $odata->callAPIfunction('ServiceRequests/AbortDocumentReviewTask', [
                 'requestId' => $this->entity['Id'],
-                'Reason' => Carbon::now()->toDateTimeString() . ' Сотрудник арендатора ' . auth()->user()->name . 'отменил согласование'
+                'Reason' => Carbon::now()->toDateTimeString() . ' Сотрудник арендатора ' . auth()->user()->name . ' отменил согласование'
             ]);
             Toast::info('Запрос на отмену согласования отправлен.');
             return redirect(route('drx.srqlist'));

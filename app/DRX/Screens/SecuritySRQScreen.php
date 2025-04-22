@@ -21,7 +21,8 @@ class SecuritySRQScreen extends BaseSRQScreen
 
     public function NewEntity() {
         $entity = parent::NewEntity();
-        $entity["ResponsibleName"] = Auth()->user()->name;
+        $entity["ResponsibleName"] = $entity["ResponsibleName"]??Auth()->user()->name;
+        $entity["ResponsiblePhone"] = $entity["ResponsiblePhone"]??Auth()->user()->phone;
         $entity["ValidTill"] = $entity["ValidFrom"] = $entity["ValidOn"] = Carbon::tomorrow();
         return $entity;
     }
@@ -38,9 +39,11 @@ class SecuritySRQScreen extends BaseSRQScreen
         $layout = Layout::rows([
                 Input::make("entity.ResponsibleName")
                     ->title("Ответственный сотрудник")->horizontal()
+                    ->help("Сотрудник, который является контактным лицом по данной заявке")
                     ->readonly($this->readOnly)->required(),
                 Input::make("entity.ResponsiblePhone")
                     ->title("Телефон сотрудника")->horizontal()
+                    ->help("Телефон требуется для оперативного обсужденения согласование и исполнения заявки")
                     ->readonly($this->readOnly)->required()
                     ->mask('+7 (999) 999-99-99'),
             ]);

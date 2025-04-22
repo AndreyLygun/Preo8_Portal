@@ -20,7 +20,6 @@ class UserEditLayout extends Rows
      */
     public function fields(): array
     {
-//        dd(Auth::user()->hasAccess('platform.systems.users'));
         return [
             Input::make('user.name')
                 ->type('text')
@@ -34,6 +33,11 @@ class UserEditLayout extends Rows
                 ->required()
                 ->title(__('Email'))
                 ->placeholder(__('Email'))
+                ->disabled(!Auth::user()->hasAccess('platform.systems.users')),
+            Input::make('user.phone')
+                ->type('text')
+                ->mask('+7 (999) 999-99-99')
+                ->title(__('Телефон'))
                 ->disabled(!Auth::user()->hasAccess('platform.systems.users')),
             Select::make('user.drx_account_id')
             ->fromModel(DrxAccount::class, 'name')

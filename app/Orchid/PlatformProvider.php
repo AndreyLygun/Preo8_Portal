@@ -58,6 +58,11 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.systems.roles')
                 ->permission('platform.systems.roles'),
 
+//            Menu::make('Form Elements')
+//                ->icon('bs.card-list')
+//                ->route('platform.example.fields')
+//                ->active('*/examples/form/*'),
+
             Menu::make(__('Бизнес-центр'))
                 ->icon('bs.lock')
                 ->route('drx.sitesettings')

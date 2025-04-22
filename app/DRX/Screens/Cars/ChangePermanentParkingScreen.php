@@ -67,7 +67,7 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
         $layout[] = Layout::rows([
             Select::make('entity.ParkingPlace.Id')
                 ->title('Парковочное место')->horizontal()
-                ->disabled(true)->required()
+                ->disabled(false)->required()
                 ->options(Databooks::GetParkingPlaces()),
             Select::make('entity.NeedNfc')
                 ->title('Изготовить электронный пропуск')->horizontal()
