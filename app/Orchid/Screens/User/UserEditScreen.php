@@ -10,6 +10,7 @@ use App\Orchid\Layouts\User\UserPasswordLayout;
 use App\Orchid\Layouts\User\UserRoleLayout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Orchid\Access\Impersonation;
@@ -36,9 +37,8 @@ class UserEditScreen extends Screen
     public function query(User $user): iterable
     {
         $user->load(['roles']);
-
         return [
-            'user'       => $user,
+            'user' => $user,
             'permission' => $user->getStatusPermission(),
         ];
     }
@@ -63,6 +63,7 @@ class UserEditScreen extends Screen
     {
         return [
             'platform.systems.users',
+            'platform.systems.renters'
         ];
     }
 
@@ -158,14 +159,18 @@ class UserEditScreen extends Screen
             ],
         ]);
         $permissions = collect($request->get('permissions'))
-            ->map(fn ($value, $key) => [base64_decode($key) => $value])
+            ->map(fn($value, $key) => [base64_decode($key) => $value])
             ->collapse()
             ->toArray();
 
         $user->when($request->filled('user.password'), function (Builder $builder) use ($request) {
             $builder->getModel()->password = Hash::make($request->input('user.password'));
         });
-        $user->drx_account_id = $request->get('user')['drx_account_id'];
+//        dd($request->has('user.drx_account_id'), Auth::user()->hasAccess('platform.portal.renters'));
+        if ($request->has('user.drx_account_id') && Auth::user()->hasAccess('platform.portal.renters'))
+            $user->drx_account_id = $request->input('user.drx_account_id');
+        else
+            $user->drx_account_id = Auth::user()->drx_account_id;
         $user
             ->fill($request->collect('user')->except(['password', 'permissions', 'roles'])->toArray())
             ->fill(['permissions' => $permissions])
@@ -175,13 +180,13 @@ class UserEditScreen extends Screen
 
         Toast::info(__('User was saved.'));
 
-        return redirect()->route('platform.systems.users');
+        return redirect()->back();
     }
 
     /**
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      *
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function remove(User $user)
     {

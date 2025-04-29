@@ -14,7 +14,7 @@ use App\DRX\Screens\SecuritySRQScreen;
 class AdditionalPermissionScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsPermission4Employees";
+    public $EntityType = "IServiceRequestsPermission4Employees";
     public $Title = "Дополнительный доступ для сотрудника";
 
     protected $TestField = ['Visitors'];

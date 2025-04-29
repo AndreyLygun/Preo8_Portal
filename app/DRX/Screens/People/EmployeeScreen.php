@@ -8,11 +8,8 @@ use App\DRX\Helpers\ImportExcel;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Exceptions\LaravelExcelException;
 use Orchid\Screen\Actions\Button;
-use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Actions\ModalToggle;
-use Orchid\Screen\Fields\Attach;
 use Orchid\Screen\Fields\Input;
-use Orchid\Screen\Fields\Label;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
@@ -23,7 +20,7 @@ use App\DRX\Screens\SecuritySRQScreen;
 class EmployeeScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsPermanentPass4Employees";
+    public $EntityType = "IServiceRequestsPermanentPass4Employees";
     public $Title = "Пропуск для сотрудника";
 
     public function CollectionFields()

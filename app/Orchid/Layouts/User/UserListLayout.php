@@ -28,7 +28,7 @@ class UserListLayout extends Table
     public function columns(): array
     {
         return [
-            TD::make('name', __('Name'))
+            TD::make('name', 'Имя')
                 ->sort()
                 ->cantHide()
                 ->filter(Input::make())
@@ -73,5 +73,18 @@ class UserListLayout extends Table
                             ]),
                     ])),
         ];
+    }
+
+    protected function textNotFound(): string
+    {
+        return __('Сотрудники не найдены');
+    }
+
+    /**
+     * @return string
+     */
+    protected function subNotFound(): string
+    {
+        return '';
     }
 }

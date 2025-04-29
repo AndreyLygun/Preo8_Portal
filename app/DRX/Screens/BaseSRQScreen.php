@@ -42,13 +42,14 @@ class BaseSRQScreen extends Screen
 //        ];
 //    }
 
-    protected $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
+    public $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
     protected $CollectionFields;                            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
     protected $ExpandFields = ["Author", "DocumentKind", "Renter"];
     protected $Title = '';
     public $readOnly;
     public $entity;
     public $ApprovalStatus;
+    public static string $Command = '';
 
     // Возвращает список полей-ссылок и полей-коллекций, который используются в форме. Нужен, чтобы OData-API вернул значения этих полей
     // Как правило, перекрытый метод в классе-наследнике добавляет свои поля к результату метода из класса-предка
@@ -131,6 +132,15 @@ class BaseSRQScreen extends Screen
         else
             return $this->Title . ' (новая)';
     }
+
+    public function permission(): ?iterable
+    {
+        return [
+//            'platform.system.createAllRequests',
+            'platform.requests.'.$this->EntityType
+        ];
+    }
+
 
     public function commandBar(): iterable
     {

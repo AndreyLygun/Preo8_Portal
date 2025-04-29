@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class SecuritySRQScreen extends BaseSRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsSecuritySRQScreen";
+    public $EntityType = "IServiceRequestsSecuritySRQScreen";
     protected $TestField = ['BaseSRQ'];
     public $entity;
 

@@ -4,9 +4,7 @@ namespace App\DRX\Screens\People;
 
 
 use App\DRX\Helpers\Databooks;
-use App\DRX\Helpers\Functions;
 use Carbon\Carbon;
-use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\DateTimer;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
@@ -24,7 +22,7 @@ class WorkPermissionScreen extends SecuritySRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsWorkPermissions";
+    public $EntityType = "IServiceRequestsWorkPermissions";
     public $Title = "Заявка на проведение работ";
 
     public function beforeSave()
@@ -59,15 +57,15 @@ class WorkPermissionScreen extends SecuritySRQScreen
             DateTimer::make('entity.FromDateTime')
                 ->title("Начало работ")->horizontal()
                 ->format('d-m-Y H:i')->serverFormat('d-m-Y H:i')
-                ->min(Carbon::today()->addDay(1))
-                ->allowInput()->value(Carbon::today()->addDay(1)->addHour(9))
+                ->min(Carbon::today()->addDay())
+                ->allowInput()->value(Carbon::today()->addDay()->addHours(9))
                 ->enableTime()->format24hr()
                 ->required()->disabled($readonly),
             DateTimer::make('entity.TillDateTime')->title("Окончания работ")->horizontal()
                 ->title("Окончание работ")->horizontal()
                 ->format('d-m-Y H:i')->serverFormat('d-m-Y H:i')
-                ->min(Carbon::today()->addDay(1))
-                ->allowInput()->value(Carbon::today()->addDay(1)->addHour(18))
+                ->min(Carbon::today()->addDay())
+                ->allowInput()->value(Carbon::today()->addDay()->addHours(18))
                 ->enableTime()->format24hr()
                 ->required()->disabled($readonly),
         ])->title('Работы');

@@ -4,11 +4,13 @@ namespace App\DRX\Screens;
 
 use App\DRX\DRXClient;
 use App\Models\DrxAccount;
+use App\Models\User;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\Button;
 use Orchid\Support\Facades\Toast;
+use App\Orchid\Layouts\User\UserListLayout;
 
 
 class DRXAccountScreen extends Screen
@@ -35,7 +37,9 @@ class DRXAccountScreen extends Screen
 
     public function query(DrxAccount $drxAccount): iterable
     {
-        return ["entity" => $drxAccount];
+        $currentUser = auth()->user();
+        $employee = User::where('drx_account_id', $drxAccount['id'])->get();
+        return ["entity" => $drxAccount, 'users' => $employee];
     }
 
     /**
@@ -70,14 +74,13 @@ class DRXAccountScreen extends Screen
      */
     public function layout(): iterable
     {
-//        dd($this->entity);
         return [
             Layout::rows([
                 Input::make("entity.Name")->title("Название компании")->horizontal(),
                 Input::make("entity.DRX_Login")->title("Логин в Directum")->horizontal(),
                 Input::make("entity.DRX_Password")->title("Пароль в Directum")->type('password')->horizontal(),
-//                Button::make('test')
-            ])
+            ]),
+            UserListLayout::class
         ];
     }
 

@@ -17,7 +17,7 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
 
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsChangePermanentParkings";
+    public $EntityType = "IServiceRequestsChangePermanentParkings";
     public $Title = "Внесение изменений на парковочное место";
 
     public function ExpandFields()
@@ -35,7 +35,7 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
     {
         $entity = parent::NewEntity();
         $entity['ValidFrom'] = Carbon::today();
-        $entity['ValidTill'] = Carbon::today()->addYear(100);
+        $entity['ValidTill'] = Carbon::today()->addYears(100);
         if ($parkingPlaceId = request()->input('parkingplace')) {
             $parkingInfo = $this->GetParkingInfo($parkingPlaceId);
             $entity['Cars'] = $parkingInfo['Cars'];

@@ -29,10 +29,7 @@ use App\DRX\Screens\People\WorkPermissionScreen;                  // Заявк�
 //use App\DRX\Screens\People\StopPermanentPass4EmployeeScreen;// Блокировка пропуска сотрудника
 
 use App\DRX\Screens\Cars\VisitorCarScreen;           // Разовый автопропуск
-use App\DRX\Screens\Cars\PermanentCarScreen;         // Псстоянный автопропуск
-use App\DRX\Screens\Cars\ChangePermanentPass4CarScreen;     // Блокировка автопропуска
 use App\DRX\Screens\Cars\ChangePermanentParkingScreen;
-
 
 
 use App\DRX\Screens\Assets\AssetsInOutScreen;         // Разовый ввоз-вывоз ТМЦ
@@ -56,6 +53,11 @@ use Tabuna\Breadcrumbs\Trail;
 | contains the need "dashboard" middleware group. Now create something great!
 |
 */
+
+
+//foreach (config('srq.requestKinds') as $kind => $property) {
+//    Route::screen("/srq/I{$kind}Dto/{id?}", $property['screen'])->name("drx1.{$kind}");
+//}
 
 // Main
 Route::screen("/srq/settings", SiteSettingsScreen::class)->name('drx.sitesettings');

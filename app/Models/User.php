@@ -6,6 +6,7 @@ use Orchid\Filters\Types\Like;
 use Orchid\Filters\Types\Where;
 use Orchid\Filters\Types\WhereDateStartEnd;
 use Orchid\Platform\Models\User as Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -73,4 +74,11 @@ class User extends Authenticatable
     public function DrxAccount() {
         return $this->belongsTo(DrxAccount::class);
     }
+
+    public function scopeRenter(Builder $query) {
+        $currentUser = auth()->user();
+        if (!$currentUser->hasAccess('platform.systems.renters'))
+            $query->where('drx_account_id', $currentUser['drx_account_id']);
+    }
+
 }

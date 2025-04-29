@@ -18,8 +18,8 @@ class VisitorsScreen extends SecuritySRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsPass4Visitors";
-    protected $Title = "Заявка на разовый пропуск";
+    public $EntityType = "IServiceRequestsPass4Visitors";
+    public $Title = "Заявка на разовый пропуск";
     protected $CollectionFields = [];
 
 
@@ -37,7 +37,6 @@ class VisitorsScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
-        dd($this->TestField());
         $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([

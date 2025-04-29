@@ -121,7 +121,6 @@
     "Link target": "Открывать ссылку",
     "Link to file": "Ссылка на файл",
     "Loading...": "Загрузка...",
-    "Login": "Войти",
     "Longitude": "Долгота",
     "Main": "Основное",
     "Role Management": "Управление ролями",
@@ -215,6 +214,6 @@
     "You requested a page that doesn't exist.": "Вы запросили страницу, которая не существует.",
     "Load more": "Загрузить больше",
     "After deleting notifications, this action cannot be undone and all associated data will be permanently lost.": "После удаления уведомлений это действие нельзя отменить, и все связанные с ними данные будут безвозвратно утеряны.",
-    "There are no objects currently displayed": "Здесь пока нет заявок",
-    "Import or create objects, or check back later for updates": "Создайте заявку или подождите, пока её создаст кто-то другой"
+    "There are no objects currently displayed": "Здесь пока нет записей",
+    "Import or create objects, or check back later for updates": ""
 }

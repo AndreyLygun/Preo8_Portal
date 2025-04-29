@@ -37,12 +37,11 @@ class UserEditLayout extends Rows
             Input::make('user.phone')
                 ->type('text')
                 ->mask('+7 (999) 999-99-99')
-                ->title(__('Телефон'))
-                ->disabled(!Auth::user()->hasAccess('platform.systems.users')),
+                ->title(__('Телефон')),
             Select::make('user.drx_account_id')
-            ->fromModel(DrxAccount::class, 'name')
-            ->title('Арендатор')
-                ->disabled(!Auth::user()->hasAccess('platform.systems.users'))
+                ->fromModel(DrxAccount::class, 'name')
+                ->title('Арендатор')
+//                ->canSee(Auth::user()->hasAccess('platform.systems.renter'))
         ];
     }
 }

@@ -20,8 +20,8 @@ use App\DRX\Screens\SecuritySRQScreen;
 class AssetsInternalScreen extends SecuritySRQScreen
 {
 
-    protected $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
-    protected $Title = 'Внутреннее перемещение ТМЦ';
+    public $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
+    public $Title = 'Внутреннее перемещение ТМЦ';
 
     public function ExpandFields()
     {
@@ -96,7 +96,7 @@ class AssetsInternalScreen extends SecuritySRQScreen
                 ->options(Databooks::GetTimeSpans())
                 ->empty('Выберите время использование лифта')
                 ->help('Можно выбрать до трех интервалов')
-                ->multiple(true)->maximumSelectionLength(3)
+                ->multiple()->maximumSelectionLength(3)
                 ->disabled($readonly),
             Select::make("entity.StorageRoom")
                 ->title('Через комнату временного хранения')->horizontal()

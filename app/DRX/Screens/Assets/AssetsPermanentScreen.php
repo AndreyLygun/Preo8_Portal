@@ -14,8 +14,8 @@ use App\DRX\Screens\SecuritySRQScreen;
 class AssetsPermanentScreen extends SecuritySRQScreen
 {
 
-    protected $EntityType = 'IServiceRequestsPass4AssetsPermanentMovings';
-    protected $Title = 'Регулярный ввоз-вывоз ТМЦ';
+    public $EntityType = 'IServiceRequestsPass4AssetsPermanentMovings';
+    public $Title = 'Регулярный ввоз-вывоз ТМЦ';
 
     public function ExpandFields()
     {

@@ -32,6 +32,11 @@ class SiteSettingsScreen extends Screen
         return 'Информация о БЦ';
     }
 
+    public function permission(): ?iterable
+    {
+        return ['platform.systems.renters'];
+    }
+
     public function layout(): iterable
     {
         $Layout = [

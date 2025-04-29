@@ -3,7 +3,6 @@
 namespace App\DRX\Screens\Assets;
 
 use App\DRX\Helpers\Databooks;
-use App\DRX\Helpers\Functions;
 use App\DRX\Helpers\ImportExcel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,7 +11,6 @@ use Maatwebsite\Excel\Exceptions\LaravelExcelException;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Actions\ModalToggle;
-use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
@@ -29,8 +27,9 @@ use App\DRX\Screens\SecuritySRQScreen;
 class AssetsInOutScreen extends SecuritySRQScreen
 {
 
-    protected $EntityType = 'IServiceRequestsPass4AssetsMovings';
-    protected $Title = 'Разовый ввоз-вывоз ТМЦ';
+    public $EntityType = 'IServiceRequestsPass4AssetsMovings';
+    public $Title = 'Разовый ввоз-вывоз ТМЦ';
+    public static string $Command = '...на разовый ввоз-вывоз ТМЦ';
 
     public function ExpandFields()
     {
@@ -76,9 +75,6 @@ class AssetsInOutScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
-        $IdNameFunction = function ($value) {
-            return [$value['Id'] => $value['Name']];
-        };
         $layout = parent::layout();
         $readonly = $this->readOnly;
         $layout[] = Layout::rows([
@@ -112,7 +108,7 @@ class AssetsInOutScreen extends SecuritySRQScreen
                 ->options(Databooks::GetTimeSpans())
                 ->empty('Выберите время использование лифта')
                 ->help('Можно выбрать до трёх интервалов')
-                ->multiple(true)->maximumSelectionLength(3)
+                ->multiple()->maximumSelectionLength(3)
                 ->disabled($readonly),
             Select::make("entity.StorageRoom")
                 ->title('Через комнату временного хранения')->horizontal()

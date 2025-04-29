@@ -20,7 +20,7 @@ class VisitorCarScreen extends SecuritySRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsPass4VisitorCars";
+    public $EntityType = "IServiceRequestsPass4VisitorCars";
     public $Title = "Заявка на разовый автопропуск";
 
     public function NewEntity()

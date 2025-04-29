@@ -29,7 +29,6 @@ class RolePermissionLayout extends Rows
     public function fields(): array
     {
         $this->user = $this->query->get('user');
-
         return $this->generatedPermissionFields(
             $this->query->getContent('permission')
         );
@@ -37,7 +36,10 @@ class RolePermissionLayout extends Rows
 
     private function generatedPermissionFields(Collection $permissionsRaw): array
     {
+//        dd($permissionsRaw);
         return $permissionsRaw
+            ->filter(fn($item) => !str_starts_with($item[0]['slug'], 'platform.systems') || auth()->user()->hasAccess('platform.systems.roles'))
+            ->filter(fn($item) => !str_starts_with($item[0]['slug'], 'platform.renter') || auth()->user()->hasAccess('platform.renter.users'))
             ->map(fn (Collection $permissions, $title) => $this->makeCheckBoxGroup($permissions, $title))
             ->flatten()
             ->toArray();
@@ -51,10 +53,9 @@ class RolePermissionLayout extends Rows
             ->map(fn (CheckBox $checkbox, $key) => $key === 0
                 ? $checkbox->title($title)
                 : $checkbox)
-            ->chunk(4)
+            ->chunk(2)
             ->map(fn (Collection $checkboxes) => Group::make($checkboxes->toArray())
-                ->alignEnd()
-                ->autoWidth());
+                ->alignEnd());
     }
 
     private function makeCheckBox(Collection $chunks): CheckBox

@@ -1,36 +1,31 @@
 <?php
 
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
 
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | DocumentKinds
-    |--------------------------------------------------------------------------
-    |
-    | Виды документов (DocumentKinds, который используются на портале)
-    | Используетсz в фильтрах на странице со списками
-    |
+    | RequestKinds
+    | Виды заявок, который существуют на портале)
+    | Используется:
+    | - в файле routes/platform, чтобы
+    | - в кнопке "Создать заявку..." в списке "Все заявки" (если command не заполнено, то команда на создание не создаётся)
+    | - фильтре "Тип заявки" в списке "Все заявки"
+    | - в permisssion на экране редактирования сотрудника (чтобы давать право на создание заявки)
      */
 
+    'requests' => [
+        \App\DRX\Screens\People\VisitorsScreen::class,
+        \App\DRX\Screens\People\EmployeeScreen::class,
+        \App\DRX\Screens\People\AdditionalPermissionScreen::class,
+        \App\DRX\Screens\People\WorkPermissionScreen::class,
+        \App\DRX\Screens\Cars\VisitorCarScreen::class,
+        \App\DRX\Screens\Cars\ChangePermanentParkingScreen::class,
+        \App\DRX\Screens\Assets\AssetsInOutScreen::class,
+        \App\DRX\Screens\Assets\AssetsInternalScreen::class,
+        \App\DRX\Screens\Assets\AssetsPermanentScreen::class,
+    ],
     'url' => env('DRX_URL', 'http://preo8/Integration/odata/'),
-
-//    'DocumentKinds' => [
-//            33 => 'Разовый гостевой пропуск ',
-//            34 => 'Разовый автомобильный пропуск',
-//            35 => 'Перемещение ТМЦ'
-//    ],
-
-//    'LifeCycles' => [
-//        "Active" => "Действующий",
-//        "Draft" => "Черновик",
-//        "OnReview" => "На рассмотрении",
-//        "Declined" => "Отказ",
-//        "Approved" => "Одобрен",
-//        "Obsolete" => "Устарел",
-//    ],
 
     'MovingDirection' => [
         'MovingIn' => 'Ввоз',
@@ -44,6 +39,7 @@ return [
 //        'OnReview' => 'На рассмотрении',
 //        'Approved' => 'Одобрен',
 //        'Denied' => 'Отказано',
-//        'Done' => 'Исполнен'
+//        'Done' => 'Исполнен',
+//          'Closed' => 'Закрыт'
 //    ]
 ];
