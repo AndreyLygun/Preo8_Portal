@@ -16,8 +16,8 @@ class StopPermanentPass4EmployeeScreen extends SecuritySRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    protected $EntityType = "IServiceRequestsStopPermanentPass4Employees";
-    public $Title = "Заявка на временный доступ для сотрудника";
+    protected static $EntityType = "IServiceRequestsStopPermanentPass4Employees";
+    public static $Title = "Заявка на временный доступ для сотрудника";
 
     // Описывает макет экрана
     public function layout(): iterable

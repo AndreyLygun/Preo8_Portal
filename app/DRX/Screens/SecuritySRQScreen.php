@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class SecuritySRQScreen extends BaseSRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsSecuritySRQScreen";
+    public static $EntityType = "IServiceRequestsSecuritySRQScreen";
     protected $TestField = ['BaseSRQ'];
     public $entity;
 
@@ -43,7 +43,7 @@ class SecuritySRQScreen extends BaseSRQScreen
                     ->readonly($this->readOnly)->required(),
                 Input::make("entity.ResponsiblePhone")
                     ->title("Телефон сотрудника")->horizontal()
-                    ->help("Телефон требуется для оперативного обсужденения согласование и исполнения заявки")
+                    ->help("Телефон требуется для обсуждения вопросов, которые могут возникнут при согласовании и исполнении заявки")
                     ->readonly($this->readOnly)->required()
                     ->mask('+7 (999) 999-99-99'),
             ]);

@@ -20,8 +20,8 @@ use App\DRX\Screens\SecuritySRQScreen;
 class AssetsInternalScreen extends SecuritySRQScreen
 {
 
-    public $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
-    public $Title = 'Внутреннее перемещение ТМЦ';
+    public static $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
+    public static $Title = 'Внутреннее перемещение ТМЦ';
 
     public function ExpandFields()
     {

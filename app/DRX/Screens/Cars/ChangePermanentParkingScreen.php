@@ -17,8 +17,8 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
 
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsChangePermanentParkings";
-    public $Title = "Внесение изменений на парковочное место";
+    public static $EntityType = "IServiceRequestsChangePermanentParkings";
+    public static $Title = "Внесение изменений на парковочное место";
 
     public function ExpandFields()
     {

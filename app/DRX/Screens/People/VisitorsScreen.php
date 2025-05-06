@@ -18,9 +18,8 @@ class VisitorsScreen extends SecuritySRQScreen
      */
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsPass4Visitors";
-    public $Title = "Заявка на разовый пропуск";
-    protected $CollectionFields = [];
+    public static $EntityType = "IServiceRequestsPass4Visitors";
+    public static $Title = "Гостевой пропуск";
 
 
     public function NewEntity()

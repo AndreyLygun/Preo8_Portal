@@ -19,8 +19,8 @@ use App\DRX\Screens\SecuritySRQScreen;
 class ChangePermanentPass4CarScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsStopPermanentPass4Cars";
-    public $Title = "Изменение постоянного автопропуска";
+    public static $EntityType = "IServiceRequestsStopPermanentPass4Cars";
+    public static $Title = "Изменение постоянного автопропуска";
 
     public function query(int $id = null): iterable
     {

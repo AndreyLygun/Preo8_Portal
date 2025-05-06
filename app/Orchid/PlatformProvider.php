@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Orchid;
 
+use App\DRX\Screens\Cars\ChangePermanentParkingScreen;
+use App\DRX\Screens\Cars\VisitorCarScreen;
+use Illuminate\Support\Facades\Auth;
 use Orchid\Platform\Dashboard;
 use Orchid\Platform\ItemPermission;
 use Orchid\Platform\OrchidServiceProvider;
@@ -40,12 +43,15 @@ class PlatformProvider extends OrchidServiceProvider
 
             Menu::make("Парковочные места")
                 ->route('drx.parking')
-                ->icon('bs.car-front'),
+                ->icon('bs.car-front')
+                ->permission(['platform.requests.' . class_basename(ChangePermanentParkingScreen::class),
+                    'platform.requests.' . class_basename(VisitorCarScreen::class)
+                ]),
 
             Menu::make(__('Сотрудники'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')
-                ->permission('platform.systems.users')
+                ->permission('platform.renter.users')
                 ->title(__('Access Controls')),
 
             Menu::make(__('Renters'))
@@ -78,19 +84,20 @@ class PlatformProvider extends OrchidServiceProvider
      */
     public function permissions(): array
     {
-        $requestsPermissions = ItemPermission::group(__('Может создавать:'));
+        $requestsPermissions = ItemPermission::group(__('Может создавать заявки:'));
         foreach (config('srq.requests') as $kind) {
             $properties = get_class_vars($kind);
-            $requestsPermissions = $requestsPermissions->addPermission("platform.requests.{$properties['EntityType']}", $properties["Title"] ?? $kind);
+            $kind = class_basename($kind);
+            $requestsPermissions = $requestsPermissions->addPermission("platform.requests.{$kind}", $properties["Title"] ?? $kind);
         }
         return [
             ItemPermission::group(__('System'))
                 ->addPermission('platform.systems.roles', __('Может настраивать все доступы'))
                 ->addPermission('platform.systems.renters', 'Может добавлять арендаторов'),
-            ItemPermission::group('Доступ')
+            ItemPermission::group('Компания')
                 ->addPermission('platform.renter.acccessAllRequests', 'Видит все заявки компании (не только свои)')
-                ->addPermission('platform.renter.users', 'Управляет пользователями')
-                ->addPermission('platform.renter.createAllRequests', 'Может создавать все заявки'),
+//                ->addPermission('platform.renter.createAllRequests', 'Может создавать все заявки')
+                ->addPermission('platform.renter.users', 'Управляет пользователями'),
             $requestsPermissions,
         ];
     }

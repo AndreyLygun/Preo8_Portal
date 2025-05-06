@@ -21,6 +21,7 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Color;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
+use function Laravel\Prompts\error;
 
 class UserEditScreen extends Screen
 {
@@ -37,6 +38,11 @@ class UserEditScreen extends Screen
     public function query(User $user): iterable
     {
         $user->load(['roles']);
+        $currentUser = Auth::user();
+        if (!$currentUser->hasAccess('platform.systems.renters') &&
+            isset($user['drx_account_id']) &&
+            $currentUser['drx_account_id'] != $user['drx_account_id'])
+                abort(403, 'Пользователь не найден');
         return [
             'user' => $user,
             'permission' => $user->getStatusPermission(),
@@ -62,7 +68,7 @@ class UserEditScreen extends Screen
     public function permission(): ?iterable
     {
         return [
-            'platform.systems.users',
+            'platform.renter.users',
             'platform.systems.renters'
         ];
     }
@@ -79,7 +85,7 @@ class UserEditScreen extends Screen
                 ->icon('bg.box-arrow-in-right')
                 ->confirm(__('You can revert to your original state by logging out.'))
                 ->method('loginAs')
-                ->canSee($this->user->exists && \request()->user()->id !== $this->user->id),
+                ->canSee($this->user->exists && \request()->user()->id !== $this->user->id && Auth::user()->roles()->where('slug', 'superadmin')->exists()),
 
             Button::make(__('Remove'))
                 ->icon('bs.trash3')

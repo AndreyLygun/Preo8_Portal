@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Orchid\Filters\Types\Like;
 use Orchid\Filters\Types\Where;
 use Orchid\Filters\Types\WhereDateStartEnd;
 use Orchid\Platform\Models\User as Authenticatable;
-use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -41,8 +42,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'permissions'          => 'array',
-        'email_verified_at'    => 'datetime',
+        'permissions' => 'array',
+        'email_verified_at' => 'datetime',
     ];
 
     /**
@@ -51,11 +52,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $allowedFilters = [
-           'id'         => Where::class,
-           'name'       => Like::class,
-           'email'      => Like::class,
-           'updated_at' => WhereDateStartEnd::class,
-           'created_at' => WhereDateStartEnd::class,
+        'id' => Where::class,
+        'name' => Like::class,
+        'email' => Like::class,
+        'updated_at' => WhereDateStartEnd::class,
+        'created_at' => WhereDateStartEnd::class,
     ];
 
     /**
@@ -71,14 +72,15 @@ class User extends Authenticatable
         'created_at',
     ];
 
-    public function DrxAccount() {
+    public function DrxAccount()
+    {
         return $this->belongsTo(DrxAccount::class);
     }
 
-    public function scopeRenter(Builder $query) {
+    public function scopeRenter(Builder $query)
+    {
         $currentUser = auth()->user();
         if (!$currentUser->hasAccess('platform.systems.renters'))
             $query->where('drx_account_id', $currentUser['drx_account_id']);
     }
-
 }

@@ -60,31 +60,38 @@ use Tabuna\Breadcrumbs\Trail;
 //}
 
 // Main
-Route::screen("/srq/settings", SiteSettingsScreen::class)->name('drx.sitesettings');
+
+//foreach (config('srq.requests') as $kind) {
+//    $kind = class_basename($kind);
+//    Route::screen("/srq/{$kind}", SiteSettingsScreen::class)->name("drx.{$kind}");
+//}
+
+Route::screen("/srq/settings", SiteSettingsScreen::class)->name("drx.sitesettings");
 Route::screen("/srq/list", EntitiesListScreen::class)->name('drx.srqlist');
 Route::screen("/srq/parking", ParkingListScreen::class)->name('drx.parking');
 
+
 // Люди
-Route::screen("/srq/IPass4VisitorDto/{id?}", VisitorsScreen::class)->name('drx.Pass4Visitors');
-Route::screen("/srq/IPermanentPass4EmployeeDto/{id?}", EmployeeScreen::class)->name('drx.PermanentPass4Employee');
-Route::screen("/srq/IPermission4EmployeeDto/{id?}", AdditionalPermissionScreen::class)->name('drx.Permission4Employee');
-Route::screen("/srq/IWorkPermissionDto/{id?}", WorkPermissionScreen::class)->name('drx.WorkPermission');
+Route::screen("/srq/IPass4VisitorDto/{id?}", VisitorsScreen::class)->name('drx.VisitorsScreen');
+Route::screen("/srq/IPermanentPass4EmployeeDto/{id?}", EmployeeScreen::class)->name('drx.EmployeeScreen');
+Route::screen("/srq/IPermission4EmployeeDto/{id?}", AdditionalPermissionScreen::class)->name('drx.AdditionalPermissionScreen');
+Route::screen("/srq/IWorkPermissionDto/{id?}", WorkPermissionScreen::class)->name('drx.WorkPermissionScreen');
 //Route::screen("/srq/IStopPermanentPass4EmployeeDto/{id?}", StopPermanentPass4EmployeeScreen::class)->name('drx.StopPermanentPass4Employee');
 
 // Машины
-Route::screen("/srq/IPass4VisitorCarDto/{id?}", VisitorCarScreen::class)->name('drx.Pass4VisitorCar');
+Route::screen("/srq/IPass4VisitorCarDto/{id?}", VisitorCarScreen::class)->name('drx.VisitorCarScreen');
 //Route::screen("/srq/IPermanentPass4CarDto/{id?}", PermanentCarScreen::class)->name('drx.PermanentPass4Car');
 //Route::screen("/srq/IStopPermanentPass4CarDto/{id?}", ChangePermanentPass4CarScreen::class)->name('drx.ChangePermanentPass4Car');
-Route::screen("/srq/IChangePermanentParkingDto/{id?}", ChangePermanentParkingScreen::class)->name('drx.ChangePermanentParking');
+Route::screen("/srq/IChangePermanentParkingDto/{id?}", ChangePermanentParkingScreen::class)->name('drx.ChangePermanentParkingScreen');
 
 // ТМЦ
-Route::screen("/srq/IPass4AssetsMovingDto/{id?}", AssetsInOutScreen::class)->name('drx.Pass4AssetsMoving');
-Route::screen("/srq/IPass4AssetsInternalMovingDto/{id?}", AssetsInternalScreen::class)->name('drx.Pass4AssetsInternalMoving');
-Route::screen("/srq/IPass4AssetsPermanentMovingDto/{id?}", AssetsPermanentScreen::class)->name('drx.Pass4AssetsPermanentMoving');
-
+Route::screen("/srq/IPass4AssetsMovingDto/{id?}", AssetsInOutScreen::class)->name('drx.AssetsInOutScreen');
+Route::screen("/srq/IPass4AssetsInternalMovingDto/{id?}", AssetsInternalScreen::class)->name('drx.AssetsInternalScreen');
+Route::screen("/srq/IPass4AssetsPermanentMovingDto/{id?}", AssetsPermanentScreen::class)->name('drx.AssetsPermanentScreen');
 
 
 //Route::screen("/srq/IPermanentPass4CarsDto/{id?}", PermanentPass4CarsSRQScreen::class)->name('drx.PermanentPass4Carsto');
+
 
 Route::screen("/srq/renters", DRXAccountListScreen::class)->name('drx.renters');
 Route::screen("/srq/renter/{drxAccount}", DRXAccountScreen::class)->name('drx.renter');

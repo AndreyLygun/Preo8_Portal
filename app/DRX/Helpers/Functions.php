@@ -3,6 +3,7 @@
 namespace App\DRX\Helpers;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Orchid\Screen\Actions\Link;
 
@@ -35,5 +36,13 @@ class Functions
     public function MakeCopyButton($id)
     {
         return Link::make('Копировать')->route(Route::currentRouteName(), ['fromId' => $this->entity['Id']]);
+    }
+
+    ///
+    ///
+    /// Проверяет, имеет ли текущий пользователь доступ к Screen с указанным имененем
+    public static function UserHasAccessTo($ScreenClassName): bool
+    {
+        return Auth::user()->hasAccess('platform.requests.' . class_basename($ScreenClassName));
     }
 }

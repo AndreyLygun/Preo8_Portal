@@ -27,9 +27,9 @@ use App\DRX\Screens\SecuritySRQScreen;
 class AssetsInOutScreen extends SecuritySRQScreen
 {
 
-    public $EntityType = 'IServiceRequestsPass4AssetsMovings';
-    public $Title = 'Разовый ввоз-вывоз ТМЦ';
-    public static string $Command = '...на разовый ввоз-вывоз ТМЦ';
+    public static $EntityType = 'IServiceRequestsPass4AssetsMovings';
+    public static $Title = 'Разовый ввоз-вывоз ТМЦ';
+    public static $Command = '...на разовый ввоз-вывоз ТМЦ';
 
     public function ExpandFields()
     {

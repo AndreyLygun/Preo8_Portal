@@ -3,6 +3,9 @@
 namespace App\DRX\Screens;
 
 use App\DRX\Helpers\Databooks;
+use App\DRX\Screens\Cars\ChangePermanentParkingScreen;
+use App\DRX\Screens\Cars\VisitorCarScreen;
+use Illuminate\Support\Facades\Auth;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\Link;
 use App\DRX\DRXClient;
@@ -49,58 +52,61 @@ class ParkingListScreen extends Screen
 
     public function commandBar(): iterable
     {
-        return [
-            Link::make("Создать заявку на гостевую парковку")->route("drx.Pass4VisitorCar")->class('btn btn-primary')
-        ];
+        $commands = [];
+        if ((Auth::user()->hasAccess('platform.requests.' . class_basename(VisitorCarScreen::class))))
+            $commands[] = Link::make("Создать заявку на гостевую парковку")->route("drx.VisitorCarScreen")->class('btn btn-primary');
+        return $commands;
     }
 
 
     public function layout(): iterable
     {
+        $Layout = [];
+        if ((Auth::user()->hasAccess('platform.requests.' . class_basename(VisitorCarScreen::class))))
+            $Layout[] = Layout::table("VisitorPasses", [
+                ExtendedTD::make("Id", "№")
+                    ->render(fn($item) => $item["Id"])
+                    ->cssClass(fn($item) => $item["RequestState"])
+                    ->width("100"),
+                ExtendedTD::make("Subject", "Автомобиль")
+                    ->render(fn($item) => "<a href='/srq/IPass4VisitorCarDto/{$item["Id"]}'>{$item["Subject"]}</a>")
+                    ->cssClass(fn($item) => $item["RequestState"])
+                    ->sort()->width("40%"),
+                ExtendedTD::make("Creator", "Автор")
+                    ->render(fn($item) => $item["Creator"])
+                    ->cssClass(fn($item) => $item["RequestState"])
+                    ->sort(),
+                ExtendedTD::make("ValidOn", "Дата въезда")
+                    ->render(fn($item) => Carbon::parse($item["ValidOn"])->format('d-m-Y'))
+                    ->cssClass(fn($item) => $item["RequestState"])
+                    ->sort()->width("30%"),
+                ExtendedTD::make("ParkingPlace", "Парковочное место")
+                    ->render(fn($item) => $item['ParkingType'] == 'PrivateParking' ? ($item['ParkingPlace']['Name'] ?? "") : 'Гостевая стоянка')
+                    ->cssClass(fn($item) => $item["RequestState"])
+                    ->sort()->width("20%"),
+                ExtendedTD::make("RequestState", "Статус")
+                    ->render(fn($item) => __($item["RequestState"]))
+                    ->cssClass(fn($item) => $item["RequestState"])->sort()
+            ])->title('Гостевая парковка (сегодня и на последующие дни)');
 
-        $Layout[] = Layout::table("VisitorPasses", [
-            ExtendedTD::make("Id", "№")
-                ->render(fn($item) => $item["Id"])
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->width("100"),
-            ExtendedTD::make("Subject", "Автомобиль")
-                ->render(fn($item) => "<a href='/srq/IPass4VisitorCarDto/{$item["Id"]}'>{$item["Subject"]}</a>")
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->sort()->width("40%"),
-            ExtendedTD::make("Creator", "Автор")
-                ->render(fn($item) => $item["Creator"])
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->sort(),
-            ExtendedTD::make("ValidOn", "Дата въезда")
-                ->render(fn($item) => Carbon::parse($item["ValidOn"])->format('d-m-Y'))
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->sort()->width("30%"),
-            ExtendedTD::make("ParkingPlace", "Парковочное место")
-                ->render(fn($item) => $item['ParkingType'] == 'PrivateParking' ? ($item['ParkingPlace']['Name'] ?? "") : 'Гостевая стоянка')
-                ->cssClass(fn($item) => $item["RequestState"])
-                ->sort()->width("20%"),
-            ExtendedTD::make("RequestState", "Статус")
-                ->render(fn($item) => __($item["RequestState"]))
-                ->cssClass(fn($item) => $item["RequestState"])->sort()
-        ])->title('Гостевая парковка (сегодня и на последующие дни)');
-
-        $Layout[] = Layout::table('ParkingPlaces', [
-            ExtendedTD::make("Name", "Название/<br>электронный пропуск")
-                ->render(fn($item) => $item["Name"] . '<br>' . ($item['NfcNumber'] ? '№ ' . $item['NfcNumber'] : 'Пропуск не оформлен'))
+        if ((Auth::user()->hasAccess('platform.requests.' . class_basename(ChangePermanentParkingScreen::class))))
+            $Layout[] = Layout::table('ParkingPlaces', [
+                ExtendedTD::make("Name", "Название/<br>электронный пропуск")
+                    ->render(fn($item) => $item["Name"] . '<br>' . ($item['NfcNumber'] ? '№ ' . $item['NfcNumber'] : 'Пропуск не оформлен'))
 //                ->cssClass(fn($item) => $item["RequestState"])
-                ->width("30%"),
-            ExtendedTD::make("Сars", "Автомобили")
-                ->render(fn($item) => $item['CarsString'])
-                ->width("30%"),
-            ExtendedTD::make("Drivers", "Водители")
-                ->render(fn($item) => $item['DriversString'])
-                ->width("30%"),
-            ExtendedTD::make("", "")
-                ->render(fn($item) => $item['NfcNumber']
-                    ? Link::make('Внести изменения')->route('drx.ChangePermanentParking', ['parkingplace' => $item['Id']])->class('btn btn-primary')
-                    : Link::make('Оформить пропуск')->route('drx.ChangePermanentParking', ['parkingplace' => $item['Id']])->class('btn btn-primary'))
-                ->width("10%")
-        ])->title('Парковочные места');
+                    ->width("30%"),
+                ExtendedTD::make("Сars", "Автомобили")
+                    ->render(fn($item) => $item['CarsString'])
+                    ->width("30%"),
+                ExtendedTD::make("Drivers", "Водители")
+                    ->render(fn($item) => $item['DriversString'])
+                    ->width("30%"),
+                ExtendedTD::make("", "")
+                    ->render(fn($item) => $item['NfcNumber']
+                        ? Link::make('Внести изменения')->route('drx.ChangePermanentParkingScreen', ['parkingplace' => $item['Id']])->class('btn btn-primary')
+                        : Link::make('Оформить пропуск')->route('drx.ChangePermanentParkingScreen', ['parkingplace' => $item['Id']])->class('btn btn-primary'))
+                    ->width("10%")
+            ])->title('Парковочные места');
 
         return $Layout;
     }

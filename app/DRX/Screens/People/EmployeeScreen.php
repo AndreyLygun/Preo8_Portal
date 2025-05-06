@@ -20,8 +20,8 @@ use App\DRX\Screens\SecuritySRQScreen;
 class EmployeeScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsPermanentPass4Employees";
-    public $Title = "Пропуск для сотрудника";
+    public static $EntityType = "IServiceRequestsPermanentPass4Employees";
+    public static $Title = "Пропуск для сотрудника";
 
     public function CollectionFields()
     {

@@ -4,6 +4,8 @@ namespace App\DRX\Screens;
 
 use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
+use App\DRX\Helpers\Functions;
+use App\DRX\Helpers\MergingProperty;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
@@ -20,6 +22,7 @@ use App\DRX\Helpers\NormalizeDate;
 class BaseSRQScreen extends Screen
 {
     use NormalizeDate;
+    use MergingProperty;
 
 //    Функция должна возвращать список полей данного объекта, которыми обменимваемся с сервисом интеграции Directum RX
 //    public function fields()
@@ -42,22 +45,27 @@ class BaseSRQScreen extends Screen
 //        ];
 //    }
 
-    public $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
-    protected $CollectionFields;                            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
-    protected $ExpandFields = ["Author", "DocumentKind", "Renter"];
-    protected $Title = '';
+    public static $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
+    public static $Title = '';
+    public static $Command = '';
+    protected static $CollectionFields;                            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected static $ExpandFields = ["Author", "DocumentKind", "Renter"];
+
     public $readOnly;
     public $entity;
     public $ApprovalStatus;
-    public static string $Command = '';
 
     // Возвращает список полей-ссылок и полей-коллекций, который используются в форме. Нужен, чтобы OData-API вернул значения этих полей
     // Как правило, перекрытый метод в классе-наследнике добавляет свои поля к результату метода из класса-предка
+//    public function ExpandFields()
+//    {
+//        return static::$ExpandFields;
+//    }
+
     public function ExpandFields()
     {
-        return $this->ExpandFields;
+        return $this->MergingProperties('ExpandFields');
     }
-
 
     public function CollectionFields()
     {
@@ -78,6 +86,9 @@ class BaseSRQScreen extends Screen
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity()
     {
+        if (!Functions::UserHasAccessTo(static::class)) {
+            abort(403, "У вас нет доступа к данному виду заявок");
+        }
         // Копируем заявку из другой
         if ($fromId = \request()->input('fromId')) {
             $odata = new DRXClient();
@@ -97,7 +108,6 @@ class BaseSRQScreen extends Screen
             'ValidTill' => Carbon::today()->addDay(),
             'ValidOn' => Carbon::today()->addDay(),
         ];
-        //  dd(array_merge($fromEntity ?? [], $newEntity, $this->entity ?? []));
         return array_merge($fromEntity ?? [], $newEntity, $this->entity ?? []);
     }
 
@@ -107,7 +117,7 @@ class BaseSRQScreen extends Screen
             $odata = new DRXClient();
             if ($id) {
                 $currentEntity = $this->entity ?? [];
-                $storedEntity = $odata->getEntity($this->EntityType, $id, $this->ExpandFields());
+                $storedEntity = $odata->getEntity(static::$EntityType, $id, $this->ExpandFields());
                 $entity = array_merge($storedEntity, $currentEntity);
             } else {
                 $entity = $this->NewEntity();
@@ -116,7 +126,9 @@ class BaseSRQScreen extends Screen
                 $ApprovalStatus = (new ApprovalStatus($odata))->Get($id);
             }
         } catch (GuzzleException $ex) {
+            dd($ex->getResponse()->getBody()->getContents());
             Alert::error("При подключении к серверу произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
+
         }
         return [
             'entity' => $entity,
@@ -130,16 +142,17 @@ class BaseSRQScreen extends Screen
         if (isset($this->entity['Id']))
             return $this->entity['DocumentKind']['Name'] . ' (' . $this->entity['Id'] . ')';
         else
-            return $this->Title . ' (новая)';
+            return static::$Title . ' (новая)';
     }
 
-    public function permission(): ?iterable
-    {
-        return [
+//    public function permission(): ?iterable
+//    {
+//        dd('platform.requests.'.self::$EntityType);
+//        return [
 //            'platform.system.createAllRequests',
-            'platform.requests.'.$this->EntityType
-        ];
-    }
+//            'platform.requests.'.self::$EntityType
+//        ];
+//    }
 
 
     public function commandBar(): iterable

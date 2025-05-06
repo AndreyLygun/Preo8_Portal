@@ -27,13 +27,13 @@ class UserEditLayout extends Rows
                 ->required()
                 ->title(__('Name'))
                 ->placeholder(__('Name'))
-                ->disabled(!Auth::user()->hasAccess('platform.systems.users')),
+                ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
             Input::make('user.email')
                 ->type('email')
                 ->required()
                 ->title(__('Email'))
                 ->placeholder(__('Email'))
-                ->disabled(!Auth::user()->hasAccess('platform.systems.users')),
+                ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
             Input::make('user.phone')
                 ->type('text')
                 ->mask('+7 (999) 999-99-99')
@@ -41,7 +41,7 @@ class UserEditLayout extends Rows
             Select::make('user.drx_account_id')
                 ->fromModel(DrxAccount::class, 'name')
                 ->title('Арендатор')
-//                ->canSee(Auth::user()->hasAccess('platform.systems.renter'))
+                ->canSee(Auth::user()->hasAccess('platform.systems.renter'))
         ];
     }
 }

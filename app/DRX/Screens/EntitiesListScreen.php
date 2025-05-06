@@ -2,6 +2,8 @@
 
 namespace App\DRX\Screens;
 
+use Illuminate\Support\Facades\Auth;
+use App\DRX\Helpers\Functions;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\DropDown;
@@ -41,18 +43,15 @@ class EntitiesListScreen extends Screen
 
     public function commandBar(): iterable
     {
+        $commands = [];
+        foreach (config('srq.requests') as $kind) {
+            if (!Functions::UserHasAccessTo($kind)) continue;
+            $properties = get_class_vars($kind);
+            $commandTitle = "...на " . mb_lcfirst($properties['Title']);
+            $commands[] = Link::make($commandTitle)->route('drx.' . class_basename($kind));
+        }
         return [
-            DropDown::make("Создать заявку...")->list([
-//                Link::make("...на разовый пропуск")->route("drx.Pass4Visitors"),
-                Link::make("...на пропуск для сотрудника")->route("drx.PermanentPass4Employee"),
-//                Link::make("...на блокировку постоянного пропуска")->route("drx.StopPermanentPass4Employee"),
-                Link::make("...на дополнительный доступ")->route("drx.Permission4Employee"),
-                Link::make("...на выполнение работ")->route("drx.WorkPermission")->hr()->horizontal(),
-                Link::make("...на гостевую парковку")->route("drx.Pass4VisitorCar")->hr()->horizontal(),
-                Link::make("...на разовый ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsMoving"),
-                Link::make("...на внутреннее перемещение ТМЦ")->route("drx.Pass4AssetsInternalMoving"),
-                Link::make("...на регулярный ввоз-вывоз ТМЦ")->route("drx.Pass4AssetsPermanentMoving"),
-            ])
+            DropDown::make("Создать заявку...")->list($commands)
         ];
     }
 

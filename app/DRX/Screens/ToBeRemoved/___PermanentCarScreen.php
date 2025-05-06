@@ -20,8 +20,8 @@ class PermanentCarScreen extends SecuritySRQScreen
 
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
-    public $EntityType = "IServiceRequestsPermanentPass4Cars";
-    public $Title = "Заявка на оформление постоянного автопропуска";
+    public static $EntityType = "IServiceRequestsPermanentPass4Cars";
+    public static $Title = "Заявка на оформление постоянного автопропуска";
 
     public function ExpandFields()
     {
