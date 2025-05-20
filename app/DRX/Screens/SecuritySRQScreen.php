@@ -12,12 +12,13 @@ class SecuritySRQScreen extends BaseSRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     public static $EntityType = "IServiceRequestsSecuritySRQScreen";
+    protected static $ExpandFields = ['ParkingPlace'];
     protected $TestField = ['BaseSRQ'];
     public $entity;
 
-    public function ExpandFields() {
-        return array_merge(parent::ExpandFields(), ['ParkingPlace']);
-    }
+//    public function ExpandFields() {
+//        return array_merge(parent::ExpandFields(), ['ParkingPlace']);
+//    }
 
     public function NewEntity() {
         $entity = parent::NewEntity();

@@ -13,12 +13,6 @@ use App\DRX\Screens\SecuritySRQScreen;
 
 class VisitorCarScreen extends SecuritySRQScreen
 {
-    /**
-     * Fetch data to be displayed on the screen.
-     *
-     * @return array
-     */
-
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     public static $EntityType = "IServiceRequestsPass4VisitorCars";
     public static $Title = "Гостевой автопропуск";

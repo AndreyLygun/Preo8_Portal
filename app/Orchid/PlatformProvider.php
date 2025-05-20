@@ -90,15 +90,16 @@ class PlatformProvider extends OrchidServiceProvider
             $kind = class_basename($kind);
             $requestsPermissions = $requestsPermissions->addPermission("platform.requests.{$kind}", $properties["Title"] ?? $kind);
         }
-        return [
+        return ([
             ItemPermission::group(__('System'))
-                ->addPermission('platform.systems.roles', __('Может настраивать все доступы'))
-                ->addPermission('platform.systems.renters', 'Может добавлять арендаторов'),
+                ->addPermission('platform.systems.roles', __('Может настраивать все доступы')),
+            ItemPermission::group(__('Портал'))
+                ->addPermission('platform.systems.renters', 'Управляет арендаторами'),
             ItemPermission::group('Компания')
-                ->addPermission('platform.renter.acccessAllRequests', 'Видит все заявки компании (не только свои)')
+                ->addPermission('platform.renter.acccessAllRequests', 'Доступ ко всем заявкам компании (не только к своим)')
 //                ->addPermission('platform.renter.createAllRequests', 'Может создавать все заявки')
                 ->addPermission('platform.renter.users', 'Управляет пользователями'),
             $requestsPermissions,
-        ];
+        ]);
     }
 }

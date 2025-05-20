@@ -77,10 +77,19 @@ class User extends Authenticatable
         return $this->belongsTo(DrxAccount::class);
     }
 
-    public function scopeRenter(Builder $query)
+    public function scopeSameRenter(Builder $query)
     {
         $currentUser = auth()->user();
-        if (!$currentUser->hasAccess('platform.systems.renters'))
-            $query->where('drx_account_id', $currentUser['drx_account_id']);
+        $query->where('drx_account_id', $currentUser['drx_account_id']);
+    }
+
+    protected static function booted(): void
+    {
+        if (Auth::user() && !Auth::user()->hasAccess('platform.systems.renters')) {
+            $renter_drx_id = Auth::user()['drx_account_id'];
+            static::addGlobalScope('renter', function (Builder $builder) use ($renter_drx_id) {
+                $builder->where('drx_account_id', $renter_drx_id);
+            });
+        }
     }
 }

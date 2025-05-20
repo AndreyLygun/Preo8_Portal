@@ -29,18 +29,9 @@ class AssetsInOutScreen extends SecuritySRQScreen
 
     public static $EntityType = 'IServiceRequestsPass4AssetsMovings';
     public static $Title = 'Разовый ввоз-вывоз ТМЦ';
-    public static $Command = '...на разовый ввоз-вывоз ТМЦ';
+    protected static $ExpandFields = ['LoadingSite', 'Inventory', 'ElevatorTimeSpan($expand=Name)'];
+    protected static $CollectionFields = ["Inventory", 'ElevatorTimeSpan'];
 
-    public function ExpandFields()
-    {
-        $ExpandFields = ['LoadingSite', 'Inventory', 'ElevatorTimeSpan($expand=Name)'];
-        return array_merge(parent::ExpandFields(), $ExpandFields);
-    }
-
-    public function CollectionFields()
-    {
-        return array_merge(parent::CollectionFields(), ["Inventory", 'ElevatorTimeSpan']);
-    }
 
     public function query(int $id = null): iterable
     {

@@ -22,12 +22,9 @@ class AssetsInternalScreen extends SecuritySRQScreen
 
     public static $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
     public static $Title = 'Внутреннее перемещение ТМЦ';
+    protected static $CollectionFields = ["Inventory", 'ElevatorTimeSpan'];            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected static $ExpandFields = ['Inventory', 'ElevatorTimeSpan($expand=Name)'];  // Список полей-ссылок, которые нужно пересоздавать в DRX заново при каждом сохранении
 
-    public function ExpandFields()
-    {
-        $ExpandFields = ['Inventory', 'ElevatorTimeSpan($expand=Name)'];
-        return array_merge(parent::ExpandFields(), $ExpandFields);
-    }
 
     public function commandBar(): iterable
     {
@@ -35,11 +32,6 @@ class AssetsInternalScreen extends SecuritySRQScreen
         if (isset($this->entity["Id"]))
             $buttons[] = Link::make('Копировать')->route(Route::currentRouteName(), ['fromId' => $this->entity['Id']]);
         return $buttons;
-    }
-
-    public function CollectionFields()
-    {
-        return array_merge(parent::CollectionFields(), ["Inventory", 'ElevatorTimeSpan']);
     }
 
     public function query(int $id = null): iterable

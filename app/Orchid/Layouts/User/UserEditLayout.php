@@ -25,8 +25,8 @@ class UserEditLayout extends Rows
                 ->type('text')
                 ->max(255)
                 ->required()
-                ->title(__('Name'))
-                ->placeholder(__('Name'))
+                ->title('Имя')
+                ->placeholder('Имя Фамилия')
                 ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
             Input::make('user.email')
                 ->type('email')
@@ -40,8 +40,10 @@ class UserEditLayout extends Rows
                 ->title(__('Телефон')),
             Select::make('user.drx_account_id')
                 ->fromModel(DrxAccount::class, 'name')
+                ->empty()
                 ->title('Арендатор')
-                ->canSee(Auth::user()->hasAccess('platform.systems.renter'))
+                ->required()
+                ->canSee(Auth::user()->hasAccess('platform.systems.renters'))
         ];
     }
 }

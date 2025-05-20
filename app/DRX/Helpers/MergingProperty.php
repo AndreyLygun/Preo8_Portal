@@ -11,17 +11,16 @@ trait MergingProperty
     public function MergingProperties($propName)
     {
         // Получаем класс текущего объекта
-        $class = new ReflectionClass($this);
+        $class = new \ReflectionClass($this);
         $merged = $class->getProperty($propName)->getValue($class); // Начинаем с текущего значения
-
         // Идем по всем родительским классам
         while ($class = $class->getParentClass()) {
             // Получаем значение свойства $property из родительского класса
             if ($class->hasProperty($propName)) {
                 $propertyValue = $class->getProperty($propName)->getValue($this);
-                $merged = array_merge($merged, $propertyValue); // Добавляем к сумме
+                $merged = array_merge($merged, $propertyValue); // Добавляем к массиву
             }
         }
-        return $merged;
+        return array_unique($merged);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Orchid\Layouts\User;
 
 use App\Models\DrxAccount;
+use Illuminate\Support\Facades\Auth;
 use Orchid\Platform\Models\User;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\DropDown;
@@ -37,14 +38,7 @@ class UserListLayout extends Table
             TD::make('email', __('Email'))
                 ->sort()
                 ->cantHide()
-                ->filter(Input::make())
-                ->render(fn (User $user) => ModalToggle::make($user->email)
-                    ->modal('asyncEditUserModal')
-                    ->modalTitle($user->presenter()->title())
-                    ->method('saveUser')
-                    ->asyncParameters([
-                        'user' => $user->id,
-                    ])),
+                ->filter(Input::make()),
 
             TD::make('updated_at', __('Last edit'))
                 ->sort()
@@ -70,7 +64,7 @@ class UserListLayout extends Table
                             ->confirm(__('Once the account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.'))
                             ->method('remove', [
                                 'id' => $user->id,
-                            ]),
+                            ])->canSee(Auth::user()->id !== $user->id),
                     ])),
         ];
     }

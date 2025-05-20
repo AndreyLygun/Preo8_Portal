@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Orchid\Screens\User;
 
+use App\DRX\Helpers\Functions;
 use App\Orchid\Layouts\Role\RolePermissionLayout;
 use App\Orchid\Layouts\User\UserEditLayout;
 use App\Orchid\Layouts\User\UserPasswordLayout;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Orchid\Access\Impersonation;
+use Orchid\Platform\Models\Role;
 use Orchid\Platform\Models\User;
 use Orchid\Screen\Action;
 use Orchid\Screen\Actions\Button;
@@ -40,26 +42,20 @@ class UserEditScreen extends Screen
         $user->load(['roles']);
         $currentUser = Auth::user();
         if (!$currentUser->hasAccess('platform.systems.renters') &&
-            isset($user['drx_account_id']) &&
-            $currentUser['drx_account_id'] != $user['drx_account_id'])
-                abort(403, 'Пользователь не найден');
+                isset($user['drx_account_id']) &&
+                    $currentUser['drx_account_id'] != $user['drx_account_id'])
+                        abort(403, 'Пользователь не найден');
         return [
             'user' => $user,
             'permission' => $user->getStatusPermission(),
         ];
     }
 
-    /**
-     * The name of the screen displayed in the header.
-     */
     public function name(): ?string
     {
         return $this->user->exists ? 'Edit User' : 'Create User';
     }
 
-    /**
-     * Display header description.
-     */
     public function description(): ?string
     {
         return 'User profile and privileges, including their associated role.';
@@ -89,9 +85,9 @@ class UserEditScreen extends Screen
 
             Button::make(__('Remove'))
                 ->icon('bs.trash3')
-                ->confirm(__('Once the account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.'))
+                ->confirm('После удаления пользователя он потеряет доступ на портал, но заявки, созданные им, будут доступны для других сотрудников')
                 ->method('remove')
-                ->canSee($this->user->exists),
+                ->canSee($this->user->exists && Auth::user()->id !== $this->user->id),
 
             Button::make(__('Save'))
                 ->icon('bs.check-circle')
@@ -119,7 +115,7 @@ class UserEditScreen extends Screen
 
             Layout::block(UserPasswordLayout::class)
                 ->title(__('Password'))
-                ->description(__('Ensure your account is using a long, random password to stay secure.'))
+                ->description('Вы можете не сообщать пароль пользователю. В этом случае он сможет воспользоваться процедурой восстановления пароля')
                 ->commands(
                     Button::make(__('Save'))
                         ->type(Color::BASIC)
@@ -131,6 +127,7 @@ class UserEditScreen extends Screen
             Layout::block(UserRoleLayout::class)
                 ->title(__('Roles'))
                 ->description(__('A Role defines a set of tasks a user assigned the role is allowed to perform.'))
+                ->canSee(Functions::UserHasAccessTo('platform.systems.roles'))
                 ->commands(
                     Button::make(__('Save'))
                         ->type(Color::BASIC)
@@ -168,20 +165,21 @@ class UserEditScreen extends Screen
             ->map(fn($value, $key) => [base64_decode($key) => $value])
             ->collapse()
             ->toArray();
-
+        $permissions['platform.systems.attachment'] = "1";
+        $permissions['platform.index'] = "1";
         $user->when($request->filled('user.password'), function (Builder $builder) use ($request) {
             $builder->getModel()->password = Hash::make($request->input('user.password'));
         });
-//        dd($request->has('user.drx_account_id'), Auth::user()->hasAccess('platform.portal.renters'));
-        if ($request->has('user.drx_account_id') && Auth::user()->hasAccess('platform.portal.renters'))
+//        dd($request->has('user.drx_account_id'), Auth::user()->hasAccess('platform.system.renters'));
+        if ($request->has('user.drx_account_id') && Auth::user()->hasAccess('platform.systems.renters'))
             $user->drx_account_id = $request->input('user.drx_account_id');
         else
             $user->drx_account_id = Auth::user()->drx_account_id;
+        $user->phone = $request->input('user.phone');
         $user
             ->fill($request->collect('user')->except(['password', 'permissions', 'roles'])->toArray())
             ->fill(['permissions' => $permissions])
             ->save();
-
         $user->replaceRoles($request->input('user.roles'));
 
         Toast::info(__('User was saved.'));

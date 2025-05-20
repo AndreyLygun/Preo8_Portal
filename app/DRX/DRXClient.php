@@ -42,6 +42,10 @@ class PostProcessor implements IProcessor
 //TODO: Сделать обработку ошибок при работе с сервисом интеграции
 class DRXClient extends ODataClient
 {
+    protected $odata;
+    protected $filter = [];
+    protected $order = [];
+
     public function __construct()
     {
         $url = config('srq.url');
@@ -60,6 +64,14 @@ class DRXClient extends ODataClient
         $this->postProcessor = new PostProcessor();
     }
 
+    public function Filter($filter) {
+        $this->filter[] = $filter;
+    }
+
+    public function Order($order) {
+        $this->order[] = $order;
+    }
+
     public function getEntity($EntityType, int $Id, $ExpandFields)
     {
         $query = $this->from($EntityType);
@@ -71,11 +83,10 @@ class DRXClient extends ODataClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
+//        dd($CollectionFields);
         $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
         unset($Entity['Id']);
         unset($Entity['Renter']);
-        // API Directum требует, чтобы в Id было целое число, а не строка, поэтому ниже такой странный костыль
-//dd(json_encode($Entity));
         foreach ($Entity as $key => $field) {
             if (is_array($field) && isset($field['Id'])) {
                 $Entity[$key]['Id'] = (int)$field['Id'];
@@ -143,6 +154,7 @@ class DRXClient extends ODataClient
     }
 
     // выбираем из строки запроса параметр sort и преваращаем его в параметры для odata-order
+
     protected function OrderBy($orderBy = 'Id')
     {
         $order_field = request()->get('sort', $orderBy);

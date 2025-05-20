@@ -2,9 +2,16 @@
 
 namespace App\DRX\Screens;
 
+use App\DRX\NewDRXClient;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Auth;
 use App\DRX\Helpers\Functions;
+use Illuminate\Support\Facades\Request;
+use Mockery\Exception;
+use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
+use Orchid\Screen\Fields\Select;
+use Orchid\Screen\Repository;
 use Orchid\Screen\Screen;
 use Orchid\Screen\Actions\DropDown;
 use Orchid\Screen\Actions\Link;
@@ -31,64 +38,102 @@ class EntitiesListScreen extends Screen
 
     public function query(): iterable
     {
-        $odata = new DRXClient();
-        $result = $odata->getList($this->DRXEntityType, $this->ExpandFields(), '-Created', 30);
-        return $result;
+
+        $drx = new NewDRXClient('IServiceRequestsBaseSRQs');
+        // Получаем сортировку и фильтр из параметров запроса
+        if ($sort = Request::input('sort'))
+            $drx->order($drx->OrchidToOdataOrder($sort));
+        else
+            $drx->order('Id', 'desc');
+        $where = [];
+        if ($filter = Request::input('filter')) {
+            if (isset($filter['Id']))
+                $where[] = ['Id', '=', (int)$filter['Id']];
+            if (isset($filter['Creator']))
+                $where[] = ['Creator', 'contains', $filter['Creator']];
+            if (isset($filter['DocumentKind.Name']))
+                $where[] = ['DocumentKind/Name', '=', $filter['DocumentKind.Name']];
+            if (isset($filter['Subject']))
+                $where[] = ['Subject', 'contains', $filter['Subject']];
+        }
+        if (!Auth::user()->hasAccess('platform.renter.acccessAllRequests'))
+            $where[] = ['CreatorMail', '=', Auth::user()->email];
+        $where[] = ['Renter/Login/LoginName', '=', Auth::user()->DrxAccount['DRX_Login']];
+        $drx->where($where);
+        try {
+            $list = $drx->with('Author,DocumentKind')->paginate(50)->get();
+        } catch (ClientException $ex) {
+          return ['error' => $ex->getMessage()];
+        }
+        return ['entities' => $list,
+            'pagination' => $drx->GetPaginator()];
     }
 
-    public function name(): ?string
+    public
+    function name(): ?string
     {
         return 'Все заявки';
     }
 
-    public function commandBar(): iterable
+    public
+    function commandBar(): iterable
     {
         $commands = [];
         foreach (config('srq.requests') as $kind) {
-            if (!Functions::UserHasAccessTo($kind)) continue;
-            $properties = get_class_vars($kind);
-            $commandTitle = "...на " . mb_lcfirst($properties['Title']);
-            $commands[] = Link::make($commandTitle)->route('drx.' . class_basename($kind));
+            if (Functions::UserHasAccessTo($kind)) {
+                $properties = get_class_vars($kind);
+                $commandTitle = "...на " . mb_lcfirst($properties['Title']);
+                $commands[] = Link::make($commandTitle)->route('drx.' . class_basename($kind));
+            }
         }
-        return [
-            DropDown::make("Создать заявку...")->list($commands)
-        ];
+        if ($commands)
+            return [DropDown::make("Создать заявку...")->list($commands)];
+        else
+            return  [];
     }
 
-    public function layout(): iterable
+    public
+    function layout(): iterable
     {
         if (isset($this->error)) {
             return [
                 Layout::rows([
-                    Label::make('error.message'),
+                    Label::make('error'),
                     Label::make('error.errnum')
                 ])->title('Ошибка!')
             ];
         }
-        $DocumentKinds = [
-            'InOutAssets' => 'Разовый ввоз-вывоз ТМЦ',
-            'InternalMovingAssets' => 'Внутреннее перемещение ТМЦ',
-        ];
+        $DocumentKindNames = [];
+        foreach (config('srq.requests') as $kind) {
+            if (Functions::UserHasAccessTo($kind)) {
+                $properties = get_class_vars($kind);
+                $commandTitle = "...на " . mb_lcfirst($properties['Title']);
+                $DocumentKindNames[$properties['Title']] = $properties['Title'];
+            }
+        }
+
         $Layout = [
             Layout::table("entities", [
                 ExtendedTD::make("Id", "№")
                     ->render(fn($item) => $item["Id"])
                     ->cssClass(fn($item) => $item["RequestState"])
-                    ->width("100"),
+                    ->width("100")
+                    ->sort()
+                    ->filter(ExtendedTD::FILTER_NUMERIC),
                 ExtendedTD::make("DocumentKind.Name", "Вид заявки")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["DocumentKind"]["Name"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
-//                    ->filter(Select::make()->options($DocumentKinds))
+                    ->filter(Select::make()->options($DocumentKindNames)->empty())
                     ->sort(),
                 ExtendedTD::make("Creator", "Автор")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["Creator"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
-//                    ->filter(ServiceRequestsFilter::class)
+                    ->filter(ServiceRequestsFilter::class)
                     ->sort(),
                 ExtendedTD::make("Subject", "Содержание")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["Subject"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
-//                    ->filter()
+                    ->filter()
                     ->sort()->width("50%"),
                 ExtendedTD::make("Created", "Cоздан")
                     ->render(fn($item) => Carbon::parse($item["Created"])->format('d/m/y'))
@@ -97,7 +142,7 @@ class EntitiesListScreen extends Screen
                     ->sort(),
                 ExtendedTD::make("RequestState", "Статус")
                     ->render(fn($item) => __($item["RequestState"]))
-                    ->cssClass(fn($item) => $item["RequestState"])->sort()
+                    ->cssClass(fn($item) => $item["RequestState"])
             ])
         ];
         if ($pagination = ($this->pagination ?? false) and ($pagination['last_page'] > 1)) {

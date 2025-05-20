@@ -16,24 +16,18 @@ class AssetsPermanentScreen extends SecuritySRQScreen
 
     public static $EntityType = 'IServiceRequestsPass4AssetsPermanentMovings';
     public static $Title = 'Регулярный ввоз-вывоз ТМЦ';
+    protected static $CollectionFields = ['Cars', 'Assets'];            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected static $ExpandFields = ['Cars', 'Assets'];  // Список полей-ссылок, которые нужно пересоздавать в DRX заново при каждом сохранении
 
-    public function ExpandFields()
-    {
-        return array_merge(parent::ExpandFields(), ['Cars', 'Assets']);
-    }
-
-    public function CollectionFields()
-    {
-        return array_merge(parent::CollectionFields(), ["Cars", "Assets"]);
-    }
 
     public function beforeSave()
     {
         parent::beforeSave();
-        if ($this->entity['Assets'] == null) $this->entity['Assets'] = '';
-        if (!isset($this->entity['Cars'])) $this->entity['Cars'] = [];
+        $this->entity['Assets'] ??= '';
+        $this->entity['Cars'] ??= [];
+//        if ($this->entity['Assets'] == null) $this->entity['Assets'] = '';
+//        if (!isset($this->entity['Cars'])) $this->entity['Cars'] = [];
         $this->NormalizeDate(['ValidFrom', 'ValidTill']);
-        //dd($this->entity);
     }
 
     public function layout(): iterable

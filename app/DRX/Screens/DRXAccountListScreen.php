@@ -49,13 +49,15 @@ class DRXAccountListScreen extends Screen
     public function update() {
         $odata = new DRXClient();
         $result = $odata->getList('IServiceRequestsRenters', ['Login'], 'Name');
+        dd($result);
     }
 
-    /**
-     * The screen's layout elements.
-     *
-     * @return \Orchid\Screen\Layout[]|string[]
-     */
+    public function permission(): ?iterable
+    {
+        return ['platform.systems.renters'];
+    }
+
+
     public function layout(): iterable
     {
         return [
@@ -63,7 +65,7 @@ class DRXAccountListScreen extends Screen
                 ExtendedTD::make("id", "№"),
                 ExtendedTD::make("Name", "Название"),
                 ExtendedTD::make("DRX_Login", "Логин для Directum"),
-                ExtendedTD::make("DRX_Password", "Пароль для Directum"),
+//                ExtendedTD::make("DRX_Password", "Пароль для Directum"),
                 ExtendedTD::make('')
                     ->render(fn (DrxAccount $DRXAccount) => Link::make('')
                         ->route('drx.renter', $DRXAccount)

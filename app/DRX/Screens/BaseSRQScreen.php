@@ -48,8 +48,8 @@ class BaseSRQScreen extends Screen
     public static $EntityType = "IServiceRequestsBaseSRQs";     // Имя сущности в сервисе интеграции, например IOfficialDocuments
     public static $Title = '';
     public static $Command = '';
-    protected static $CollectionFields;                            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
-    protected static $ExpandFields = ["Author", "DocumentKind", "Renter"];
+    protected static $CollectionFields = [];                                // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
+    protected static $ExpandFields = ["Author", "DocumentKind", "Renter"];  // Список полей-ссылок, которые нужно пересоздавать в DRX заново при каждом сохранении
 
     public $readOnly;
     public $entity;
@@ -69,7 +69,7 @@ class BaseSRQScreen extends Screen
 
     public function CollectionFields()
     {
-        return [];
+        return $this->MergingProperties('CollectionFields');
     }
 
     // В наследуемых классах можно переопределить эту функцию, для предварительной обработки сохраняемой $this->Entity
@@ -145,16 +145,6 @@ class BaseSRQScreen extends Screen
             return static::$Title . ' (новая)';
     }
 
-//    public function permission(): ?iterable
-//    {
-//        dd('platform.requests.'.self::$EntityType);
-//        return [
-//            'platform.system.createAllRequests',
-//            'platform.requests.'.self::$EntityType
-//        ];
-//    }
-
-
     public function commandBar(): iterable
     {
         if (!isset($this->entity["RequestState"])) return [];
@@ -192,7 +182,7 @@ class BaseSRQScreen extends Screen
         $this->entity['CreatorMail'] = Auth()->user()->email;
 
         $odata = new DRXClient();
-        $entity = $odata->saveEntity($this->EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
+        $entity = $odata->saveEntity(static::$EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // Сохраняем бинарные данные
         foreach ($this->BinaryFields() as $binaryField) {
             if (\request()->hasFile($binaryField)) {

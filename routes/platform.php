@@ -94,7 +94,7 @@ Route::screen("/srq/IPass4AssetsPermanentMovingDto/{id?}", AssetsPermanentScreen
 
 
 Route::screen("/srq/renters", DRXAccountListScreen::class)->name('drx.renters');
-Route::screen("/srq/renter/{drxAccount}", DRXAccountScreen::class)->name('drx.renter');
+Route::screen("/srq/renter/{drxAccount?}", DRXAccountScreen::class)->name('drx.renter');
 
 Route::screen('/main', EntitiesListScreen::class)->name('platform.main');
 

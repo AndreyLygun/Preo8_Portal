@@ -22,22 +22,13 @@ class EmployeeScreen extends SecuritySRQScreen
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     public static $EntityType = "IServiceRequestsPermanentPass4Employees";
     public static $Title = "Пропуск для сотрудника";
-
-    public function CollectionFields()
-    {
-        return array_merge(parent::CollectionFields(), ['Employees']);
-    }
+    protected static $ExpandFields = ['Employees'];
+    protected static $CollectionFields = ['Employees'];
 
     // Список полей типа "Бинарные данные", "Бинарные данные в хранилище" или "Картинка"
     public function BinaryFields(): array
     {
         return array_merge(['EmployeePhoto'], parent::BinaryFields());
-    }
-
-    public function ExpandFields()
-    {
-        $ExpandFields = ['Employees'];
-        return array_merge(parent::ExpandFields(), $ExpandFields);
     }
 
     public function beforeSave()

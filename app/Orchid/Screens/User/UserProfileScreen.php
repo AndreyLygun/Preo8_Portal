@@ -84,6 +84,11 @@ class UserProfileScreen extends Screen
                         ->type(Color::BASIC())
                         ->icon('bs.check-circle')
                         ->method('save'):null
+                )->commands(
+                    Button::make(__('Save'))
+                        ->type(Color::BASIC())
+                        ->icon('bs.check-circle')
+                        ->method('save')
                 ),
 
             Layout::block(ProfilePasswordLayout::class)

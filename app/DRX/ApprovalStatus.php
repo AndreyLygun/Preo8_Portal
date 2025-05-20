@@ -33,9 +33,9 @@ class ApprovalStatus
         }
     }
 
+    // возвращает задания по задаче с данным taskId
     private  function GetAssignments($taskId)
     {
-        // возвращает
         if (!isset($taskId)) return null;
         try {
             $asignments = $this->odata->from('IAssignments') //IEntityApprovalAssignments
@@ -49,6 +49,7 @@ class ApprovalStatus
             return null;
         }
     }
+
 
     private  function GetApprovalProcess($assignments)
     {

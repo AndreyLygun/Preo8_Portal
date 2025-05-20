@@ -22,9 +22,9 @@ class RolePermissionLayout extends Rows
     /**
      * The screen's layout elements.
      *
+     * @return Field[]
      * @throws Throwable
      *
-     * @return Field[]
      */
     public function fields(): array
     {
@@ -40,7 +40,7 @@ class RolePermissionLayout extends Rows
         return $permissionsRaw
             ->filter(fn($item) => !str_starts_with($item[0]['slug'], 'platform.systems') || auth()->user()->hasAccess('platform.systems.roles'))
             ->filter(fn($item) => !str_starts_with($item[0]['slug'], 'platform.renter') || auth()->user()->hasAccess('platform.renter.users'))
-            ->map(fn (Collection $permissions, $title) => $this->makeCheckBoxGroup($permissions, $title))
+            ->map(fn(Collection $permissions, $title) => $this->makeCheckBoxGroup($permissions, $title))
             ->flatten()
             ->toArray();
     }
@@ -48,21 +48,31 @@ class RolePermissionLayout extends Rows
     private function makeCheckBoxGroup(Collection $permissions, string $title): Collection
     {
         return $permissions
-            ->map(fn (array $chunks) => $this->makeCheckBox(collect($chunks)))
+            ->map(fn(array $chunks) => $this->makeCheckBox(collect($chunks)))
             ->flatten()
-            ->map(fn (CheckBox $checkbox, $key) => $key === 0
+            ->map(fn(CheckBox $checkbox, $key) => $key === 0
                 ? $checkbox->title($title)
                 : $checkbox)
             ->chunk(2)
-            ->map(fn (Collection $checkboxes) => Group::make($checkboxes->toArray())
+            ->map(fn(Collection $checkboxes) => Group::make($checkboxes->toArray())
                 ->alignEnd());
     }
 
     private function makeCheckBox(Collection $chunks): CheckBox
     {
-        return CheckBox::make('permissions.'.base64_encode($chunks->get('slug')))
-            ->placeholder($chunks->get('description'))
-            ->value($chunks->get('active'))
+        $active = $chunks->get('active');
+        $placeholder = $chunks->get('description');
+        if ($chunks->get('slug') == 'platform.index') {
+            $placeholder = "Общий доступ на портал";
+            if (!optional($this->user)->exists)
+                $active = true;
+        }
+
+
+        // Код выше нужен, чтобы при создании пользователя было активно разрешение 'platform.index'
+        return CheckBox::make('permissions.' . base64_encode($chunks->get('slug')))
+            ->placeholder($placeholder)
+            ->value($active)
             ->sendTrueOrFalse()
             ->indeterminate($this->getIndeterminateStatus(
                 $chunks->get('slug'),

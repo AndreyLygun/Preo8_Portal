@@ -8,6 +8,7 @@ use App\Orchid\Layouts\User\UserEditLayout;
 use App\Orchid\Layouts\User\UserFiltersLayout;
 use App\Orchid\Layouts\User\UserListLayout;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 //use Orchid\Platform\Models\User;
 use App\Models\User;
@@ -26,7 +27,7 @@ class UserListScreen extends Screen
     public function query(): iterable
     {
         return [
-            'users' => User::renter()->with('roles','DrxAccount')
+            'users' => User::SameRenter()->with('roles','DrxAccount')
                 ->filters(UserFiltersLayout::class)
                 ->defaultSort('id', 'desc')
                 ->paginate(),
@@ -38,22 +39,15 @@ class UserListScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'User Management';
+        return 'Сотрудники ' . Auth::user()->DrxAccount->Name;
     }
 
     /**
      * Display header description.
      */
-    public function description(): ?string
-    {
-        return 'A comprehensive list of all registered users, including their profiles and privileges.';
-    }
-
     public function permission(): ?iterable
     {
-        return [
-            'platform.renter.users',
-        ];
+        return ['platform.renter.users'];
     }
 
     /**

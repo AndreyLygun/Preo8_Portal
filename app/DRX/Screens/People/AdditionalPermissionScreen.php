@@ -16,18 +16,9 @@ class AdditionalPermissionScreen extends SecuritySRQScreen
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     public static $EntityType = "IServiceRequestsPermission4Employees";
     public static $Title = "Дополнительный доступ для сотрудника";
+    protected static $ExpandFields = ['Access($expand=Site)'];
+    protected static $CollectionFields = ['Access'];
 
-    protected $TestField = ['Visitors'];
-
-    public function ExpandFields()
-    {
-        return array_merge(parent::ExpandFields(), ['Access($expand=Site)']);
-    }
-
-    public function CollectionFields()
-    {
-        return array_merge(parent::CollectionFields(), ['Access']);
-    }
 
     public function query(int $id = null): iterable
     {
