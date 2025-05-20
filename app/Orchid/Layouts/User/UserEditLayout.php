@@ -30,7 +30,7 @@ class UserEditLayout extends Rows
                 ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
             Input::make('user.email')
                 ->type('email')
-                ->required()
+//                ->required()
                 ->title(__('Email'))
                 ->placeholder(__('Email'))
                 ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
