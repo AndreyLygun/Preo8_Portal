@@ -56,8 +56,8 @@ class EntitiesListScreen extends Screen
             if (isset($filter['Subject']))
                 $where[] = ['Subject', 'contains', $filter['Subject']];
         }
-        if (!Auth::user()->hasAccess('platform.renter.acccessAllRequests'))
-            $where[] = ['CreatorMail', '=', Auth::user()->email];
+//        if (!Auth::user()->hasAccess('platform.renter.acccessAllRequests'))
+//            $where[] = ['CreatorMail', '=', Auth::user()->email];
         $where[] = ['Renter/Login/LoginName', '=', Auth::user()->DrxAccount['DRX_Login']];
         $drx->where($where);
         try {
