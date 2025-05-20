@@ -32,8 +32,8 @@ class UserEditLayout extends Rows
                 ->type('email')
 //                ->required()
                 ->title(__('Email'))
-                ->placeholder(__('Email'))
-                ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
+//                ->disabled(!Auth::user()->hasAccess('platform.renter.users'))
+                ->placeholder(__('Email'))                ,
             Input::make('user.phone')
                 ->type('text')
                 ->mask('+7 (999) 999-99-99')
