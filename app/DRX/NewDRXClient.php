@@ -91,9 +91,9 @@ class NewDRXClient
 
     public function find(int $Id)
     {
-        $query = $this->odata->from($this->EntityType);
+        $query = $this->odata->from($this->type);
         if ($this->expand)
-            $query = $this->$query->expand($this->expand);
+            $query = $query->expand($this->expand);
         $entity = $query->find($Id);
         return $entity;
     }

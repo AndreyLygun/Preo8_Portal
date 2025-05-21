@@ -6,6 +6,7 @@ use App\DRX\ApprovalStatus;
 use App\DRX\DRXClient;
 use App\DRX\Helpers\Functions;
 use App\DRX\Helpers\MergingProperty;
+use App\DRX\NewDRXClient;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Request;
@@ -91,12 +92,12 @@ class BaseSRQScreen extends Screen
         }
         // Копируем заявку из другой
         if ($fromId = \request()->input('fromId')) {
-            $odata = new DRXClient();
+            $drx = new NewDRXClient(static::$EntityType);
             try {
-                $fromEntity = $odata->getEntity($this->EntityType, $fromId, $this->ExpandFields());
-                unset($fromEntity['Id']);
+                $original = $drx->with($this->ExpandFields())->find($fromId);
+                unset($original['Id']);
             } catch (\Exception $ex) {
-                $fromEntity = [];
+                $original = [];
             }
         }
         // Заполняем поля по умолчанию
@@ -108,7 +109,7 @@ class BaseSRQScreen extends Screen
             'ValidTill' => Carbon::today()->addDay(),
             'ValidOn' => Carbon::today()->addDay(),
         ];
-        return array_merge($fromEntity ?? [], $newEntity, $this->entity ?? []);
+        return array_merge($original ?? [], $newEntity, $this->entity ?? []);
     }
 
     public function query(int $id = null): iterable
