@@ -61,12 +61,14 @@ class EntitiesListScreen extends Screen
         $where[] = ['Renter/Login/LoginName', '=', Auth::user()->DrxAccount['DRX_Login']];
         $drx->where($where);
         try {
-            $list = $drx->with('Author,DocumentKind')->paginate(50)->get();
+            $list = $drx->with('Author,DocumentKind')->paginate(20)->get();
         } catch (ClientException $ex) {
           return ['error' => $ex->getMessage()];
         }
-        return ['entities' => $list,
-            'pagination' => $drx->GetPaginator()];
+        return [
+            'entities' => $list,
+            'pagination' => $drx->GetPaginator()
+        ];
     }
 
     public

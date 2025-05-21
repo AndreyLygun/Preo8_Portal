@@ -100,7 +100,6 @@ class NewDRXClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
-//        dd($CollectionFields);
         $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
         unset($Entity['Id']);
         unset($Entity['Renter']);
@@ -148,12 +147,7 @@ class NewDRXClient
 
     public function paginate($perPage = 20)
     {
-        $query = $this->odata->from($this->type);
-        if ($this->filter)
-            foreach ($this->filter as $criteria)
-                $query = $query->where($criteria[0], $criteria[1]);
-        $total = $query->count();
-
+        $total = $this->odata->from($this->type)->where($this->filter)->count();
         $pagination = [];
         $pagination["total"] = $total;
         $page = Request::input('page', 1);

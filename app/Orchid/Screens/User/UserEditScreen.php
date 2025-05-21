@@ -101,7 +101,6 @@ class UserEditScreen extends Screen
     public function layout(): iterable
     {
         return [
-
             Layout::block(UserEditLayout::class)
                 ->title(__('Profile Information'))
                 ->description(__('Update your account\'s profile information and email address.'))
@@ -127,7 +126,7 @@ class UserEditScreen extends Screen
             Layout::block(UserRoleLayout::class)
                 ->title(__('Roles'))
                 ->description(__('A Role defines a set of tasks a user assigned the role is allowed to perform.'))
-                ->canSee(Functions::UserHasAccessTo('platform.systems.roles'))
+                ->canSee(Auth::user()->hasAccess('platform.systems.roles'))
                 ->commands(
                     Button::make(__('Save'))
                         ->type(Color::BASIC)

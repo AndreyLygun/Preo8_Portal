@@ -97,8 +97,8 @@ class PlatformProvider extends OrchidServiceProvider
                 ->addPermission('platform.systems.renters', 'Управляет арендаторами'),
             ItemPermission::group('Компания')
                 ->addPermission('platform.renter.acccessAllRequests', 'Доступ ко всем заявкам компании (не только к своим)')
-//                ->addPermission('platform.renter.createAllRequests', 'Может создавать все заявки')
-                ->addPermission('platform.renter.users', 'Управляет пользователями'),
+                ->addPermission('platform.renter.users', 'Управляет пользователями')
+                ->addPermission('platform.renter.createAllRequests', 'Может создавать все виды заявок'),
             $requestsPermissions,
         ]);
     }

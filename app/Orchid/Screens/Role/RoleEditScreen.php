@@ -110,9 +110,13 @@ class RoleEditScreen extends Screen
                 'required',
                 Rule::unique(Role::class, 'slug')->ignore($role),
             ],
+            'role.description',
+            'role.mandatory_level'
         ]);
-
         $role->fill($request->get('role'));
+        $role->mandatory_level = $request->input('role.mandatory_level');
+        $role->description = $request->input('role.description');
+
 
         $role->permissions = collect($request->get('permissions'))
             ->map(fn ($value, $key) => [base64_decode($key) => $value])

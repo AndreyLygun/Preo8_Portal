@@ -60,6 +60,7 @@ class RolePermissionLayout extends Rows
 
     private function makeCheckBox(Collection $chunks): CheckBox
     {
+        // При создании пользователя значение по умолчанию 'platform.index' должно быть true
         $active = $chunks->get('active');
         $placeholder = $chunks->get('description');
         if ($chunks->get('slug') == 'platform.index') {
@@ -68,8 +69,6 @@ class RolePermissionLayout extends Rows
                 $active = true;
         }
 
-
-        // Код выше нужен, чтобы при создании пользователя было активно разрешение 'platform.index'
         return CheckBox::make('permissions.' . base64_encode($chunks->get('slug')))
             ->placeholder($placeholder)
             ->value($active)
