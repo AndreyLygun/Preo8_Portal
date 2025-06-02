@@ -85,7 +85,7 @@ class User extends Authenticatable
 
     protected static function booted(): void
     {
-        if (Auth::user() && !Auth::user()->hasAccess('platform.systems.renters')) {
+        if (Auth::user() && !Auth::user()->hasAccess('platform.portal.renters')) {
             $renter_drx_id = Auth::user()['drx_account_id'];
             static::addGlobalScope('renter', function (Builder $builder) use ($renter_drx_id) {
                 $builder->where('drx_account_id', $renter_drx_id);

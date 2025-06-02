@@ -16,10 +16,8 @@ class SecuritySRQScreen extends BaseSRQScreen
     protected $TestField = ['BaseSRQ'];
     public $entity;
 
-//    public function ExpandFields() {
-//        return array_merge(parent::ExpandFields(), ['ParkingPlace']);
-//    }
 
+    /// Возвращает атрибуты заявки, заполненные значениями по умолчанию.
     public function NewEntity() {
         $entity = parent::NewEntity();
         $entity["ResponsibleName"] = $entity["ResponsibleName"]??Auth()->user()->name;

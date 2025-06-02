@@ -34,7 +34,7 @@ class SiteSettingsScreen extends Screen
 
     public function permission(): ?iterable
     {
-        return ['platform.systems.renters'];
+        return ['platform.portal.renters'];
     }
 
     public function layout(): iterable

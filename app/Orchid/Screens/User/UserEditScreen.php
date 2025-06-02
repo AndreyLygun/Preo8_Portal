@@ -41,7 +41,7 @@ class UserEditScreen extends Screen
     {
         $user->load(['roles']);
         $currentUser = Auth::user();
-        if (!$currentUser->hasAccess('platform.systems.renters') &&
+        if (!$currentUser->hasAccess('platform.portal.renters') &&
                 isset($user['drx_account_id']) &&
                     $currentUser['drx_account_id'] != $user['drx_account_id'])
                         abort(403, 'Пользователь не найден');
@@ -65,7 +65,7 @@ class UserEditScreen extends Screen
     {
         return [
             'platform.renter.users',
-            'platform.systems.renters'
+            'platform.portal.renters'
         ];
     }
 
@@ -170,7 +170,7 @@ class UserEditScreen extends Screen
             $builder->getModel()->password = Hash::make($request->input('user.password'));
         });
 //        dd($request->has('user.drx_account_id'), Auth::user()->hasAccess('platform.system.renters'));
-        if ($request->has('user.drx_account_id') && Auth::user()->hasAccess('platform.systems.renters'))
+        if ($request->has('user.drx_account_id') && Auth::user()->hasAccess('platform.portal.renters'))
             $user->drx_account_id = $request->input('user.drx_account_id');
         else
             $user->drx_account_id = Auth::user()->drx_account_id;

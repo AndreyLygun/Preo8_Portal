@@ -43,7 +43,7 @@ class UserEditLayout extends Rows
                 ->empty()
                 ->title('Арендатор')
                 ->required()
-                ->canSee(Auth::user()->hasAccess('platform.systems.renters'))
+                ->canSee(Auth::user()->hasAccess('platform.portal.renters'))
         ];
     }
 }
