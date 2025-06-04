@@ -23,7 +23,6 @@ class AdditionalPermissionScreen extends SecuritySRQScreen
     public function query(int $id = null): iterable
     {
         $query = parent::query($id);
-        $query["entity"]["ValidTill"] = null;
         if (isset($query["entity"]["Access"])) {
             $query["entity"]["Access"] = array_map(fn($value) => (int)(isset($value['Site']) ? $value['Site']['Id'] : 0),
                 $query["entity"]["Access"]);
@@ -46,9 +45,6 @@ class AdditionalPermissionScreen extends SecuritySRQScreen
         $layout[] = Layout::rows([
             Input::make("entity.Employee")
                 ->title("ФИО сотрудника")->horizontal()
-                ->readonly($this->readOnly)->required(),
-            Input::make("entity.PassNumber")
-                ->title("Номер пропуска сотрудника")->horizontal()
                 ->readonly($this->readOnly)->required(),
             DateTimer::make('entity.ValidTill')
                 ->title("Действует до")->horizontal()

@@ -56,21 +56,14 @@ class BaseSRQScreen extends Screen
     public $entity;
     public $ApprovalStatus;
 
-    // Возвращает список полей-ссылок и полей-коллекций, который используются в форме. Нужен, чтобы OData-API вернул значения этих полей
-    // Как правило, перекрытый метод в классе-наследнике добавляет свои поля к результату метода из класса-предка
-//    public function ExpandFields()
-//    {
-//        return static::$ExpandFields;
-//    }
-
     public function ExpandFields()
     {
-        return $this->MergingProperties('ExpandFields');
+        return $this->MergeProperties('ExpandFields');
     }
 
     public function CollectionFields()
     {
-        return $this->MergingProperties('CollectionFields');
+        return $this->MergeProperties('CollectionFields');
     }
 
     // В наследуемых классах можно переопределить эту функцию, для предварительной обработки сохраняемой $this->Entity
@@ -150,7 +143,6 @@ class BaseSRQScreen extends Screen
     {
         if (!isset($this->entity["RequestState"])) return [];
         $commands = [];
-        $dropdownList = [];
 
         switch ($this->entity["RequestState"]) {
             case 'Draft':
