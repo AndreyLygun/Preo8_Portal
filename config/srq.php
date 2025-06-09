@@ -14,7 +14,7 @@ return [
     | - в permisssion на экране редактирования сотрудника (чтобы давать право на создание заявки)
      */
     'requests' => [
-//        \App\DRX\Screens\People\VisitorsScreen::class,
+        \App\DRX\Screens\People\VisitorsScreen::class,
         \App\DRX\Screens\People\EmployeeScreen::class,
         \App\DRX\Screens\People\AdditionalPermissionScreen::class,
         \App\DRX\Screens\People\WorkPermissionScreen::class,
