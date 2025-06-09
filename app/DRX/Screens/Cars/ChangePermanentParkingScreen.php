@@ -3,6 +3,7 @@
 namespace App\DRX\Screens\Cars;
 
 use App\DRX\DRXClient;
+use App\DRX\ExtendedMatrix;
 use App\DRX\Helpers\Databooks;
 use Carbon\Carbon;
 use Orchid\Screen\Fields\Matrix;
@@ -52,22 +53,29 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
     // Описывает макет экрана
     public function layout(): iterable
     {
+        $actions = [
+            'noAction' => 'Не менять',
+            'remove' => 'Исключить',
+            'add' => 'Добавить и изготовить ламинат',
+            'makeLaminate' => 'Перевыпустить ламинат'
+        ];
         $layout = parent::layout();
         $layout[] = Layout::rows([
             Select::make('entity.ParkingPlace.Id')
                 ->title('Парковочное место')->horizontal()
-                ->disabled(false)->required()
+                ->disabled($this->readOnly)->required()
                 ->options(Databooks::GetParkingPlaces()),
             Select::make('entity.NeedNfc')
                 ->title('Изготовить электронный пропуск')->horizontal()
                 ->disabled($this->readOnly)->required()
                 ->options(Databooks::GetYesNo()),
-            Matrix::make('entity.Cars')
+            ExtendedMatrix::make('entity.Cars')->readonly($this->readOnly)->removableRows(false)
                 ->title('Добавьте или удалите автомобили, на которые оформлена постоянная парковка')->horizontal()
-                ->columns(['Модель'=>'Model', 'Номер'=>'Number', 'Изготовить пропуск' => 'NeedPrintedPass'])
+                ->columns(['Модель'=>'Model', 'Номер'=>'Number', 'Изготовить ламинат' => 'NeedPrintedPass'])
                 ->fields([
-                    'NeedPrintedPass' => Select::make('NeedPrintedPass')->options(Databooks::GetYesNo())])
-                ->disabled($this->readOnly)->required(),
+                    'NeedPrintedPass' => Select::make('NeedPrintedPass')->options(Databooks::GetYesNo())->disabled($this->readOnly)])
+//                ->disabled()
+                ->required(),
             TextArea::make('entity.Visitors')
                 ->title('Водители')->horizontal()
                 ->rows(3)

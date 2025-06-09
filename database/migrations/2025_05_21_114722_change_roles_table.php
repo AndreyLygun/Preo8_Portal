@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->integer('mandatory_level');
-            $table->text('description');
+            $table->integer('mandatory_level')->default(0);
+            $table->text('description')->nullable();
         });
     }
 

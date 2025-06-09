@@ -168,8 +168,8 @@ class NewDRXClient
 
     public function callAPIfunction($functionName, $params)
     {
-        $Entity = $this->from($functionName)->post($params);
-        return $Entity;
+        $Result = $this->odata->from($functionName)->post($params);
+        return $Result;
     }
 
     // Преобразует оператор сортировки формата Orchid ("-Name") в оператор сортировки формата OdataClient (['Name', 'desc'])

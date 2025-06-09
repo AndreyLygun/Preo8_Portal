@@ -34,18 +34,18 @@ class RoleEditLayout extends Rows
                 ->placeholder(__('Slug'))
                 ->help(__('Actual name in the system')),
 
-//            Input::make('role.mandatory_level')
-//                ->type('integer')
-//                ->max(1000)
-//                ->required()
-//                ->title('Уровень доступа')
-//                ->placeholder()
-//                ->help('Пользователь видит роли и привелегии, уровень доступа которых равны или ниже его роли'),
-//
-//            Input::make('role.description')
-//                ->type('text')
-//                ->required()
-//                ->title('Описание роли')
+            Input::make('role.mandatory_level')
+                ->type('integer')
+                ->max(1000)
+                ->required()
+                ->title('Уровень доступа')
+                ->placeholder()
+                ->help('Пользователь видит роли и привелегии, уровень доступа которых равны или ниже его роли'),
+
+            Input::make('role.description')
+                ->type('text')
+                ->required()
+                ->title('Описание роли')
         ];
     }
 }

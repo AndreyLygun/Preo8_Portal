@@ -181,7 +181,7 @@ class BaseSRQScreen extends Screen
             if (\request()->hasFile($binaryField)) {
                 $file = \request()->file($binaryField);
                 $encoded = base64_encode($file->getContent());
-                $odata->from("{$this->EntityType}({$entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
+                $odata->from(self::$EntityType."({$entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
             }
         }
         if ($submitToApproval) {

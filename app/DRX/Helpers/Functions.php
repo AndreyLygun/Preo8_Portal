@@ -41,8 +41,10 @@ class Functions
     ///
     ///
     /// Проверяет, имеет ли текущий пользователь доступ к Screen с указанным имененем
-    public static function UserHasAccessTo($ScreenClassName): bool
+    public static function UserHasAccessTo(string $ScreenClassName): bool
     {
-        return Auth::user()->hasAccess('platform.requests.' . class_basename($ScreenClassName));
+        $currentUser = Auth::user();
+        return $currentUser->hasAccess('platform.requests.' . class_basename($ScreenClassName))
+            || $currentUser->hasAccess('platform.renter.acccessAllRequests');
     }
 }
