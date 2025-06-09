@@ -28,7 +28,8 @@ class Pass4VisitorCarListener extends Listener
             DateTimer::make("entity.ValidOn")
                 ->title("Дата въезда.")->horizontal()
                 ->format("d-m-Y")->serverFormat("d-m-Y")
-                ->withQuickDates(['Завтра' => now()->addDay(), 'Послезавтра' => now()->addDay(2)])
+                ->min(today())
+                ->withQuickDates(['Сегодня' => now(), 'Завтра' => now()->addDay(), 'Послезавтра' => now()->addDays(2)])
                 ->required()->disabled($readOnly),
             DateTimer::make("entity.ValidOnDateTime")
                 ->title("Время въезда.")->horizontal()->placeholder('Укажите время')

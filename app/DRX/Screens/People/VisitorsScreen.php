@@ -36,12 +36,15 @@ class VisitorsScreen extends SecuritySRQScreen
 
     public function layout(): iterable
     {
-        $readonly = $this->entity['RequestState'] != 'Draft';
+                $readonly = $this->entity['RequestState'] != 'Draft';
         $layout = parent::layout();
         $layout[] = Layout::rows([
-                DateTimer::make("entity.ValidOn")->title("Дата посещения")
-                    ->horizontal()->enableTime(false)->min(Carbon::today())
-                    ->format('Y-m-d')->serverFormat('Y-m-d\Z')->readonly($readonly),
+                DateTimer::make("entity.ValidOn")
+                    ->title("Дата посещения")->horizontal()
+                    ->format('d-m-Y')->serverFormat('d-m-Y')
+                    ->min(Carbon::today())
+                    ->withQuickDates(['Сегодня' => today(), 'Завтра' => today()->addDay(), 'Послезавтра' => today()->addDays(2)])
+                    ->readonly($readonly),
                 TextArea::make("entity.Visitors")->columns(['ФИО' => 'Name'])->readonly($readonly)
                     ->title("Посетители")->horizontal()->rows(20)
             ]);
