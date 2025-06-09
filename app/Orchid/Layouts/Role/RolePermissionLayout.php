@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Orchid\Layouts\Role;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Orchid\Platform\Models\User;
 use Orchid\Screen\Field;
 use Orchid\Screen\Fields\CheckBox;
@@ -18,6 +19,12 @@ class RolePermissionLayout extends Rows
      * @var User|null
      */
     private $user;
+    // Какие разрешения может выдывать пользователь с данными разрешениями (
+    private $access = [
+        'platform.systems.roles' => ['platform.systems.roles'],
+        'platform.portal.renters' => ['platform.portal.', 'platform.renter.', 'platform.requests.'],
+        'platform.renter.users' => ['platform.renter.', 'platform.requests.']
+    ];
 
     /**
      * The screen's layout elements.
@@ -36,14 +43,34 @@ class RolePermissionLayout extends Rows
 
     private function generatedPermissionFields(Collection $permissionsRaw): array
     {
-//        dd($permissionsRaw);
+        $access = collect($this->access);
+        $permissions = array_intersect(
+            array_keys(array_filter(Auth::user()->permissions, fn($value) => $value == 1)),
+            array_keys($this->access)
+        );
+        $canSetPermissions = $access->filter(fn($value, $key) => in_array($key, $permissions))->flatten();
+        debugbar()->info($canSetPermissions);
+        foreach($permissionsRaw as  $sectionKey => $section) {
+            foreach($section as $controlKey => $control) {
+                debugbar()->notice('----');
+                debugbar()->info($control['slug']);
+                $allowed = false;
+                foreach($canSetPermissions as $permission) {
+                    if ($allowed = str_starts_with($control['slug'], $permission))
+                        break;
+                }
+                if (!$allowed) {
+                    unset($permissionsRaw[$sectionKey][$controlKey]);
+                }
+            }
+        }
+        debugbar()->info($permissionsRaw);
         return $permissionsRaw
-            ->filter(fn($item) => !str_starts_with($item[0]['slug'], 'platform.systems') || auth()->user()->hasAccess('platform.systems.roles'))
-            ->filter(fn($item) => !str_starts_with($item[0]['slug'], 'platform.renter') || auth()->user()->hasAccess('platform.renter.users'))
             ->map(fn(Collection $permissions, $title) => $this->makeCheckBoxGroup($permissions, $title))
             ->flatten()
             ->toArray();
     }
+
 
     private function makeCheckBoxGroup(Collection $permissions, string $title): Collection
     {
@@ -53,7 +80,7 @@ class RolePermissionLayout extends Rows
             ->map(fn(CheckBox $checkbox, $key) => $key === 0
                 ? $checkbox->title($title)
                 : $checkbox)
-            ->chunk(2)
+            ->chunk(1)
             ->map(fn(Collection $checkboxes) => Group::make($checkboxes->toArray())
                 ->alignEnd());
     }

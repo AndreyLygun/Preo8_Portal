@@ -43,7 +43,10 @@ class DRXAccountListScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        return [Button::make('Обновить')->method('update')->confirm('С сервера Директум будет получен список арендаторов вместе со статусом')];
+        return [
+            Button::make('Обновить')->method('update')->confirm('С сервера Директум будет получен список арендаторов вместе со статусом'),
+            Link::make('Создать')->route('drx.renter')
+        ];
     }
 
     public function update() {
@@ -54,7 +57,7 @@ class DRXAccountListScreen extends Screen
 
     public function permission(): ?iterable
     {
-        return ['platform.systems.renters'];
+        return ['platform.portal.renters'];
     }
 
 
@@ -62,14 +65,15 @@ class DRXAccountListScreen extends Screen
     {
         return [
             Layout::table("entities", [
-                ExtendedTD::make("id", "№"),
-                ExtendedTD::make("Name", "Название"),
-                ExtendedTD::make("DRX_Login", "Логин для Directum"),
-//                ExtendedTD::make("DRX_Password", "Пароль для Directum"),
-                ExtendedTD::make('')
-                    ->render(fn (DrxAccount $DRXAccount) => Link::make('')
-                        ->route('drx.renter', $DRXAccount)
-                        ->icon('bs.pencil'))
+                ExtendedTD::make("id", "№")->render(
+                    fn (DrxAccount $DRXAccount) => Link::make($DRXAccount->id)->route('drx.renter', $DRXAccount)
+                ),
+                ExtendedTD::make("Name", "Название")->render(
+                    fn (DrxAccount $DRXAccount) => Link::make($DRXAccount->Name)->route('drx.renter', $DRXAccount)
+                ),
+                ExtendedTD::make("DRX_Login", "Логин для Directum")->render(
+                    fn (DrxAccount $DRXAccount) => Link::make($DRXAccount->DRX_Login)->route('drx.renter', $DRXAccount)
+                )
             ])
         ];
     }

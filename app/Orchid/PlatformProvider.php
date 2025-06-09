@@ -57,7 +57,7 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make(__('Renters'))
                 ->icon('bs.building')
                 ->route('drx.renters')
-                ->permission('platform.systems.renters')
+                ->permission('platform.portal.renters')
                 ->divider(),
 
             Menu::make(__('Roles'))
@@ -73,7 +73,7 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make(__('Бизнес-центр'))
                 ->icon('bs.lock')
                 ->route('drx.sitesettings')
-                ->permission('platform.systems.renters')
+                ->permission('platform.portal.renters')
         ];
     }
 
@@ -84,7 +84,7 @@ class PlatformProvider extends OrchidServiceProvider
      */
     public function permissions(): array
     {
-        $requestsPermissions = ItemPermission::group(__('Может создавать заявки:'));
+        $requestsPermissions = ItemPermission::group(__('Может создавать заявки вида:'));
         foreach (config('srq.requests') as $kind) {
             $properties = get_class_vars($kind);
             $kind = class_basename($kind);
@@ -94,7 +94,7 @@ class PlatformProvider extends OrchidServiceProvider
             ItemPermission::group(__('System'))
                 ->addPermission('platform.systems.roles', __('Может настраивать все доступы')),
             ItemPermission::group(__('Портал'))
-                ->addPermission('platform.systems.renters', 'Управляет арендаторами'),
+                ->addPermission('platform.portal.renters', 'Управляет арендаторами'),
             ItemPermission::group('Компания')
                 ->addPermission('platform.renter.acccessAllRequests', 'Доступ ко всем заявкам компании (не только к своим)')
                 ->addPermission('platform.renter.users', 'Управляет пользователями')

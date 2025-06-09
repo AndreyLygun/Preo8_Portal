@@ -23,6 +23,10 @@ class RoleListLayout extends Table
     public function columns(): array
     {
         return [
+            TD::make('mandatory_level', 'Уровень доступа')
+                ->sort()
+                ->cantHide(),
+
             TD::make('name', __('Name'))
                 ->sort()
                 ->cantHide()
