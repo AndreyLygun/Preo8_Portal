@@ -40,11 +40,11 @@ class Functions
 
     ///
     ///
-    /// Проверяет, имеет ли текущий пользователь доступ к Screen с указанным имененем
-    public static function UserHasAccessTo(string $ScreenClassName): bool
+    /// Проверяет, может ли имеет ли текущий пользователь доступ к Screen с указанным имененем
+    public static function UserCanCreateRequest(string $ScreenClassName): bool
     {
         $currentUser = Auth::user();
         return $currentUser->hasAccess('platform.requests.' . class_basename($ScreenClassName))
-            || $currentUser->hasAccess('platform.renter.acccessAllRequests');
+            || $currentUser->hasAccess('platform.renter.createAllRequests');
     }
 }

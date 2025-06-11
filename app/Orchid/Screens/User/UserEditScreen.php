@@ -180,10 +180,8 @@ class UserEditScreen extends Screen
             ->fill(['permissions' => $permissions])
             ->save();
         $user->replaceRoles($request->input('user.roles'));
-
         Toast::info(__('User was saved.'));
-
-        return redirect()->back();
+        return redirect()->route('platform.systems.users.edit', ['user' => $user->id]);
     }
 
     /**

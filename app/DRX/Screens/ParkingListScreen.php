@@ -3,6 +3,7 @@
 namespace App\DRX\Screens;
 
 use App\DRX\Helpers\Databooks;
+use App\DRX\Helpers\Functions;
 use App\DRX\Screens\Cars\ChangePermanentParkingScreen;
 use App\DRX\Screens\Cars\VisitorCarScreen;
 use Illuminate\Support\Facades\Auth;
@@ -62,7 +63,7 @@ class ParkingListScreen extends Screen
     public function layout(): iterable
     {
         $Layout = [];
-        if ((Auth::user()->hasAccess('platform.requests.' . class_basename(VisitorCarScreen::class))))
+        if (Functions::UserCanCreateRequest(VisitorCarScreen::class))
             $Layout[] = Layout::table("VisitorPasses", [
                 ExtendedTD::make("Id", "№")
                     ->render(fn($item) => $item["Id"])
@@ -87,9 +88,9 @@ class ParkingListScreen extends Screen
                 ExtendedTD::make("RequestState", "Статус")
                     ->render(fn($item) => __($item["RequestState"]))
                     ->cssClass(fn($item) => $item["RequestState"])->sort()
-            ])->title('Гостевая парковка (сегодня и на последующие дни)');
+            ])->title('Заявки на гостевую парковку (сегодня и на последующие дни)');
 
-        if ((Auth::user()->hasAccess('platform.requests.' . class_basename(ChangePermanentParkingScreen::class))))
+        if (Functions::UserCanCreateRequest(ChangePermanentParkingScreen::class))
             $Layout[] = Layout::table('ParkingPlaces', [
                 ExtendedTD::make("Name", "Название/<br>электронный пропуск")
                     ->render(fn($item) => $item["Name"] . '<br>' . ($item['NfcNumber'] ? '№ ' . $item['NfcNumber'] : 'Пропуск не оформлен'))

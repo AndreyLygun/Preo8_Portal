@@ -80,7 +80,7 @@ class BaseSRQScreen extends Screen
     // Используется для заполнения значений для новых сущностей (значения по-умолчанию).
     public function NewEntity()
     {
-        if (!Functions::UserHasAccessTo(static::class)) {
+        if (!Functions::UserCanCreateRequest(static::class)) {
             abort(403, "У вас нет доступа к данному виду заявок");
         }
         // Копируем заявку из другой

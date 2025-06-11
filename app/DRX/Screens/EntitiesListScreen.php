@@ -82,7 +82,7 @@ class EntitiesListScreen extends Screen
     {
         $commands = [];
         foreach (config('srq.requests') as $kind) {
-            if (Functions::UserHasAccessTo($kind)) {
+            if (Functions::UserCanCreateRequest($kind)) {
                 $properties = get_class_vars($kind);
                 $commandTitle = "...на " . mb_lcfirst($properties['Title']);
                 $commands[] = Link::make($commandTitle)->route('drx.' . class_basename($kind));
@@ -107,7 +107,7 @@ class EntitiesListScreen extends Screen
         }
         $DocumentKindNames = [];
         foreach (config('srq.requests') as $kind) {
-            if (Functions::UserHasAccessTo($kind)) {
+            if (Functions::UserCanCreateRequest($kind)) {
                 $properties = get_class_vars($kind);
                 $commandTitle = "...на " . mb_lcfirst($properties['Title']);
                 $DocumentKindNames[$properties['Title']] = $properties['Title'];

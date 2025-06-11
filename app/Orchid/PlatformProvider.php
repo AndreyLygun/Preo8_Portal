@@ -44,8 +44,10 @@ class PlatformProvider extends OrchidServiceProvider
             Menu::make("Парковочные места")
                 ->route('drx.parking')
                 ->icon('bs.car-front')
-                ->permission(['platform.requests.' . class_basename(ChangePermanentParkingScreen::class),
-                    'platform.requests.' . class_basename(VisitorCarScreen::class)
+                ->permission([
+                    'platform.requests.' . class_basename(ChangePermanentParkingScreen::class),
+                    'platform.requests.' . class_basename(VisitorCarScreen::class),
+                    'platform.renter.createAllRequests'
                 ]),
 
             Menu::make(__('Сотрудники'))
@@ -96,7 +98,7 @@ class PlatformProvider extends OrchidServiceProvider
             ItemPermission::group(__('Портал'))
                 ->addPermission('platform.portal.renters', 'Управляет арендаторами'),
             ItemPermission::group('Компания')
-                ->addPermission('platform.renter.acccessAllRequests', 'Доступ ко всем заявкам компании (не только к своим)')
+                ->addPermission('platform.renter.acccessAllRequests', 'Видит все заявки компании (не только к свои)')
                 ->addPermission('platform.renter.users', 'Управляет пользователями')
                 ->addPermission('platform.renter.createAllRequests', 'Может создавать все виды заявок'),
             $requestsPermissions,
