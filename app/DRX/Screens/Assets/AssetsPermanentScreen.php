@@ -20,6 +20,13 @@ class AssetsPermanentScreen extends SecuritySRQScreen
     protected static $ExpandFields = ['Cars', 'Assets'];  // Список полей-ссылок, которые нужно пересоздавать в DRX заново при каждом сохранении
 
 
+        public function NewEntity()
+        {
+            $entity = parent::NewEntity();
+            $entity['ValidTill'] = Carbon::today()->endOfYear();
+            return $entity;
+        }
+
     public function beforeSave()
     {
         parent::beforeSave();
