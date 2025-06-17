@@ -7,8 +7,6 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Auth;
 use App\DRX\Helpers\Functions;
 use Illuminate\Support\Facades\Request;
-use Mockery\Exception;
-use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Repository;
@@ -19,6 +17,7 @@ use App\DRX\DRXClient;
 use App\DRX\ExtendedTD;
 use Orchid\Support\Facades\Layout;
 use Carbon\Carbon;
+use App\DRX\Screens\Cars\ChangePermanentParkingScreen;
 
 
 class EntitiesListScreen extends Screen
@@ -56,8 +55,6 @@ class EntitiesListScreen extends Screen
             if (isset($filter['Subject']))
                 $where[] = ['Subject', 'contains', $filter['Subject']];
         }
-//        if (!Auth::user()->hasAccess('platform.renter.acccessAllRequests'))
-//            $where[] = ['CreatorMail', '=', Auth::user()->email];
         $where[] = ['Renter/Login/LoginName', '=', Auth::user()->DrxAccount['DRX_Login']];
         $drx->where($where);
         try {
@@ -82,7 +79,7 @@ class EntitiesListScreen extends Screen
     {
         $commands = [];
         foreach (config('srq.requests') as $kind) {
-            if (Functions::UserCanCreateRequest($kind)) {
+            if (Functions::UserCanCreateRequest($kind) && $kind != ChangePermanentParkingScreen::class ) {
                 $properties = get_class_vars($kind);
                 $commandTitle = "...на " . mb_lcfirst($properties['Title']);
                 $commands[] = Link::make($commandTitle)->route('drx.' . class_basename($kind));
