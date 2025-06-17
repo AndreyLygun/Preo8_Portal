@@ -113,6 +113,7 @@ class BaseSRQScreen extends Screen
                 $currentEntity = $this->entity ?? [];
                 $storedEntity = $odata->getEntity(static::$EntityType, $id, $this->ExpandFields());
                 $entity = array_merge($storedEntity, $currentEntity);
+//                dd($currentEntity, $storedEntity, $entity);
             } else {
                 $entity = $this->NewEntity();
             }
@@ -120,9 +121,7 @@ class BaseSRQScreen extends Screen
                 $ApprovalStatus = (new ApprovalStatus($odata))->Get($id);
             }
         } catch (GuzzleException $ex) {
-            dd($ex->getResponse()->getBody()->getContents());
             Alert::error("При подключении к серверу произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
-
         }
         return [
             'entity' => $entity,
@@ -176,7 +175,7 @@ class BaseSRQScreen extends Screen
 
         $odata = new DRXClient();
         $entity = $odata->saveEntity(static::$EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
-        // Сохраняем бинарные данные
+        // отдельно сохраняем бинарные данные
         foreach ($this->BinaryFields() as $binaryField) {
             if (\request()->hasFile($binaryField)) {
                 $file = \request()->file($binaryField);

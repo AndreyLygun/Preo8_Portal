@@ -69,12 +69,10 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
                 ->title('Изготовить электронный пропуск')->horizontal()
                 ->disabled($this->readOnly)->required()
                 ->options(Databooks::GetYesNo()),
-            ExtendedMatrix::make('entity.Cars')->readonly($this->readOnly)->removableRows(false)
+            ExtendedMatrix::make('entity.Cars')->readonly($this->readOnly)
                 ->title('Добавьте или удалите автомобили, на которые оформлена постоянная парковка')->horizontal()
                 ->columns(['Модель'=>'Model', 'Номер'=>'Number', 'Изготовить ламинат' => 'NeedPrintedPass'])
-                ->fields([
-                    'NeedPrintedPass' => Select::make('NeedPrintedPass')->options(Databooks::GetYesNo())->disabled($this->readOnly)])
-//                ->disabled()
+                ->fields(['NeedPrintedPass' => Select::make('NeedPrintedPass')->options(Databooks::GetYesNo())->disabled($this->readOnly)])
                 ->required(),
             TextArea::make('entity.Visitors')
                 ->title('Водители')->horizontal()
@@ -84,12 +82,5 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
             ->title("Примечание")->rows(10)->horizontal()
             ->disabled($this->readOnly)]);
         return $layout;
-    }
-
-    public function BlockPass()
-    {
-        $this->entity['RequestState'] = 'Done';
-        $this->entity['VaildTill'] = Carbon::today()->addDays(-1);
-        parent::SubmitToApproval('Заявка на блокировку пропуска отправлена');
     }
 }
