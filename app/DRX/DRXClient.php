@@ -58,7 +58,7 @@ class DRXClient extends ODataClient
         parent::__construct($url,
             function ($request) use ($login, $password) {
                 $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
-//                $request->headers['Return'] = 'representation';
+                $request->headers['Return'] = 'representation';
             },
             $httpProvider
         );
