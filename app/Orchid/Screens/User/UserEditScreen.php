@@ -45,11 +45,20 @@ class UserEditScreen extends Screen
                 isset($user['drx_account_id']) &&
                     $currentUser['drx_account_id'] != $user['drx_account_id'])
                         abort(403, 'Пользователь не найден');
+
+        if (!$user->exists) {
+            if (\request()->has('renter') && Auth::user()->hasAccess('platform.portal.renters')) {// Если в реквесте указан арендатор, добавляем сотрудника к этому арендатору
+                $user->drx_account_id = request()->input('renter');
+            }
+            else    // Иначае задаём арендатора таким же, как у текущего сотрудника
+                $user->drx_account_id = Auth::user()->drx_account_id;
+        }
         return [
             'user' => $user,
             'permission' => $user->getStatusPermission(),
         ];
     }
+
 
     public function name(): ?string
     {
@@ -154,6 +163,7 @@ class UserEditScreen extends Screen
      */
     public function save(User $user, Request $request)
     {
+        $user->drx_account_id = $this->user->drx_account_id;
         $request->validate([
             'user.email' => [
                 'required',
@@ -169,16 +179,10 @@ class UserEditScreen extends Screen
         $user->when($request->filled('user.password'), function (Builder $builder) use ($request) {
             $builder->getModel()->password = Hash::make($request->input('user.password'));
         });
-//        dd($request->has('user.drx_account_id'), Auth::user()->hasAccess('platform.system.renters'));
-        if ($request->has('user.drx_account_id') && Auth::user()->hasAccess('platform.portal.renters'))
-            $user->drx_account_id = $request->input('user.drx_account_id');
-        else
-            $user->drx_account_id = Auth::user()->drx_account_id;
         $user->phone = $request->input('user.phone');
-        $user
-            ->fill($request->collect('user')->except(['password', 'permissions', 'roles'])->toArray())
-            ->fill(['permissions' => $permissions])
-            ->save();
+        $user->fill($request->collect('user')->except(['password', 'permissions', 'roles'])->toArray())
+             ->fill(['permissions' => $permissions])
+             ->save();
         $user->replaceRoles($request->input('user.roles'));
         Toast::info(__('User was saved.'));
         return redirect()->route('platform.systems.users.edit', ['user' => $user->id]);
@@ -191,11 +195,13 @@ class UserEditScreen extends Screen
      */
     public function remove(User $user)
     {
+        $renter_id = $user->drx_account_id;
         $user->delete();
-
         Toast::info(__('User was removed'));
-
-        return redirect()->route('platform.systems.users');
+        if (Auth::user()->drx_account_id == $user->drx_account_id)
+            return redirect()->route('platform.systems.users');
+        else
+            return redirect()->route('drx.renter', ['drxAccount' => $renter_id]);
     }
 
     /**

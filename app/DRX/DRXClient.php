@@ -57,8 +57,9 @@ class DRXClient extends ODataClient
         ]]);
         parent::__construct($url,
             function ($request) use ($login, $password) {
-            $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
-        },
+                $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
+                $request->headers['Return'] = 'representation';
+            },
             $httpProvider
         );
         $this->postProcessor = new PostProcessor();
@@ -83,10 +84,8 @@ class DRXClient extends ODataClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
-//        dd($CollectionFields);
         $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
-        unset($Entity['Id']);
-        unset($Entity['Renter']);
+        unset($Entity['Id'], $Entity['Renter']);
         foreach ($Entity as $key => $field) {
             if (is_array($field) && isset($field['Id'])) {
                 $Entity[$key]['Id'] = (int)$field['Id'];
@@ -98,13 +97,13 @@ class DRXClient extends ODataClient
                 // ..исправлям баг|фичу, из-за которой поле Matrix начинает нумерацию строк с единицы
                 $Entity[$cf] = array_values($Entity[$cf]);
             }
-            // ..потом очищаем поле на сервере DRX, чтоб заполнить его новыми значениями
+            // ..потом очищаем поле на сервере DRX, чтоб позже аполнить его новыми значениями
             if ($Id && isset($Entity[$cf]))
                 $this->delete("{$EntityType}({$Id})/$cf");
         }
         if ($Id) {            // Обновляем запись
-            $Entity = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity))[0];
-        } else {            // Создаём запись
+            $response = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity));
+        } else {        // Создаём запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->post($Entity))[0];
         }
         return $Entity;
@@ -118,7 +117,7 @@ class DRXClient extends ODataClient
     public function getList($DRXEntity, $ExpandFields = [], $orderBy = '', $perPage = 100000)
     {
         try {
-            $filter = $this->filterBy(request()->input('filter')??[]);
+            $filter = $this->filterBy(request()->input('filter') ?? []);
             $total = $this->from($DRXEntity)->count();
             $p = $this->pagination($total, $perPage);
             $request = $this->from($DRXEntity)
@@ -128,7 +127,7 @@ class DRXClient extends ODataClient
                 ->order($this->OrderBy($orderBy));
             if ($ExpandFields) $request = $request->expand($ExpandFields);
             if ($filter) {
-                foreach($filter as $f ) {
+                foreach ($filter as $f) {
                     $request = $request->where('id', '!=', 12345);
                 }
             }

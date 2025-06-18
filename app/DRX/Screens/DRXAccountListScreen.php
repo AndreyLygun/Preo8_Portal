@@ -15,22 +15,14 @@ class DRXAccountListScreen extends Screen
 {
 
     public $entities;
-    /**
-     * Fetch data to be displayed on the screen.
-     *
-     * @return array
-     */
+
     public function query(): iterable
     {
         return ['entities' => DrxAccount::all()];
 
     }
 
-    /**
-     * The name of the screen displayed in the header.
-     *
-     * @return string|null
-     */
+
     public function name(): ?string
     {
         return 'Арендаторы';
@@ -44,16 +36,10 @@ class DRXAccountListScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-            Button::make('Обновить')->method('update')->confirm('С сервера Директум будет получен список арендаторов вместе со статусом'),
-            Link::make('Создать')->route('drx.renter')
+            Link::make('Добавить арендатора')->route('drx.renter')
         ];
     }
 
-    public function update() {
-        $odata = new DRXClient();
-        $result = $odata->getList('IServiceRequestsRenters', ['Login'], 'Name');
-        dd($result);
-    }
 
     public function permission(): ?iterable
     {
@@ -71,8 +57,8 @@ class DRXAccountListScreen extends Screen
                 ExtendedTD::make("Name", "Название")->render(
                     fn (DrxAccount $DRXAccount) => Link::make($DRXAccount->Name)->route('drx.renter', $DRXAccount)
                 ),
-                ExtendedTD::make("DRX_Login", "Логин для Directum")->render(
-                    fn (DrxAccount $DRXAccount) => Link::make($DRXAccount->DRX_Login)->route('drx.renter', $DRXAccount)
+                ExtendedTD::make("ИНН", "ИНН")->render(
+                    fn (DrxAccount $DRXAccount) => Link::make($DRXAccount->INN)->route('drx.renter', $DRXAccount)
                 )
             ])
         ];

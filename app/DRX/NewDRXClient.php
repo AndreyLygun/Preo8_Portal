@@ -64,6 +64,11 @@ class NewDRXClient
         $this->type = $EntityType;
     }
 
+    public function from(string $type) {
+        $this->type = $type;
+        return $this;
+    }
+
     public function where($filter)
     {
         if (!is_array($filter)) $filter = [$filter];
@@ -100,6 +105,7 @@ class NewDRXClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
+        dd($Entity);
         $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
         unset($Entity['Id']);
         unset($Entity['Renter']);
@@ -139,7 +145,6 @@ class NewDRXClient
         if ($p = $this->pagination) {
             $query = $query->take($p['per_page'])
                 ->skip($p['per_page'] * ($p['page'] - 1));
-//                ->where('Id', '>', 0);   // Обходим баг в сервисе интеграции DRX. Без этого условия параметры 'take' и 'skip' не работают
         }
         $list = $query->get();
         return $list;

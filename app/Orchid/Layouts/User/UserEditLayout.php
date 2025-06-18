@@ -20,30 +20,30 @@ class UserEditLayout extends Rows
      */
     public function fields(): array
     {
+        $canChangeAnotherUsers = Auth::user()->hasAnyAccess(['platform.renter.users', 'platform.portal.renters']);
+
         return [
             Input::make('user.name')
                 ->type('text')
                 ->max(255)
-                ->required()
+                ->required($canChangeAnotherUsers)
                 ->title('Имя')
-                ->placeholder('Имя Фамилия')
-                ->disabled(!Auth::user()->hasAccess('platform.renter.users')),
+                ->readonly(!$canChangeAnotherUsers)
+                ->placeholder('Имя Фамилия'),
             Input::make('user.email')
                 ->type('email')
-//                ->required()
+                ->required($canChangeAnotherUsers)
                 ->title(__('Email'))
-//                ->disabled(!Auth::user()->hasAccess('platform.renter.users'))
-                ->placeholder(__('Email'))                ,
+                ->readonly(!$canChangeAnotherUsers)
+                ->placeholder(__('Email')),
             Input::make('user.phone')
                 ->type('text')
                 ->mask('+7 (999) 999-99-99')
                 ->title(__('Телефон')),
             Select::make('user.drx_account_id')
                 ->fromModel(DrxAccount::class, 'name')
-                ->empty()
                 ->title('Арендатор')
-                ->required()
-                ->canSee(Auth::user()->hasAccess('platform.portal.renters'))
+                ->disabled(true)
         ];
     }
 }

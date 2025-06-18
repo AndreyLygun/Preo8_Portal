@@ -6,7 +6,12 @@ use App\DRX\DRXClient;
 use App\DRX\NewDRXClient;
 use App\Models\DrxAccount;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Orchid\Screen\Actions\Link;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Screen;
@@ -18,7 +23,9 @@ use App\Orchid\Layouts\User\UserListLayout;
 class DRXAccountScreen extends Screen
 {
 
-    public $renter;
+
+
+    public ?DrxAccount $renter = null;
     public $users;
 
     public function query(?DrxAccount $drxAccount = null): iterable
@@ -39,10 +46,16 @@ class DRXAccountScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        $buttons = [];
-        $buttons[] = Button::make("Проверить пароль")
-            ->method("TestConnection")->class('btn btn-primary');
-        $buttons[] = Button::make("Сохранить")->method("Save")->class('btn btn-primary');
+        $buttons = [
+//            Button::make("Проверить пароль")->method("TestConnection")
+//                ->canSee($this->renter->exists)
+//                ->class('btn btn-primary'),
+            Link::make('Добавить сотрудника')->class('btn btn-primary')
+                ->canSee($this->renter->exists)
+                ->route('platform.systems.users.create', ['renter'=>$this->renter->id]),
+            Button::make("Сохранить")->method("Save")->class('btn btn-primary'),
+
+        ];
         return $buttons;
     }
 
@@ -54,30 +67,25 @@ class DRXAccountScreen extends Screen
      */
     public function layout(): iterable
     {
-        $loginHint = $this->renter->exists ?
-            'Логин должен совпадать с логином в Directum RX (ссылка "Логин" на странице арендатора в разделе "Сервисные заявки/Арендаторы")' :
-            'Удобно использовать в качестве логина интернет-домен заказчика. Например, если сайт компании - www.preo8.ru, логином может быть preo8';
-        $passwordHint = $this->renter->exists ?
-            'Пароль должен совпадать с паролем в Directum RX (ссылка "Логин" на странице арендатора в разделе "Сервисные заявки/Арендаторы")' :
-            'Вы можете использовать этот случайный пароль или создать свой.';
 
         return [
             Layout::rows([
                 Input::make("renter.Name")
                     ->title("Название компании")->horizontal()
-                    ->placeholder('ООО "Ромашка"')
+                    ->required(),
+                Input::make("renter.INN")
+                    ->title("ИНН компании")->horizontal()
                     ->required(),
                 Input::make("renter.DRX_Login")
                     ->title("Логин в Directum")->horizontal()
-                    ->placeholder('romashka')
-                    ->help($loginHint)
+                    ->help('Логин должен совпадать с логином Арендатора в Directum RX')
+                    ->canSee($this->renter->exists && Auth::user()->hasAccess('platform.systems.roles'))
                     ->required(),
                 Input::make("renter.DRX_Password")
                     ->title("Пароль в Directum")->horizontal()
-                    ->type('password')
-                    ->help($passwordHint)
-                    ->required()
-                    ->value(bin2hex(random_bytes(10))),
+                    //->type('password')
+                    ->help('Пароль должен совпадать с паролем арендатора в Directum RX ')
+                    ->canSee($this->renter->exists && Auth::user()->hasAccess('platform.systems.roles'))
             ]),
             UserListLayout::class
         ];
@@ -90,21 +98,57 @@ class DRXAccountScreen extends Screen
 
     public function Save(Request $request)
     {
-        $client = new NewDRXClient('');
-        if (!$this->renter->exists) {
-            $validated = $request->validate([
-                'renter.Name' => ['required', 'unique:drx_accounts,Name'],
-                'renter.DRX_Login' => ['required', 'unique:drx_accounts,DRX_Login'],
-                'renter.DRX_Password' => ['required'],
+        $validated = Validator::make($request->input('renter'), [
+            'Name' => ['required', Rule::unique('drx_accounts')->ignore($this->renter->id)],
+            'INN' => ['required', 'integer', Rule::unique('drx_accounts')->ignore($this->renter->id),],
+        ])->validated();
+        $this->renter->fill($validated);
+        if ($this->renter->exists) {
+            $this->renter->fill($validated);
+            $this->UpdateRenterInDRX($this->renter->DRX_Login, $this->renter);
+        } else {
+            $RenterInDRX =  $this->CreateRenterInDrx($validated);
+            $this->renter->fill([
+                'Name' => $RenterInDRX['Name'],
+                'DRX_Login' => $RenterInDRX['DRX_Login'],
+                'DRX_Password' => $RenterInDRX['DRX_Password']
             ]);
-            dd($validated);
-            $client->callAPIfunction('CreateLogin', [
-                'loginName' => $validated['renter.DRX_Login'],
-                'password' => $validated['renter.DRX_Password']
-            ]);
-        }
-        $this->entity->fill(request('renter'))->save();
+        };
+        $this->renter->save();
+        Toast::info('Арендатор сохранён');
+        return redirect()->route('drx.renter', $this->renter->id);
     }
+
+    private function CreateRenterInDRX($validated): array {
+        $client = new DRXClient();
+        $numberOfDay = today()->diffInDays(Carbon::parse('2001-01-01')); //Количество дней с начала века
+        $LoginName = 'preo8_' . $validated['INN'] . '_' .$numberOfDay; //Уникальный логин на основании названия системы, ИНН и количества дней
+        $Password = bin2hex(random_bytes(10));              //Случайный пароль
+        // с помоощью интеграционной функции создаём учётку арендатора в DRX .
+        $client->callAPIfunction('Company/CreateLogin', [
+            'loginName' => $LoginName,
+            'password' => $Password
+        ]);
+        // Потом ищем созданный логин, ибо функция создания логина ничего не возаращает.
+        $Login = $client->from('ILogins')->where(array(["LoginName", '=', $LoginName]))->get()[0];
+        $renter = [
+            'Name' => $validated['Name'],
+            'Login' => ['Id' => $Login['Id']]
+        ];
+        $RenterInDRX = $client->saveEntity('IServiceRequestsRenters', $renter, 'Login');
+        $RenterInDRX['DRX_Login'] = $LoginName;
+        $RenterInDRX['DRX_Password'] = $Password;
+        return $RenterInDRX;
+    }
+
+    private function UpdateRenterInDRX($RenterLoginName, $data){
+        $client = new DRXClient();
+        // Ищем в DRX арендатора с указанным именем учётки
+        $RenterInDRX = ($client->from('IServiceRequestsRenters')->where('Login/LoginName', $RenterLoginName)->take(1)->get())[0];
+        $RenterInDRX['Name'] = $data['Name'];
+        $client->saveEntity('IServiceRequestsRenters', $RenterInDRX);
+    }
+
 
     public function TestConnection()
     {
