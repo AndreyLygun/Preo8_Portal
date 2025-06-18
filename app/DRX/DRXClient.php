@@ -58,7 +58,7 @@ class DRXClient extends ODataClient
         parent::__construct($url,
             function ($request) use ($login, $password) {
                 $request->headers['Authorization'] = 'Basic ' . base64_encode($login . ':' . $password);
-                $request->headers['Return'] = 'representation';
+//                $request->headers['Return'] = 'representation';
             },
             $httpProvider
         );
@@ -84,6 +84,7 @@ class DRXClient extends ODataClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
+
         $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
         unset($Entity['Id'], $Entity['Renter']);
         foreach ($Entity as $key => $field) {
@@ -103,8 +104,10 @@ class DRXClient extends ODataClient
         }
         if ($Id) {            // Обновляем запись
             $response = ($this->from($EntityType)->expand($ExpandFields)->whereKey($Id)->patch($Entity));
+            $Entity = $response[0];
         } else {        // Создаём запись
             $Entity = ($this->from($EntityType)->expand($ExpandFields)->post($Entity))[0];
+
         }
         return $Entity;
     }

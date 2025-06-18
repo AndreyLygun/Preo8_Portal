@@ -169,11 +169,13 @@ class BaseSRQScreen extends Screen
     public function SaveToDRX($submitToApproval = false, $entity = null)
     {
         $this->entity = $entity ?? \request()->get('entity');
+
         $this->beforeSave();
         $this->entity['Creator'] = Auth()->user()->name;
         $this->entity['CreatorMail'] = Auth()->user()->email;
 
         $odata = new DRXClient();
+
         $entity = $odata->saveEntity(static::$EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // отдельно сохраняем бинарные данные
         foreach ($this->BinaryFields() as $binaryField) {
