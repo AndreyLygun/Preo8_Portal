@@ -58,7 +58,7 @@ class AssetsPermanentScreen extends SecuritySRQScreen
                 ->readonly($this->readOnly)])
             ->title('Описание ТМЦ');
         $layout[] = Layout::rows([
-            Input::make('Carrier')
+            Input::make('entity.Carrier')
                 ->title('Поставщик/перевозчик')->horizontal()
                 ->readonly($this->readOnly),
             ExtendedMatrix::make('entity.Cars')
