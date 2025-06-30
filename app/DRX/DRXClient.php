@@ -84,7 +84,6 @@ class DRXClient extends ODataClient
 
     public function saveEntity($EntityType, $Entity, $ExpandFields = [], $CollectionFields = [])
     {
-
         $Id = isset($Entity['Id']) ? (int)$Entity['Id'] : null;
         unset($Entity['Id'], $Entity['Renter']);
         foreach ($Entity as $key => $field) {

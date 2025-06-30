@@ -30,10 +30,8 @@ class AssetsPermanentScreen extends SecuritySRQScreen
     public function beforeSave()
     {
         parent::beforeSave();
-        $this->entity['Assets'] ??= '';
+        $this->entity['Assets'] ??= [];
         $this->entity['Cars'] ??= [];
-//        if ($this->entity['Assets'] == null) $this->entity['Assets'] = '';
-//        if (!isset($this->entity['Cars'])) $this->entity['Cars'] = [];
         $this->NormalizeDate(['ValidFrom', 'ValidTill']);
     }
 
@@ -55,8 +53,8 @@ class AssetsPermanentScreen extends SecuritySRQScreen
         $layout[] = Layout::rows([
             ExtendedMatrix::make('entity.Assets')
                 ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity', 'Примечание' => 'Note'])
-                ->readonly($this->readOnly)])
-            ->title('Описание ТМЦ');
+                ->readonly($this->readOnly)
+            ])->title('Описание ТМЦ');
         $layout[] = Layout::rows([
             Input::make('entity.Carrier')
                 ->title('Поставщик/перевозчик')->horizontal()

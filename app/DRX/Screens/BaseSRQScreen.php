@@ -98,9 +98,9 @@ class BaseSRQScreen extends Screen
             "Renter" => ['Name' => Auth()->user()->DrxAccount->Name],
             "Creator" => Auth()->user()->name,
             "RequestState" => "Draft",
-            'ValidFrom' => Carbon::today()->addDay(),
-            'ValidTill' => Carbon::today()->addDay(),
-            'ValidOn' => Carbon::today()->addDay(),
+//            'ValidFrom' => Carbon::today()->addDay(),
+//            'ValidTill' => Carbon::today()->addDay(),
+//            'ValidOn' => Carbon::today()->addDay(),
         ];
         return array_merge($original ?? [], $newEntity, $this->entity ?? []);
     }
@@ -122,7 +122,7 @@ class BaseSRQScreen extends Screen
             }
         } catch (GuzzleException $ex) {
             Alert::error("При подключении к серверу произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
-        }
+        };
         return [
             'entity' => $entity,
             'readOnly' => !in_array($entity['RequestState'], ['Draft', 'Denied']),
@@ -175,7 +175,6 @@ class BaseSRQScreen extends Screen
         $this->entity['CreatorMail'] = Auth()->user()->email;
 
         $odata = new DRXClient();
-
         $entity = $odata->saveEntity(static::$EntityType, $this->entity, $this->ExpandFields(), $this->CollectionFields());
         // отдельно сохраняем бинарные данные
         foreach ($this->BinaryFields() as $binaryField) {
