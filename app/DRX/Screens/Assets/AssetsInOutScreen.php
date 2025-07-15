@@ -146,6 +146,11 @@ class AssetsInOutScreen extends SecuritySRQScreen
                 ->title('Грузчики (по одному человеку на строку)')->horizontal()->rows(3)
                 ->help("Если во время создания заявки имена грузчиков неизвестны, их можно указать позже - до въезда"),
         ])->title('Сведения о перевозчике');
+
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
+
         return $layout;
     }
 

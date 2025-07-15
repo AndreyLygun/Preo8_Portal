@@ -59,6 +59,9 @@ class Databooks
         return collect([
             'MovingIn' => 'Ввоз',
             'MovingOut' => 'Вывоз',
+            'CarryingIn' => 'Внос (через турникеты)',
+            'CarryingOut' => 'Вынос (через турникеты)',
+            'GarbageOut' => 'Вывоз мусора'
         ]);
     }
 

@@ -7,6 +7,7 @@ use App\DRX\Helpers\Databooks;
 use Carbon\Carbon;
 use Orchid\Screen\Fields\DateTimer;
 use Orchid\Screen\Fields\Select;
+use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use App\DRX\Screens\SecuritySRQScreen;
@@ -56,6 +57,11 @@ class AdditionalPermissionScreen extends SecuritySRQScreen
                 ->options(Databooks::GetSites('Pass'))->multiple()
                 ->readonly($this->readOnly)->required(false),
         ])->title('Описание дополнительного доступа');
+
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
+
         return $layout;
     }
 }

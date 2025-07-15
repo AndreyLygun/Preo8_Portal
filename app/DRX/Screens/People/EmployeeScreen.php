@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Exceptions\LaravelExcelException;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\ModalToggle;
+use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
@@ -64,6 +65,10 @@ class EmployeeScreen extends SecuritySRQScreen
 //                ->canSee(!$readonly),
         ])->title('Сведения о сотрудниках');
         $layout[] = ImportExcel::MakeModalExcel('Выберите файл Excel', '/assets/employees.xlsx');
+
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
 
         return $layout;
     }

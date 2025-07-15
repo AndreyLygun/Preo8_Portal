@@ -60,6 +60,11 @@ class VisitorsScreen extends SecuritySRQScreen
                 TextArea::make("entity.Visitors")->columns(['ФИО' => 'Name'])->readonly($readonly)
                     ->title("Посетители")->horizontal()->rows(20)
             ]);
+
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
+
         return $layout;
     }
 }

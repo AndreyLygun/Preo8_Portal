@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Fields\Select;
+use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
 use Orchid\Screen\Fields\Input;
 use Orchid\Support\Color;
@@ -106,6 +107,10 @@ class AssetsInternalScreen extends SecuritySRQScreen
                 ->columns(['Описание' => 'Name', 'Габариты' => 'Size', 'Количество' => 'Quantity'])
                 ->readonly($readonly)
         ])->title("Описание ТМЦ");
+
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
 
         return $layout;
     }

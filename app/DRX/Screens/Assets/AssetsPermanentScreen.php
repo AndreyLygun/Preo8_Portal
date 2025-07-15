@@ -68,7 +68,11 @@ class AssetsPermanentScreen extends SecuritySRQScreen
                 ->readonly($this->readOnly)
                 ->rows(5)
         ])->title('Сведения о перевозчике');
-        $layout[] = Layout::rows([TextArea::make('entity.Note')->title("Примечание")->rows(10)]);
+
+        $layout[] = Layout::rows([TextArea::make('entity.Note')
+            ->title("Примечание")->rows(10)->horizontal()
+            ->disabled($this->readOnly)]);
+
         $layout[] = Layout::rows([
                 TextArea::make('')->rows(5)->readonly(true)
                     ->placeholder('При перещении ТМЦ обязуемся убирать за собой упаковочную тару, не загромождать проходы в зонах общего пользования. Сохранность оборудования, интерьера Здания по маршруту движения гарантируем. В случае порчи или нанесения повреждений обязуемся возместить ущерб.')
