@@ -9,12 +9,11 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Exceptions\LaravelExcelException;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Actions\ModalToggle;
-use Orchid\Screen\Fields\Input;
 use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
-use function App\DRX\Helpers\Import;
 use App\DRX\Screens\SecuritySRQScreen;
+use Orchid\Screen\Fields\Label;
 
 
 class EmployeeScreen extends SecuritySRQScreen
@@ -47,8 +46,7 @@ class EmployeeScreen extends SecuritySRQScreen
         $readonly = $this->entity['RequestState'] != 'Draft';
         $modalToggeButton = ModalToggle::make('Заполнить из Excel')
             ->modal('Excel')
-            ->method('FillFromExcell')
-            ->icon('bs.table');
+            ->method('FillFromExcell');
         $clearButton = Button::make('Очистить')
             ->icon('full-screen')
             ->method('Clear');
@@ -58,11 +56,12 @@ class EmployeeScreen extends SecuritySRQScreen
                 ->readOnly($readonly)
                 ->addButton($clearButton)
                 ->addButton($modalToggeButton),
-            Input::make('EmployeePhoto')->type('file')
-                ->title('Файл с фотографиями сотрудников: ' . ($this->entity['EmployeePhotoFileName']??'-'))
-                ->help('Прикрепите файл в формате JPEG (для одной фотографии) или ZIP-архив с фотографиями.')
-                ->accept('.zip, .jpg, .jpeg')
-                ->canSee(!$readonly),
+            Label::make('')->value('Файл с фотографиями сотрудников отправьте на почту reception.a@preo8.ru с указанием номера заявки')
+//            Input::make('EmployeePhoto')->type('file')
+//                ->title('Файл с фотографиями сотрудников: ' . ($this->entity['EmployeePhotoFileName']??'-'))
+//                ->help('Прикрепите файл в формате JPEG (для одной фотографии) или ZIP-архив с фотографиями.')
+//                ->accept('.zip, .jpg, .jpeg')
+//                ->canSee(!$readonly),
         ])->title('Сведения о сотрудниках');
         $layout[] = ImportExcel::MakeModalExcel('Выберите файл Excel', '/assets/employees.xlsx');
 
