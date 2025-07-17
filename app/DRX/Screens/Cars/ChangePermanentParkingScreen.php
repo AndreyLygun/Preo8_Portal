@@ -17,7 +17,7 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
 {
 
     public static $EntityType = "IServiceRequestsChangePermanentParkings";
-    public static $Title = "Внесение изменений на парковочное место";
+    public static $Title = "Изменение на парковочном месте";
     protected static $ExpandFields = ['Cars'];
     protected static $CollectionFields = ['Cars'];
 

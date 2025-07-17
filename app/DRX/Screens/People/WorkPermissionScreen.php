@@ -23,7 +23,7 @@ class WorkPermissionScreen extends SecuritySRQScreen
 
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     public static $EntityType = "IServiceRequestsWorkPermissions";
-    public static $Title = "Проведение работ";
+    public static $Title = "Выполнение работ в БЦ";
 
     public function beforeSave()
     {

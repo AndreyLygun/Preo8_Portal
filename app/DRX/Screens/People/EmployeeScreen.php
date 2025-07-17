@@ -21,7 +21,7 @@ class EmployeeScreen extends SecuritySRQScreen
 {
     // Тип документа в сервисе интеграции, например IOfficialDocuments
     public static $EntityType = "IServiceRequestsPermanentPass4Employees";
-    public static $Title = "Пропуск для сотрудника";
+    public static $Title = "Постоянный пропуск для сотрудника";
     protected static $ExpandFields = ['Employees'];
     protected static $CollectionFields = ['Employees'];
 

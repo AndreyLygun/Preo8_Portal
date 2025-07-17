@@ -22,7 +22,7 @@ class AssetsInternalScreen extends SecuritySRQScreen
 {
 
     public static $EntityType = 'IServiceRequestsPass4AssetsInternalMovings';
-    public static $Title = 'Внутреннее перемещение ТМЦ';
+    public static $Title = 'Разовое внутреннее перемещение ТМЦ';
     protected static $CollectionFields = ["Inventory", 'ElevatorTimeSpan'];            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
     protected static $ExpandFields = ['Inventory', 'ElevatorTimeSpan($expand=Name)'];  // Список полей-ссылок, которые нужно пересоздавать в DRX заново при каждом сохранении
 

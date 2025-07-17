@@ -3,6 +3,8 @@
 namespace App\DRX\Screens\Assets;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Route;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\TextArea;
 use Orchid\Support\Facades\Layout;
@@ -15,17 +17,25 @@ class AssetsPermanentScreen extends SecuritySRQScreen
 {
 
     public static $EntityType = 'IServiceRequestsPass4AssetsPermanentMovings';
-    public static $Title = 'Регулярный ввоз-вывоз ТМЦ';
+    public static $Title = 'Постоянный пропуск на ввоз-вывоз ТМЦ';
     protected static $CollectionFields = ['Cars', 'Assets'];            // Список полей-коллекций, которые нужно пересоздавать в DRX заново при каждом сохранении
     protected static $ExpandFields = ['Cars', 'Assets'];  // Список полей-ссылок, которые нужно пересоздавать в DRX заново при каждом сохранении
 
 
-        public function NewEntity()
-        {
-            $entity = parent::NewEntity();
-            $entity['ValidTill'] = Carbon::today()->endOfYear();
-            return $entity;
-        }
+    public function NewEntity()
+    {
+        $entity = parent::NewEntity();
+        $entity['ValidTill'] = Carbon::today()->endOfYear();
+        return $entity;
+    }
+
+    public function commandBar(): iterable
+    {
+        $buttons = parent::commandBar();
+        if (isset($this->entity["Id"]))
+            $buttons[] = Link::make('Копировать')->route(Route::currentRouteName(), ['fromId' => $this->entity['Id']]);
+        return $buttons;
+    }
 
     public function beforeSave()
     {
