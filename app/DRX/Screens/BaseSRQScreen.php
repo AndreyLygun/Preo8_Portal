@@ -181,7 +181,7 @@ class BaseSRQScreen extends Screen
             if (\request()->hasFile($binaryField)) {
                 $file = \request()->file($binaryField);
                 $encoded = base64_encode($file->getContent());
-                $odata->from(self::$EntityType."({$entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
+                $odata->from(static::$EntityType."({$entity["Id"]})/$binaryField")->patch(['Value' => $encoded]);
             }
         }
         if ($submitToApproval) {
@@ -197,6 +197,7 @@ class BaseSRQScreen extends Screen
             Toast::info("Успешно сохранено");
             return redirect(route(Request::route()->getName()) . "/" . $this->entity['Id']);
         } catch (GuzzleException $ex) {
+            dd($ex);
             Alert::error("При сохранении заявки произошла ошибка: " . stripcslashes($ex->getResponse()->getBody()->getContents()));
         }
     }
