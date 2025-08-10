@@ -122,7 +122,7 @@ class EntitiesListScreen extends Screen
                 ExtendedTD::make("DocumentKind.Name", "Вид заявки")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["DocumentKind"]["Name"]}</a>")
                     ->cssClass(fn($item) => $item["RequestState"])
-                    ->filter(Select::make()->options($DocumentKindNames)->empty())
+                    ->filter(Select::make()->options($DocumentKindNames)->empty('')->empty('Выберите тип пропуска для отбора', ''))
                     ->sort(),
                 ExtendedTD::make("Creator", "Автор")
                     ->render(fn($item) => "<a href='/srq/{$item["@odata.type"]}/{$item["Id"]}'>{$item["Creator"]}</a>")

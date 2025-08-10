@@ -7,6 +7,7 @@ namespace App\DRX\Helpers;
 
 use App\Models\DrxAccount;
 use App\DRX\DRXClient;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class Databooks

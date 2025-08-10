@@ -7,56 +7,29 @@ namespace App\DRX\Layouts;
 use App\DRX\ExtendedMatrix;
 use App\DRX\Helpers\Databooks;
 use App\DRX\Helpers\ImportExcel;
-use App\Models\DrxAccount;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Orchid\Platform\Models\User;
 use Orchid\Screen\Actions\Button;
-use Orchid\Screen\Actions\DropDown;
-use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Actions\ModalToggle;
-use Orchid\Screen\Fields\DateTimer;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Label;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
-use Orchid\Screen\Layouts\Persona;
 use Orchid\Screen\Layouts\Rows;
 use Orchid\Screen\TD;
 use Orchid\Support\Facades\Layout;
 
-class AssetInOutMovingLayout extends Rows
+class AssetMovingInOutLayout extends Rows
 {
-    /**
-     * @var string
-     */
-    public $target = 'users';
-
-    /**
-     * @return TD[]
-     */
     public function fields(): array
     {
         {
-            $layout = parent::layout();
-            $readonly = $this->readOnly;
+            $readonly = false;
             $layout[] = Layout::rows([
-                Select::make('entity.MovingDirection')
-                    ->title('Направление перемещения')->horizontal()
-                    ->options(Databooks::GetMovingDirection())->empty('')
-                    ->required()->disabled($readonly),
-                DateTimer::make('entity.ValidOn')
-                    ->title("Дата перемещения")->horizontal()
-                    ->format('d-m-Y')->serverFormat('d-m-Y')
-                    ->min(Carbon::now()->hour < 14?Carbon::today():Carbon::tomorrow())
-                    ->help("Заявки &laquo;на сегодня&raquo; принимаются до 14:00. Время согласования заявки - 3 часа")
-                    ->disabled($readonly)->required(),
                 Select::make('entity.LoadingSite.Id')
                     ->title('Место разгрузки')->horizontal()
                     ->options(Databooks::GetSites('Loading'))->empty('')
                     ->required()->disabled($readonly),
                 Input::make('entity.Floor')
-                    ->title('Куда/откуда')
+                    ->title('Куда')
                     ->horizontal()
                     ->required()
                     ->help("Укажите блок, этаж, помещение")
@@ -66,13 +39,6 @@ class AssetInOutMovingLayout extends Rows
                     ->empty('')->required()
                     ->options(Databooks::GetYesNo())
                     ->disabled($this->readOnly),
-                Select::make('entity.ElevatorTimeSpan')
-                    ->title('Время использования лифта')->horizontal()
-                    ->options(Databooks::GetTimeSpans())
-                    ->empty('Выберите время использование лифта')
-                    ->help('Можно выбрать до трёх интервалов')
-                    ->multiple()->maximumSelectionLength(3)
-                    ->disabled($readonly),
                 Select::make("entity.StorageRoom")
                     ->title('Через комнату временного хранения')->horizontal()
                     ->empty('')->required()

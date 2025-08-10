@@ -18,7 +18,8 @@ class ExtendedMatrix extends Matrix
         return $this;
     }
 
-    public function addButton(Button $button) {
+    public function addButton(?Button $button) {
+        if ($button == null) return $this;
         $extraButtons = $this->get('extraButtons', []);
         $extraButtons[] = $button;
         $this->set('extraButtons', $extraButtons);
