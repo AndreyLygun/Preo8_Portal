@@ -6,6 +6,7 @@ use App\DRX\DRXClient;
 use App\DRX\ExtendedMatrix;
 use App\DRX\Helpers\Databooks;
 use Carbon\Carbon;
+use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Matrix;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Fields\TextArea;
@@ -31,7 +32,7 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
             $parkingInfo = $this->GetParkingInfo($parkingPlaceId);
             $entity['Cars'] = $parkingInfo['Cars'];
             array_walk($entity['Cars'], fn(&$item, $key) => $item['NeedPrintedPass']='No');
-            $entity['NeedNfc'] = $parkingInfo['NfcNumber']?'No':'Yes';
+            $entity['NeedNfc'] = $parkingInfo['NfcNumber']?'No':'NewPass';
             $entity['Visitors'] = $parkingInfo['Drivers'];
             $entity['ParkingPlace']['Id'] = $parkingPlaceId;
         }
@@ -53,26 +54,26 @@ class ChangePermanentParkingScreen extends SecuritySRQScreen
     // Описывает макет экрана
     public function layout(): iterable
     {
-        $actions = [
-            'noAction' => 'Не менять',
-            'remove' => 'Исключить',
-            'add' => 'Добавить и изготовить ламинат',
-            'makeLaminate' => 'Перевыпустить ламинат'
+        $Actions = [
+            'NewPass' => 'Оформить впервые',
+            'No' => 'Нет',
+            'ReissuePass' => 'Перевыпустить',
         ];
+//        dd($this->entity);
         $layout = parent::layout();
         $layout[] = Layout::rows([
             Select::make('entity.ParkingPlace.Id')
                 ->title('Парковочное место')->horizontal()
                 ->disabled($this->readOnly)->required()
                 ->options(Databooks::GetParkingPlaces()),
-            Select::make('entity.NeedNfc')
+            Select::make('entity.NeedNFC')
                 ->title('Изготовить электронный пропуск')->horizontal()
                 ->disabled($this->readOnly)->required()
-                ->options(Databooks::GetYesNo()),
+                ->options($Actions),
             ExtendedMatrix::make('entity.Cars')->readonly($this->readOnly)
                 ->title('Добавьте или удалите автомобили, на которые оформлена постоянная парковка')->horizontal()
                 ->columns(['Модель'=>'Model', 'Номер'=>'Number', 'Изготовить ламинат' => 'NeedPrintedPass'])
-                ->fields(['NeedPrintedPass' => Select::make('NeedPrintedPass')->options(Databooks::GetYesNo())->disabled($this->readOnly)])
+                ->fields(['NeedPrintedPass' => Select::make('NeedPrintedPass')->options($Actions)->disabled($this->readOnly)])
                 ->required(),
             TextArea::make('entity.Visitors')
                 ->title('Водители')->horizontal()
