@@ -22,7 +22,7 @@ class SiteSettingsScreen extends Screen
         $result['PassSites'] = Databooks::GetSites('Pass');
         $result['LoadingSites'] = Databooks::GetSites('Loading');
         $result['SectionSites'] = Databooks::GetSites('RenterSite');
-        $result['ParkingSites'] = Databooks::GetSites('ParkingSite');
+//        $result['ParkingSites'] = Databooks::GetSites('ParkingSite');
         $result['TimeSpans'] = Databooks::GetTimeSpans();
         return $result;
     }
@@ -45,7 +45,7 @@ class SiteSettingsScreen extends Screen
                 ExtendedMatrix::make("SectionSites")->readonly()->columns(['Этажи здания'=>'Value']),
                 ExtendedMatrix::make("PassSites")->readonly()->columns(['Места входа-выхода'=>'Value']),
                 ExtendedMatrix::make("LoadingSites")->readonly()->columns(['Места загрузки-разгрузки'=>'Value']),
-                ExtendedMatrix::make("ParkingSites")->readonly()->columns(['Уровни парковки'=>'Value']),
+//                ExtendedMatrix::make("ParkingSites")->readonly()->columns(['Уровни парковки'=>'Value']),
             ])->title("Места в бизнес-центре"),
             Layout::rows([
                 Label::make('')->title('Список интервалов можно изменить в Directum RX. После изменения зайдите на эту страницу снова.'),

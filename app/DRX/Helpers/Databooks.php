@@ -17,7 +17,7 @@ class Databooks
     {
         $odata = $odata ?? (new DRXClient());
         $Sites = Cache::rememberForever('Sites', function () use ($odata) {
-            return $odata->from('IServiceRequestsSites')->get();
+            return $odata->from('IServiceRequestsSites')->where('Status', 'Active')->get();
         });
         if ($type) return collect($Sites)->where('Type', $type)->mapWithKeys(fn($v) => [$v['Id'] => $v['Name']]);
         return collect($Sites)->mapWithKeys(fn($v) => [$v['Id'] => $v['Name']]);
@@ -29,23 +29,23 @@ class Databooks
         return DrxAccount::find(auth()->user()->drx_account_id)->DRX_Login;
     }
 
-    public static function GetParkingPlaces($odata = null)
-    {
-        $odata = $odata ?? (new DRXClient());
-        $places = $odata->from('IServiceRequestsParkingPlaces')
-            ->select('Id, Name')
-            ->where('Renter/Login/LoginName', self::GetRenterLogin())
-            ->order('Index')
-            ->get();
-        return collect($places)->mapWithKeys(fn($v) => [$v['Id'] => $v['Name']]);
-    }
+//    public static function GetParkingPlaces($odata = null)
+//    {
+//        $odata = $odata ?? (new DRXClient());
+//        $places = $odata->from('IServiceRequestsParkingPlaces')
+//            ->select('Id, Name')
+//            ->where('Renter/Login/LoginName', self::GetRenterLogin())
+//            ->order('Index')
+//            ->get();
+//        return collect($places)->mapWithKeys(fn($v) => [$v['Id'] => $v['Name']]);
+//    }
 
     // Список периодов времени
     public static function GetTimeSpans($odata = null)
     {
         $odata = $odata ?? (new DRXClient());
         $TimeSpans = Cache::rememberForever('TimeSpans', function () use ($odata) {
-            return $odata->from('IServiceRequestsTimeSpans')->get();
+            return $odata->from('IServiceRequestsTimeSpans')->where('Status', 'Active')->get();
         });
         return collect($TimeSpans)->mapWithKeys(fn($v) => [$v['Id'] => $v['Name']]);
     }
