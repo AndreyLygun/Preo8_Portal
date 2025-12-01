@@ -58,7 +58,7 @@ class AssetsPermanentScreen extends SecuritySRQScreen
                 ->title("Действует до")->horizontal()
                 ->disabled($this->readOnly)
                 ->enableTime(false)->format('d-m-Y')->serverFormat('d-m-Y')
-                ->min(Carbon::today())->max(Carbon::today()->endOfYear())
+                ->min(Carbon::today())->max(Carbon::today()->addMonths(2)->endOfYear())
         ]);
         $layout[] = Layout::rows([
             ExtendedMatrix::make('entity.Assets')
